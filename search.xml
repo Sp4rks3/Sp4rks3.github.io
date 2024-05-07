@@ -1,6 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Brup插件开发-基础篇</title>
+    <url>/2024/05/07/Burp%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/Burp%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91-%E5%9F%BA%E7%A1%80%E7%AF%87/</url>
+    <content><![CDATA[<h1 id="目前采用JAVA21，新版API"><a href="#目前采用JAVA21，新版API" class="headerlink" title="目前采用JAVA21，新版API"></a>目前采用JAVA21，新版API</h1><hr>
+<h2 id="调试软件："><a href="#调试软件：" class="headerlink" title="调试软件："></a>调试软件：</h2><p><img src="https://raw.githubusercontent.com/Sp4rks3/HexoPicgoJpg/main/image-20240504200306884.png" alt="image-20240504200306884"></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">java  -agentlib:jdwp=transport=dt_socket,server=y,<span class="built_in">suspend</span>=n,address=5005 --add-opens=java.desktop/javax.swing=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED --add-opens=java.base/jdk.internal.org.objectweb.asm.tree=ALL-UNNAMED --add-opens=java.base/jdk.internal.org.objectweb.asm.Opcodes=ALL-UNNAMED  -javaagent:.\BurpLoaderKeygen.jar -noverify -jar .\burpsuite_pro.jar</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<hr>
+<h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><p><a href="">https://ovi3.github.io/2024/01/18/burpsuite-java-extension-code-env/</a></p>
+]]></content>
+      <categories>
+        <category>JAVA</category>
+      </categories>
+      <tags>
+        <tag>Burp插件开发</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>创建型-工厂模式</title>
     <url>/2024/05/03/JAVA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>​	为了写出更“优雅”的代码，遂准备来学习JAVA的设计模式。</p>
@@ -34,30 +55,55 @@
       </tags>
   </entry>
   <entry>
+    <title></title>
+    <url>/2024/05/07/%E5%86%85%E7%BD%91%E5%AE%89%E5%85%A8/%E5%86%85%E7%BD%91%E5%AE%89%E5%85%A8/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>内网</category>
+      </categories>
+      <tags>
+        <tag>内网安全</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>创建型-抽象工厂模式</title>
     <url>/2024/05/07/JAVA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>​	工厂模式关注于创建单个对象，通过一个工厂类来实现。但是假如遇到需要创建一系列相关或相互依赖的对象的时候，就有些乏力了，而抽象工厂模式能很好的解决这个问题。</p>
-<h2 id="抽象工厂模式"><a href="#抽象工厂模式" class="headerlink" title="抽象工厂模式"></a>抽象工厂模式</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public abstract class Fruit &#123; //水果抽象类</span><br><span class="line">    protected final String name;</span><br><span class="line"></span><br><span class="line">    protected Fruit(String name) &#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        return name +&quot;@&quot;+hashCode();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="抽象工厂模式"><a href="#抽象工厂模式" class="headerlink" title="抽象工厂模式"></a>抽象工厂模式</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">Fruit</span> &#123; <span class="comment">//水果抽象类</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">final</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> <span class="title function_">Fruit</span><span class="params">(String name)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">toString</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> name +<span class="string">&quot;@&quot;</span>+hashCode();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public class Apple extends Fruit &#123; //水果实现类</span><br><span class="line"></span><br><span class="line">   public Apple() &#123;</span><br><span class="line">       super(&quot;苹果&quot;);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Apple</span> <span class="keyword">extends</span> <span class="title class_">Fruit</span> &#123; <span class="comment">//水果实现类</span></span><br><span class="line"></span><br><span class="line">   <span class="keyword">public</span> <span class="title function_">Apple</span><span class="params">()</span> &#123;</span><br><span class="line">       <span class="built_in">super</span>(<span class="string">&quot;苹果&quot;</span>);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public class Orange extends Fruit &#123; //水果实现类</span><br><span class="line"></span><br><span class="line">    public Orange() &#123;</span><br><span class="line">        super(&quot;橘子&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Orange</span> <span class="keyword">extends</span> <span class="title class_">Fruit</span> &#123; <span class="comment">//水果实现类</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Orange</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>(<span class="string">&quot;橘子&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public abstract class AbstractFruitFactory &#123;  //抽象水果工厂</span><br><span class="line">    public abstract Fruit getApple();</span><br><span class="line">    public abstract Fruit getOrange();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">AbstractFruitFactory</span> &#123;  <span class="comment">//抽象水果工厂</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">abstract</span> Fruit <span class="title function_">getApple</span><span class="params">()</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">abstract</span> Fruit <span class="title function_">getOrange</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public class AppleFactory extends AbstractFruitFactory &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public Fruit createApple() &#123;</span><br><span class="line">        return new Apple();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Fruit createOrange() &#123;</span><br><span class="line">        return null; // 在苹果工厂中不创建橘子</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class OrangeFactory extends AbstractFruitFactory &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public Fruit createApple() &#123;</span><br><span class="line">        return null; // 在橘子工厂中不创建苹果</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Fruit createOrange() &#123;</span><br><span class="line">        return new Orange();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">AppleFactory</span> <span class="keyword">extends</span> <span class="title class_">AbstractFruitFactory</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Fruit <span class="title function_">createApple</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Apple</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Fruit <span class="title function_">createOrange</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>; <span class="comment">// 在苹果工厂中不创建橘子</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrangeFactory</span> <span class="keyword">extends</span> <span class="title class_">AbstractFruitFactory</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Fruit <span class="title function_">createApple</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>; <span class="comment">// 在橘子工厂中不创建苹果</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Fruit <span class="title function_">createOrange</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Orange</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        AbstractFruitFactory appleFactory = new AppleFactory();</span><br><span class="line">        Fruit apple = appleFactory.createApple();</span><br><span class="line">        System.out.println(apple);</span><br><span class="line"></span><br><span class="line">        AbstractFruitFactory orangeFactory = new OrangeFactory();</span><br><span class="line">        Fruit orange = orangeFactory.createOrange();</span><br><span class="line">        System.out.println(orange);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">AbstractFruitFactory</span> <span class="variable">appleFactory</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">AppleFactory</span>();</span><br><span class="line">        <span class="type">Fruit</span> <span class="variable">apple</span> <span class="operator">=</span> appleFactory.createApple();</span><br><span class="line">        System.out.println(apple);</span><br><span class="line"></span><br><span class="line">        <span class="type">AbstractFruitFactory</span> <span class="variable">orangeFactory</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">OrangeFactory</span>();</span><br><span class="line">        <span class="type">Fruit</span> <span class="variable">orange</span> <span class="operator">=</span> orangeFactory.createOrange();</span><br><span class="line">        System.out.println(orange);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<h2 id="工厂模式和抽象工厂模式的区别"><a href="#工厂模式和抽象工厂模式的区别" class="headerlink" title="工厂模式和抽象工厂模式的区别"></a>工厂模式和抽象工厂模式的区别</h2><p>​	工厂模式关注于创建单个对象，通常是通过一个工厂类来实现。</p>
-<p>​	工厂模式适用于创建单个对象的场景，抽象工厂模式适用于需要创建一系列相关对象的场景。</p>
-<p>​	抽象工厂模式则更加封闭，因为它需要一次性定义所有产品族的创建方法。</p>
+<h2 id="工厂模式和抽象工厂模式的区别"><a href="#工厂模式和抽象工厂模式的区别" class="headerlink" title="工厂模式和抽象工厂模式的区别"></a>工厂模式和抽象工厂模式的区别</h2><p>​	<strong>工厂模式关注于创建单个对象，通常是通过一个工厂类来实现。</strong></p>
+<p>​	<strong>工厂模式适用于创建单个对象的场景，抽象工厂模式适用于需要创建一系列相关对象的场景。</strong></p>
+<p>​	<strong>抽象工厂模式则更加封闭，因为它需要一次性定义所有产品族的创建方法。</strong></p>
 ]]></content>
       <categories>
         <category>JAVA</category>
       </categories>
       <tags>
         <tag>JAVA设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>URLDNS链</title>
+    <url>/2024/05/07/JAVA/URLDNS%E9%93%BE/</url>
+    <content><![CDATA[<h2 id="Java反序列化"><a href="#Java反序列化" class="headerlink" title="Java反序列化"></a>Java反序列化</h2><p>Java提供了一种对象序列化的机制，用一个字节序列表示一个对象，该字节包含对象的数据、对象的类型、对象的存储属性。字节序列写出到文件后，相当于可以持久报错了一个对象信息，这过程叫做序列化。序列化对象会通过<code>ObjectOutputStream</code>的<code>writeObject</code>方法将一个对象写入到文件中。</p>
+<p>而反序列化是使用了<code>readObject</code> 方法进行读取并还原成在序列化前的一个类。</p>
+<p>这一步骤并没有什么安全问题，但是如果反序列化的数据是可控的情况下，那么我们就可以从某个输入点，输入恶意代码，再去查找在哪个点，我们的输入会被一层一层的带去到我们的触发点去，而这一步叫做寻找利用链的步骤。</p>
+]]></content>
+      <categories>
+        <category>JAVA</category>
+      </categories>
+      <tags>
+        <tag>JAVA安全</tag>
       </tags>
   </entry>
 </search>
