@@ -25,12 +25,12 @@
 <meta property="og:site_name" content="Sp4rks3&#39;s Blog">
 <meta property="og:description" content="前言之前博客都是通过GitHub实现图床的，但是国内访问图片的速度实在是不敢恭维；另外GitHub其实是不允许做图床的，当库超过1G以后会有人工审查，发现是图床可能会删库，甚至封帐号； 前期解决方案总体来看有几个解决方法 阿里云oss	腾讯云cos	七牛云	又拍云 七牛云有免费的额度，也可以使用不备案的域名，但是这样的话图片速度比Github还慢 又拍云需要网站备案，加入又拍云联盟才有免费额度，又">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628144516183.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628144701802.png">
 <meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628145013147.png">
 <meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628145259856.png">
 <meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628145524103.png">
 <meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628151002609.png">
-<meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628144516183.png">
-<meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628144701802.png">
 <meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628151346032.png">
 <meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628151514382.png">
 <meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628151750145.png">
@@ -38,11 +38,11 @@
 <meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628152607640.png">
 <meta property="og:image" content="https://image.sp4rks.xyz/2024/06/image-20240628153202851.png">
 <meta property="article:published_time" content="2024-07-08T11:51:17.317Z">
-<meta property="article:modified_time" content="2024-06-30T16:55:16.491Z">
+<meta property="article:modified_time" content="2024-07-08T12:03:40.434Z">
 <meta property="article:author" content="Sp4rks3">
 <meta property="article:tag" content="奇技淫巧">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://image.sp4rks.xyz/2024/06/image-20240628145013147.png">
+<meta name="twitter:image" content="https://image.sp4rks.xyz/2024/06/image-20240628144516183.png">
   
   
   
@@ -328,15 +328,6 @@
 <h2 id="使用Cloudflare-R2的前期准备"><a href="#使用Cloudflare-R2的前期准备" class="headerlink" title="使用Cloudflare R2的前期准备"></a>使用Cloudflare R2的前期准备</h2><p><a target="_blank" rel="noopener" href="https://github.com/Kuingsmile/PicList">PicList</a></p>
 <p><a target="_blank" rel="noopener" href="https://www.paypal.com/">paypal</a></p>
 <p>域名(可不备案)</p>
-<hr>
-<p>首先需要把你的域名添加到<strong>Cloudflare</strong></p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628145013147.png" srcset="/img/loading.gif" lazyload alt="image-20240628145013147"></p>
-<p>选择免费的计划就行，随后会分配两个dns服务器</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628145259856.png" srcset="/img/loading.gif" lazyload alt="image-20240628145259856"></p>
-<p>直接去域名的服务商那里改成这<strong>Cloudflare</strong>的DNS地址</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628145524103.png" srcset="/img/loading.gif" lazyload alt="image-20240628145524103"></p>
-<p>另外使用CF之后发现，网站加载速度很慢。把A记录和CNAME设置为仅DNS就行</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628151002609.png" srcset="/img/loading.gif" lazyload alt="image-20240628151002609"></p>
 <h2 id="第一个坑点"><a href="#第一个坑点" class="headerlink" title="第一个坑点"></a>第一个坑点</h2><p>其实之前很早就注册<strong>Cloudflare</strong>了，上去看了一下，有很多自己不是很了解的东西，就留在温柔乡了。。。继续使用cos桶；另一个问题是之前听过创建R2存储用paypal就行，但是我上去看必须要信用卡，遂放弃。</p>
 <p>偶然发现是梯子的问题</p>
 <p>个人习惯梯子开机自启，习惯谷歌，杜绝百度</p>
@@ -344,6 +335,14 @@
 <p><img src="https://image.sp4rks.xyz/2024/06/image-20240628144516183.png" srcset="/img/loading.gif" lazyload alt="image-20240628144516183"></p>
 <p>不开梯子就可以使用paypal付款了</p>
 <p><img src="https://image.sp4rks.xyz/2024/06/image-20240628144701802.png" srcset="/img/loading.gif" lazyload alt="image-20240628144701802"></p>
+<h2 id="网站托管到Cloudflare"><a href="#网站托管到Cloudflare" class="headerlink" title="网站托管到Cloudflare"></a>网站托管到Cloudflare</h2><p>首先需要把你的域名添加到<strong>Cloudflare</strong></p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628145013147.png" srcset="/img/loading.gif" lazyload alt="image-20240628145013147"></p>
+<p>选择免费的计划就行，随后会分配两个dns服务器</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628145259856.png" srcset="/img/loading.gif" lazyload alt="image-20240628145259856"></p>
+<p>直接去域名的服务商那里改成这<strong>Cloudflare</strong>的DNS地址</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628145524103.png" srcset="/img/loading.gif" lazyload alt="image-20240628145524103"></p>
+<p>另外使用CF之后发现，网站加载速度很慢。把A记录和CNAME设置为仅DNS就行</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628151002609.png" srcset="/img/loading.gif" lazyload alt="image-20240628151002609"></p>
 <h2 id="创建存储桶"><a href="#创建存储桶" class="headerlink" title="创建存储桶"></a>创建存储桶</h2><p>位置选择 亚太地区</p>
 <p><img src="https://image.sp4rks.xyz/2024/06/image-20240628151346032.png" srcset="/img/loading.gif" lazyload alt="image-20240628151346032"></p>
 <p>R2创建完之后，设置连接域名，输入刚刚添加的域名的三级域名，比如 a.com 写为image.a.com，<strong>Cloudflare</strong>会自动添加记录，用这个域名就可以访问R2存储的内容</p>
@@ -352,7 +351,7 @@
 <p><img src="https://image.sp4rks.xyz/2024/06/image-20240628151750145.png" srcset="/img/loading.gif" lazyload alt="image-20240628151750145"></p>
 <p>剩下的默认即可</p>
 <p><img src="https://image.sp4rks.xyz/2024/06/image-20240628151925647.png" srcset="/img/loading.gif" lazyload alt="image-20240628151925647"></p>
-<h2 id="PicList不能同步闪出云端图片的解决方案"><a href="#PicList不能同步闪出云端图片的解决方案" class="headerlink" title="PicList不能同步闪出云端图片的解决方案"></a>PicList不能同步闪出云端图片的解决方案</h2><p>严格按照如图所示位置填写</p>
+<h2 id="PicList不能同步删除云端图片的解决方案"><a href="#PicList不能同步删除云端图片的解决方案" class="headerlink" title="PicList不能同步删除云端图片的解决方案"></a>PicList不能同步删除云端图片的解决方案</h2><p>严格按照如图所示位置填写</p>
 <p><img src="https://image.sp4rks.xyz/2024/06/image-20240628152607640.png" srcset="/img/loading.gif" lazyload alt="image-20240628152607640"></p>
 <p>上传路径可以根据表自己组合填写</p>
 <table>
@@ -410,7 +409,7 @@
 <p>地区因为选择亚太地区所有填写 apac</p>
 <p><strong>自定义域名写刚刚的三级域名如:<a target="_blank" rel="noopener" href="http://image.a.com/">http://image.a.com</a></strong></p>
 <hr>
-<h3 id="踩坑原因"><a href="#踩坑原因" class="headerlink" title="踩坑原因"></a>踩坑原因</h3><p>之前设置<strong>PicList</strong>自定义节点使用了这个 S3 API，它其实和上图管辖地址只差一个存储桶的名字 </p>
+<h3 id="PicList不能同步删除云端图片的踩坑记录"><a href="#PicList不能同步删除云端图片的踩坑记录" class="headerlink" title="PicList不能同步删除云端图片的踩坑记录"></a>PicList不能同步删除云端图片的踩坑记录</h3><p>之前设置<strong>PicList</strong>自定义节点使用了这个 S3 API，它其实和上图管辖地址只差一个存储桶的名字 </p>
 <p><img src="https://image.sp4rks.xyz/2024/06/image-20240628153202851.png" srcset="/img/loading.gif" lazyload alt="image-20240628153202851"></p>
 <p>而且可以上传图片，但是图片在typora加载会失败</p>
 <p>随后将<strong>PicList</strong>自定义域名<a target="_blank" rel="noopener" href="http://image.a.com,改为http//image.a.com/blog1">http://image.a.com，改为http://image.a.com/blog1</a></p>
