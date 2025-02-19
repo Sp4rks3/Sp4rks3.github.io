@@ -232,6 +232,189 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2025/02/16/JAVA%E5%AE%89%E5%85%A8/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/JDBC%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" target="_self">
+          JDBC反序列化
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/16/JAVA%E5%AE%89%E5%85%A8/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/JDBC%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" target="_self">
+        <div>
+          前言connector&#x2F;J 5、6、8个版本触发反序列化的方式略有区别，文中所使用的JDBC驱动版本为8.0.12，为了验证漏洞还有CC的依赖 12345&lt;dependency&gt;    &lt;groupId&gt;mysql&lt;/groupId&gt;    &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-02-16 01:22" pubdate>
+              2025-02-16
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/JAVA/" class="category-chain-item">JAVA</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/JAVA%E5%AE%89%E5%85%A8/">#JAVA安全</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2025/02/11/JAVA%E5%AE%89%E5%85%A8/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/JNDI%E6%B3%A8%E5%85%A5/" target="_self">
+          JNDI注入
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/11/JAVA%E5%AE%89%E5%85%A8/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/JNDI%E6%B3%A8%E5%85%A5/" target="_self">
+        <div>
+          JNDI概述JNDI(Java Naming and Directory Interface，Java命名和目录接口)，为开发人员查找和访问各种资源提供了统一的通用接口，用于访问各种命名和目录服务。 JNDI 主要支持的服务协议 RMI（远程方法调用）： 允许 Java 程序通过 JNDI 查找并调用远程对象。 LDAP（轻量级目录访问协议）： 用于访问和查询存储在 LDAP 目录中的信息，如用户
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-02-11 18:45" pubdate>
+              2025-02-11
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/JAVA/" class="category-chain-item">JAVA</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/JAVA%E5%AE%89%E5%85%A8/">#JAVA安全</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2025/02/07/JAVA%E5%AE%89%E5%85%A8/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/%E4%BB%8ECTF%E5%AD%A6%E4%B9%A0JAVA%E5%AE%89%E5%85%A8/" target="_self">
+          从CTF学习JAVA安全
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/07/JAVA%E5%AE%89%E5%85%A8/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/%E4%BB%8ECTF%E5%AD%A6%E4%B9%A0JAVA%E5%AE%89%E5%85%A8/" target="_self">
+        <div>
+          2021东华杯 ezgadget题目地址一道关于Java反序列化的CTF题-东华杯ezgadget   qe53 题目分析WEB端有readobject路由，把输入的数据通过工具类解码，包装成ObjectInputStream类型，再调用readObject方法，所以这里可以作为反序列化的入口点  工具类Tools，负责base64编码、解码，序列化、反序列化  工具类ToStringBean，调
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-02-07 10:53" pubdate>
+              2025-02-07
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/JAVA/" class="category-chain-item">JAVA</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/JAVA%E5%AE%89%E5%85%A8/">#JAVA安全</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2025/01/14/JAVA%E5%AE%89%E5%85%A8/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/RMI%E4%B8%93%E9%A2%98-%E6%94%BB%E5%87%BB%E7%AF%87/" target="_self">
           JAVA反序列化-RMI攻击篇
         </a>
@@ -646,189 +829,6 @@
             <i class="iconfont icon-tags"></i>
             
               <a href="/tags/%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7/">#奇技淫巧</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/07/03/%E5%86%85%E7%BD%91%E5%AE%89%E5%85%A8/%E5%88%A9%E7%94%A8FRP%E5%AE%9E%E7%8E%B0cobalt%20strike%E6%9C%AC%E5%9C%B0%E4%B8%8A%E7%BA%BF/" target="_self">
-          用FRP实现Cobalt Strike本地上线
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/03/%E5%86%85%E7%BD%91%E5%AE%89%E5%85%A8/%E5%88%A9%E7%94%A8FRP%E5%AE%9E%E7%8E%B0cobalt%20strike%E6%9C%AC%E5%9C%B0%E4%B8%8A%E7%BA%BF/" target="_self">
-        <div>
-          前言如果将Cobalt Strike部署在VPS上，长期使用VPS会被标记。另外，大家使用的一般是破解版，不能确保没有后门之类的东西。那可以将CS部署在虚拟机里，利用FRP转发上线。 比如现在有三个角色：公网服务器：41.24.10.40      CS服务器：192.168.73.98（虚拟机里）      靶机：192.168.112.130(可以访问公网) 实现步骤在公网服务器上frp绑定端
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-07-03 21:34" pubdate>
-              2024-07-03
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E5%86%85%E7%BD%91%E5%AE%89%E5%85%A8/" class="category-chain-item">内网安全</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E5%86%85%E7%BD%91%E5%AE%89%E5%85%A8/">#内网安全</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/06/09/JAVA%E5%AE%89%E5%85%A8/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/Shiro550/" target="_self">
-          Java反序列化Shiro 550分析
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/06/09/JAVA%E5%AE%89%E5%85%A8/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/Shiro550/" target="_self">
-        <div>
-          漏洞简介影响版本：Shiro &lt;&#x3D; 1.2.4 漏洞根本原因:固定key加密 Shiro特征：返回包中包含rememberMe&#x3D;deleteMe字段。 Shiro框架提供了记住密码的功能（RememberMe），用户登录成功后会生成经过加密并编码的cookie。在服务端对rememberMe的cookie值，先base64解码然后AES解密再反序列化，就导致了反序列化RC
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-06-09 14:44" pubdate>
-              2024-06-09
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/JAVA/" class="category-chain-item">JAVA</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/JAVA%E5%AE%89%E5%85%A8/">#JAVA安全</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/06/08/JAVA%E5%AE%89%E5%85%A8/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/CB%E9%93%BE/" target="_self">
-          Java反序列化CommonsBeanutils链
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/06/08/JAVA%E5%AE%89%E5%85%A8/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/CB%E9%93%BE/" target="_self">
-        <div>
-          前言 CommonsBeanutils属于Apache Commons 工具集下的一个项目，它和Commons-Collections很像，也是对JAVA内置功能的加强，CC是对JAVA集合类的增强，CB是对JavaBean的加强。 环境搭建1234567&lt;dependencies&gt;       &lt;dependency&gt;           &lt;groupId&gt;c
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-06-08 00:11" pubdate>
-              2024-06-08
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/JAVA/" class="category-chain-item">JAVA</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/JAVA%E5%AE%89%E5%85%A8/">#JAVA安全</a>
             
           </div>
         
