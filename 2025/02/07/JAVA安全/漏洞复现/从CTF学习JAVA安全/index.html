@@ -32,14 +32,14 @@
 <meta property="og:image" content="https://image.sp4rks.xyz/2025/02/image-20250206112934536.png">
 <meta property="og:image" content="https://image.sp4rks.xyz/2025/02/image-20250206142513497.png">
 <meta property="og:image" content="https://image.sp4rks.xyz/2025/02/image-20250206200359967.png">
-<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250218141820791.png">
-<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250218144304130.png">
-<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250219002819532.png">
-<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250218234830492.png">
-<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250218172315694.png">
-<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250218172759801.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/02/image-20250218141820791.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/02/image-20250218144304130.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/02/image-20250219002819532.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/02/image-20250218234830492.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/02/image-20250218172315694.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/02/image-20250218172759801.png">
 <meta property="article:published_time" content="2025-02-07T02:53:56.119Z">
-<meta property="article:modified_time" content="2025-02-19T05:25:18.709Z">
+<meta property="article:modified_time" content="2025-02-19T08:34:50.855Z">
 <meta property="article:author" content="Sp4rks3">
 <meta property="article:tag" content="JAVA安全">
 <meta name="twitter:card" content="summary_large_image">
@@ -319,21 +319,21 @@
 <p>这题主要考察 <strong>反序列化</strong>、<strong>类加载</strong>、<strong>字节码执行</strong>，另外组长的视频适合反复观看<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV16h411z7o9?spm_id_from=333.788.videopod.episodes&vd_source=d195054a6a081ba07486dcc86c6ba707&p=4">Java反序列化漏洞专题-基础篇(21&#x2F;09&#x2F;05更新类加载部分)</a></p>
 <h1 id="羊城杯-2020-A-Piece-Of-Java"><a href="#羊城杯-2020-A-Piece-Of-Java" class="headerlink" title="[羊城杯 2020]A Piece Of Java"></a>[羊城杯 2020]A Piece Of Java</h1><h2 id="题目地址-1"><a href="#题目地址-1" class="headerlink" title="题目地址"></a>题目地址</h2><p><a target="_blank" rel="noopener" href="https://buuoj.cn/challenges#[%E7%BE%8A%E5%9F%8E%E6%9D%AF%202020]A%20Piece%20Of%20Java">A Piece Of Java</a></p>
 <h2 id="题目分析-1"><a href="#题目分析-1" class="headerlink" title="题目分析"></a>题目分析</h2><p>把题目的jar添加为项目库，idea就会直接反编译了，先关注路由</p>
-<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250218141820791.png" srcset="/img/loading.gif" lazyload alt="image-20250218141820791"></p>
+<p><img src="https://image.sp4rks.xyz/2025/02/image-20250218141820791.png" srcset="/img/loading.gif" lazyload alt="image-20250218141820791"></p>
 <p>逻辑还是挺简单的：</p>
 <ul>
 <li><code>/index</code>获取参数<code>username、password</code>，将参数赋值给<code>userinfo</code>对象，并将该对象序列化存储到Cookie的data中</li>
 <li><code>/hello</code>获得cookie中的data并反序列化，并调用info.getAllInfo()，将返回的数据显示到hello.html中的<code>info</code>参数</li>
 </ul>
 <p>嗯？那不直接可以CC链打了么？没那么简单，接着我们看重写的deserialize方法，它其实是有限制的</p>
-<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250218144304130.png" srcset="/img/loading.gif" lazyload alt="image-20250218144304130"></p>
+<p><img src="https://image.sp4rks.xyz/2025/02/image-20250218144304130.png" srcset="/img/loading.gif" lazyload alt="image-20250218144304130"></p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-meta">&lt;?xml version=<span class="hljs-string">&quot;1.0&quot;</span> encoding=<span class="hljs-string">&quot;UTF-8&quot;</span>?&gt;</span><br><span class="hljs-comment">&lt;!-- serialkiller.conf --&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">config</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">refresh</span>&gt;</span>6000<span class="hljs-tag">&lt;/<span class="hljs-name">refresh</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">mode</span>&gt;</span><br>        <span class="hljs-comment">&lt;!-- set to &#x27;false&#x27; for blocking mode --&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">profiling</span>&gt;</span>false<span class="hljs-tag">&lt;/<span class="hljs-name">profiling</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">mode</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">blacklist</span>&gt;</span><br><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">blacklist</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">whitelist</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">regexp</span>&gt;</span>gdufs\..*<span class="hljs-tag">&lt;/<span class="hljs-name">regexp</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">regexp</span>&gt;</span>java\.lang\..*<span class="hljs-tag">&lt;/<span class="hljs-name">regexp</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">whitelist</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">config</span>&gt;</span><br></code></pre></td></tr></table></figure>
 
 <p>可以看到白名单，<strong>也就是反序列化的目标收到了限制，只能是白名单中的包下的类才能反序列化</strong>。</p>
 <p>接着调用了Info接口的getAllInfo()方法，实现Info接口的有两个类UserInfo和DatabaseInfo这里UserInfo并没有什么用，我们看DatabaseInfo类，其中有checkAllInfo()方法调用了connect方法，connect()方法使用JDBC连接了数据库，这里就可以考虑JDBC反序列化，也就绕过了上面反序列化的限制。</p>
-<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250219002819532.png" srcset="/img/loading.gif" lazyload alt="image-20250219002819532"></p>
+<p><img src="https://image.sp4rks.xyz/2025/02/image-20250219002819532.png" srcset="/img/loading.gif" lazyload alt="image-20250219002819532"></p>
 <p>问题是如何调用checkAllInfo()方法，题目中还给了个InfoInvocationHandler类它实现了InvocationHandler类，并且**invoke()**方法中调用了checkAllInfo()方法。</p>
-<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250218234830492.png" srcset="/img/loading.gif" lazyload alt="image-20250218234830492"></p>
+<p><img src="https://image.sp4rks.xyz/2025/02/image-20250218234830492.png" srcset="/img/loading.gif" lazyload alt="image-20250218234830492"></p>
 <p>思路就有了，使用动态代理，根据动态代理的特性，代理对象调用任意方法时就会触发<code>invoke()</code>方法。</p>
 <p><strong>调用链</strong></p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">反序列化-&gt;info.getAllinfo()-&gt;(动态代理)InfoInvocationHandler.invoke()-&gt;Databaseinfo.checkAllInfo()-&gt;Databaseinfo-&gt;connect()<br></code></pre></td></tr></table></figure>
@@ -345,8 +345,8 @@
 
 
 
-<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250218172315694.png" srcset="/img/loading.gif" lazyload alt="image-20250218172315694"></p>
-<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250218172759801.png" srcset="/img/loading.gif" lazyload alt="image-20250218172759801"></p>
+<p><img src="https://image.sp4rks.xyz/2025/02/image-20250218172315694.png" srcset="/img/loading.gif" lazyload alt="image-20250218172315694"></p>
+<p><img src="https://image.sp4rks.xyz/2025/02/image-20250218172759801.png" srcset="/img/loading.gif" lazyload alt="image-20250218172759801"></p>
 <h2 id="坑点与总结-1"><a href="#坑点与总结-1" class="headerlink" title="坑点与总结"></a>坑点与总结</h2><p>坑点：做题时，类的包名要和题目jar中的包名一致，不然会导致反序列化找不到类失败。</p>
 <p>题目主要考察对<strong>动态代理</strong>的理解和<strong>JDBC反序列化</strong>，推荐观看组长对动态代理的讲解<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV16h411z7o9?spm_id_from=333.788.videopod.episodes&vd_source=d195054a6a081ba07486dcc86c6ba707&p=3">Java反序列化漏洞专题-基础篇(21&#x2F;09&#x2F;05更新类加载部分)</a></p>
 
