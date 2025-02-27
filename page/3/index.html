@@ -232,6 +232,67 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2024/05/27/JAVA%E5%AE%89%E5%85%A8/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/CC3/" target="_self">
+          Java反序列化CommonsCollections篇-CC3
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/05/27/JAVA%E5%AE%89%E5%85%A8/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/CC3/" target="_self">
+        <div>
+          前言CC1和CC2都是通过反序列化自动执行了object()方法最终导致了InvokerTransformer.transform(Method.invoke())的命令执行，那有没有一种可能，不通过InvokerTransformer.transform(Method.invoke())来进行命令执行？CC3给出了答案，CC3是通过JAVA的动态类加载机制来自动执行恶意类代码。 环境配置 JDK
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-05-27 15:51" pubdate>
+              2024-05-27
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/JAVA/" class="category-chain-item">JAVA</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/JAVA%E5%AE%89%E5%85%A8/">#JAVA安全</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2024/05/25/JAVA%E5%AE%89%E5%85%A8/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/CC6/" target="_self">
           Java反序列化CommonsCollections篇-CC6(最好用的CC链)
         </a>
@@ -423,7 +484,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2024/05/16/JAVA%E5%AE%89%E5%85%A8/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/%E5%8F%8D%E5%B0%84/" target="_self">
         <div>
-          前言学习Java的反射机制是为了理解Apache Commons Collections中的反序列化漏洞做准备的。 反射概念反射是一种间接操作目标对象的机制，允许程序在运行时获取类的信息，并且在运行时动态地创建对象、调用方法、访问字段等等；对于任意一个类都能够知道这个类所有的属性和方法，并且对于任意一个对象，都能够调用它的方法&#x2F;访问属性。  实质就是得到一个Class对象后，反向获取Cl
+          前言学习Java的反射机制是为了理解Apache Commons Collections中的反序列化漏洞做准备的。 反射概念反射是一种间接操作目标对象的机制，允许程序在运行时获取类的信息，并且在运行时动态地创建对象、调用方法、访问字段等等；对于任意一个类都能够知道这个类所有的属性和方法，并且对于任意一个对象，都能够调用它的方法&#x2F;访问属性。  通俗来讲就是先获取一个类的原型，通过这个原型映
         </div>
       </a>
 
