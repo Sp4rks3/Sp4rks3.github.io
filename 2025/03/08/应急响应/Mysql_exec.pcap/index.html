@@ -21,22 +21,33 @@
   <meta name="author" content="Sp4rks3">
   <meta name="keywords" content="博客">
   
-    <meta name="description" content="饿汉式1234567891011public class Singleton &#123;    private static final Singleton instance &#x3D; new Singleton();  &#x2F;&#x2F;用于引用全局唯一的单例对象，在一开始就创建好    private Singleton() &#123;  &#x2F;&#x2F;不允许随便new    &#125;    public stat">
+    <meta name="description" content="题目溯源123451. 攻击者登录mysql失败多少次，提交答案例如：1232. 攻击者执行的第一个命令返回结果是什么？提交的字符串例如：www-data3. 攻击者通过udf提权的方式上传了一个插件，提交该插件的小写md5值4. 该插件被写入到什么位置？提交答案例如：&#x2F;usr&#x2F;lib&#x2F;mysql.elf5. 攻击者窃取了哪些文件？提交的文件名称全小写，并更具小写字母的顺序提交，例如aa.txt-">
 <meta property="og:type" content="article">
-<meta property="og:title" content="创建型-单例模式">
-<meta property="og:url" content="https://sp4rks3.github.io/2024/05/10/JAVA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/index.html">
+<meta property="og:title" content="应急响应实操 mysql_exec">
+<meta property="og:url" content="https://sp4rks3.github.io/2025/03/08/%E5%BA%94%E6%80%A5%E5%93%8D%E5%BA%94/Mysql_exec.pcap/index.html">
 <meta property="og:site_name" content="Sp4rks3&#39;s Blog">
-<meta property="og:description" content="饿汉式1234567891011public class Singleton &#123;    private static final Singleton instance &#x3D; new Singleton();  &#x2F;&#x2F;用于引用全局唯一的单例对象，在一开始就创建好    private Singleton() &#123;  &#x2F;&#x2F;不允许随便new    &#125;    public stat">
+<meta property="og:description" content="题目溯源123451. 攻击者登录mysql失败多少次，提交答案例如：1232. 攻击者执行的第一个命令返回结果是什么？提交的字符串例如：www-data3. 攻击者通过udf提权的方式上传了一个插件，提交该插件的小写md5值4. 该插件被写入到什么位置？提交答案例如：&#x2F;usr&#x2F;lib&#x2F;mysql.elf5. 攻击者窃取了哪些文件？提交的文件名称全小写，并更具小写字母的顺序提交，例如aa.txt-">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-05-10T12:10:07.157Z">
-<meta property="article:modified_time" content="2024-05-12T15:07:28.725Z">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250308230917702.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250308231208569.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250308232438507.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250309135100758.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250308231804540.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250309005532038.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250309135229885.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250309005648396.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250309010429476.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250309010618118.png">
+<meta property="article:published_time" content="2025-03-08T14:53:40.665Z">
+<meta property="article:modified_time" content="2025-03-09T10:38:04.199Z">
 <meta property="article:author" content="Sp4rks3">
-<meta property="article:tag" content="JAVA设计模式">
+<meta property="article:tag" content="蓝队">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://image.sp4rks.xyz/2025/03/image-20250308230917702.png">
   
   
   
-  <title>创建型-单例模式 - Sp4rks3&#39;s Blog</title>
+  <title>应急响应实操 mysql_exec - Sp4rks3&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -202,7 +213,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="创建型-单例模式"></span>
+            <span id="subtitle" data-typed-text="应急响应实操 mysql_exec"></span>
           
         </div>
 
@@ -213,8 +224,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-05-10 20:10" pubdate>
-          2024年5月10日 晚上
+        <time datetime="2025-03-08 22:53" pubdate>
+          2025年3月8日 晚上
         </time>
       </span>
     
@@ -225,7 +236,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          467 字
+          679 字
         
       </span>
     
@@ -236,7 +247,7 @@
         
         
         
-          4 分钟
+          6 分钟
         
       </span>
     
@@ -273,30 +284,43 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">创建型-单例模式</h1>
+            <h1 id="seo-header">应急响应实操 mysql_exec</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="饿汉式"><a href="#饿汉式" class="headerlink" title="饿汉式"></a>饿汉式</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Singleton</span> &#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Singleton</span> <span class="hljs-variable">instance</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Singleton</span>();  <span class="hljs-comment">//用于引用全局唯一的单例对象，在一开始就创建好</span><br><br>    <span class="hljs-keyword">private</span> <span class="hljs-title function_">Singleton</span><span class="hljs-params">()</span> &#123;  <span class="hljs-comment">//不允许随便new</span><br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title function_">getInstance</span><span class="hljs-params">()</span> &#123;   <span class="hljs-comment">//获取全局唯一的单例对象</span><br>        <span class="hljs-keyword">return</span> instance;<br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+                <h1 id="题目溯源"><a href="#题目溯源" class="headerlink" title="题目溯源"></a>题目溯源</h1><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml">1. 攻击者登录mysql失败多少次，提交答案例如：123<br>2. 攻击者执行的第一个命令返回结果是什么？提交的字符串例如：www-data<br>3. 攻击者通过udf提权的方式上传了一个插件，提交该插件的小写md5值<br>4. 该插件被写入到什么位置？提交答案例如：/usr/lib/mysql.elf<br>5. 攻击者窃取了哪些文件？提交的文件名称全小写，并更具小写字母的顺序提交，例如aa.txt-ab.txt-aa.txt<br></code></pre></td></tr></table></figure>
 
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Main</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        <span class="hljs-type">Singleton</span> <span class="hljs-variable">instance</span> <span class="hljs-operator">=</span> Singleton.getInstance();<br>        System.out.println(instance);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="攻击者登录mysql失败多少次？"><a href="#攻击者登录mysql失败多少次？" class="headerlink" title="攻击者登录mysql失败多少次？"></a>攻击者登录mysql失败多少次？</h2><p>溯源其实就是找特征的过程。发现登录失败的包都有Error Code，直接过滤就好。</p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250308230917702.png" srcset="/img/loading.gif" lazyload alt="image-20250308230917702"></p>
+<h2 id="攻击者执行的第一个命令返回结果是什么？"><a href="#攻击者执行的第一个命令返回结果是什么？" class="headerlink" title="攻击者执行的第一个命令返回结果是什么？"></a>攻击者执行的第一个命令返回结果是什么？</h2><p>小知识：一个竖线包含的就是同一个会话。</p>
+<p>题目的问题其实就是就是找udf返回的结果是什么，我们直接跟踪流，最终我们在最长的这个会话发现了异常。</p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250308231208569.png" srcset="/img/loading.gif" lazyload alt="image-20250308231208569"></p>
+<p>把so文件写入到 &#x2F;usr&#x2F;local&#x2F;mysql&#x2F;lib&#x2F;plugin，后面还有自定义函数sys_eval</p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250308232438507.png" srcset="/img/loading.gif" lazyload alt="image-20250308232438507"></p>
+<p>把16进制解码一下就能看到执行的命令</p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250309135100758.png" srcset="/img/loading.gif" lazyload alt="image-20250309135100758"></p>
+<h2 id="攻击者通过udf提权的方式上传了一个插件，提交该插件的小写md5值。"><a href="#攻击者通过udf提权的方式上传了一个插件，提交该插件的小写md5值。" class="headerlink" title="攻击者通过udf提权的方式上传了一个插件，提交该插件的小写md5值。"></a>攻击者通过udf提权的方式上传了一个插件，提交该插件的小写md5值。</h2><p>还是在这个流里面，0x7f454c46表明存入的是一个 ELF 可执行文件的二进制数据。可以看到这个插件是分段传输的</p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250308231804540.png" srcset="/img/loading.gif" lazyload alt="image-20250308231804540"></p>
+<p>根据数据包的特征，我们可以用这个语法过滤所有的包，mysql contains “sqlmapfile” &amp;&amp; mysql contains “0x”</p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250309005532038.png" srcset="/img/loading.gif" lazyload alt="image-20250309005532038"></p>
+<p>用python脚本复原即可</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> pyshark<br><span class="hljs-keyword">import</span> re<br><span class="hljs-keyword">import</span> binascii<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">extract_mysql_hex_data</span>(<span class="hljs-params">pcap_file</span>):<br>    display_filter = <span class="hljs-string">&#x27;mysql contains &quot;sqlmapfile&quot; &amp;&amp; mysql contains &quot;0x&quot;&#x27;</span><br>    cap = pyshark.FileCapture(pcap_file, display_filter=display_filter)<br>    hex_pattern = re.<span class="hljs-built_in">compile</span>(<span class="hljs-string">r&quot;0x([0-9a-fA-F]+)&quot;</span>)<br>    hex_data = <span class="hljs-string">&quot;&quot;</span><br><br>    <span class="hljs-keyword">for</span> packet <span class="hljs-keyword">in</span> cap:<br>        <span class="hljs-keyword">if</span> <span class="hljs-string">&#x27;MYSQL&#x27;</span> <span class="hljs-keyword">in</span> packet:<br>            mysql_data = <span class="hljs-built_in">str</span>(packet[<span class="hljs-string">&#x27;mysql&#x27;</span>].query)<br>            matches = hex_pattern.findall(mysql_data)<br>            <span class="hljs-keyword">for</span> <span class="hljs-keyword">match</span> <span class="hljs-keyword">in</span> matches:<br>                hex_data += <span class="hljs-keyword">match</span><br>    <br>    <span class="hljs-keyword">return</span> hex_data<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">main</span>():<br>    pcap_file = <span class="hljs-built_in">input</span>(<span class="hljs-string">&quot;请输入PCAP文件路径: &quot;</span>)<br>    hex_data = extract_mysql_hex_data(pcap_file)<br>    <br>    <span class="hljs-keyword">if</span> hex_data:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;提取的十六进制数据: <span class="hljs-subst">&#123;hex_data&#125;</span>&quot;</span>)<br>        save_option = <span class="hljs-built_in">input</span>(<span class="hljs-string">&quot;是否保存为文件？(y/n): &quot;</span>)<br>        <span class="hljs-keyword">if</span> save_option.lower() == <span class="hljs-string">&#x27;y&#x27;</span>:<br>            output_file = <span class="hljs-built_in">input</span>(<span class="hljs-string">&quot;请输入要保存的文件名（如 recovered_udf.so）: &quot;</span>)<br>            binary_data = binascii.unhexlify(hex_data)<br>            <span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(output_file, <span class="hljs-string">&quot;wb&quot;</span>) <span class="hljs-keyword">as</span> udf_file:<br>                udf_file.write(binary_data)<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;UDF .so 插件已成功保存为 <span class="hljs-subst">&#123;output_file&#125;</span>&quot;</span>)<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;未保存文件。&quot;</span>)<br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;没有提取到有效的十六进制数据。&quot;</span>)<br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    main()<br></code></pre></td></tr></table></figure>
+
+
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs dns">ab27f6c7634e9efc13fb2db<span class="hljs-number">29216a0a8</span><br></code></pre></td></tr></table></figure>
 
 
 
-<h2 id="懒汉式"><a href="#懒汉式" class="headerlink" title="懒汉式"></a>懒汉式</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Singleton</span> &#123;<br>    <br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Singleton instance;  <span class="hljs-comment">//在一开始不创建对象</span><br><br>    <span class="hljs-keyword">private</span> <span class="hljs-title function_">Singleton</span><span class="hljs-params">()</span> &#123;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title function_">getInstance</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">if</span> (instance == <span class="hljs-literal">null</span>) &#123;  <span class="hljs-comment">//如果实例为空就创建</span><br>            instance = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Singleton</span>();<br>        &#125;<br>        <span class="hljs-keyword">return</span> instance;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>但是这种方法有种缺陷，由于懒汉式在方法中进行初始化，在多线程的环境下，可能会出现问题。</p>
-<h3 id="懒汉式-改进"><a href="#懒汉式-改进" class="headerlink" title="懒汉式-改进"></a>懒汉式-改进</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Singleton</span> &#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Singleton instance;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-title function_">Singleton</span><span class="hljs-params">()</span> &#123;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title function_">getInstance</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">if</span> (instance == <span class="hljs-literal">null</span>) &#123;<br>            <span class="hljs-keyword">synchronized</span> (Singleton.class) &#123;<br>                instance = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Singleton</span>();<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> instance;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>但是这种效率比较低，只能又一个线程能进入同步块，其他的必须要等待</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Singleton</span> &#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">volatile</span> Singleton instance;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-title function_">Singleton</span><span class="hljs-params">()</span> &#123;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title function_">getInstance</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">if</span> (instance == <span class="hljs-literal">null</span>) &#123;<br>            <span class="hljs-keyword">synchronized</span> (Singleton.class) &#123;<br>                <span class="hljs-keyword">if</span> (instance == <span class="hljs-literal">null</span>) &#123;<br>                    instance = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Singleton</span>();  <span class="hljs-comment">//双重检查</span><br>                &#125;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> instance;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>双重检查可以确保在多线程环境下也能保持单例的唯一性，同时尽可能地减少了同步的开销。</p>
-<h3 id="JAVA特有的写法"><a href="#JAVA特有的写法" class="headerlink" title="JAVA特有的写法"></a>JAVA特有的写法</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Singleton</span> &#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-title function_">Singleton</span><span class="hljs-params">()</span> &#123;<br>    &#125;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SingletonHolder</span> &#123;  <span class="hljs-comment">//由静态内部类持有单例对象，根据类加载的特性，仅使用Singleton类时，不会对静态内部类进行初始化</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Singleton</span> <span class="hljs-variable">INSTANCE</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Singleton</span>();<br>    &#125;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title function_">getInstance</span><span class="hljs-params">()</span> &#123; <span class="hljs-comment">//只有真正使用内部类时，才会进行类初始化</span><br>        <span class="hljs-keyword">return</span> SingletonHolder.INSTANCE;<br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>在Java中，静态内部类在被使用之前是不会被初始化的，这是由类加载器的工作原理决定的。</p>
-<p>当程序第一次访问静态内部类 <code>SingletonHolder</code> 时，JVM 会加载 <code>SingletonHolder</code> 类。这个加载过程是延迟的，只有在真正需要使用 <code>SingletonHolder</code> 类时才会触发。所以，即使 <code>Singleton</code> 类被加载了，但是不会导致 <code>SingletonHolder</code> 类被加载，也就不会创建单例对象。</p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250309135229885.png" srcset="/img/loading.gif" lazyload alt="image-20250309135229885"></p>
+<h2 id="该插件被写入到什么位置？"><a href="#该插件被写入到什么位置？" class="headerlink" title="该插件被写入到什么位置？"></a>该插件被写入到什么位置？</h2><p>查看流即可</p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250309005648396.png" srcset="/img/loading.gif" lazyload alt="image-20250309005648396"></p>
+<h2 id="攻击者窃取了哪些文件？"><a href="#攻击者窃取了哪些文件？" class="headerlink" title="攻击者窃取了哪些文件？"></a>攻击者窃取了哪些文件？</h2><p>查看流即可</p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250309010429476.png" srcset="/img/loading.gif" lazyload alt="image-20250309010429476"></p>
+<p>原来还有一个题目 数据库的第一个用户的登录密码是多少？</p>
+<p>这里出题失误，不能解密这个密码，不过无伤大雅。</p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250309010618118.png" srcset="/img/loading.gif" lazyload alt="image-20250309010618118"></p>
+<h1 id="参考连接"><a href="#参考连接" class="headerlink" title="参考连接"></a>参考连接</h1><p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1gd9yYQEKs/?spm_id_from=333.1387.homepage.video_card.click&vd_source=d195054a6a081ba07486dcc86c6ba707">第一期Mysql_exec.pcap题解</a></p>
 
                 
               </div>
@@ -315,7 +339,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/JAVA/" class="category-chain-item">JAVA</a>
+  <a href="/categories/%E5%BA%94%E6%80%A5%E5%93%8D%E5%BA%94/" class="category-chain-item">应急响应</a>
   
   
 
@@ -330,7 +354,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/JAVA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" class="print-no-link">#JAVA设计模式</a>
+        <a href="/tags/%E8%93%9D%E9%98%9F/" class="print-no-link">#蓝队</a>
       
     </div>
   
@@ -342,8 +366,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>创建型-单例模式</div>
-      <div>https://sp4rks3.github.io/2024/05/10/JAVA设计模式/单例模式/</div>
+      <div>应急响应实操 mysql_exec</div>
+      <div>https://sp4rks3.github.io/2025/03/08/应急响应/Mysql_exec.pcap/</div>
     </div>
     <div class="license-meta">
       
@@ -355,7 +379,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年5月10日</div>
+          <div>2025年3月8日</div>
         </div>
       
       
@@ -387,18 +411,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/05/16/JAVA%E5%AE%89%E5%85%A8/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/%E5%8F%8D%E5%B0%84/" title="反射">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">反射</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/05/09/JAVA%E5%AE%89%E5%85%A8/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/URLDNS%E9%93%BE/" title="RULDNS链">
-                        <span class="hidden-mobile">RULDNS链</span>
+                      <a href="/2025/02/19/JAVA%E5%AE%89%E5%85%A8/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/SPEL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5/" title="SPEL表达式注入">
+                        <span class="hidden-mobile">SPEL表达式注入</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
