@@ -1,0 +1,738 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Sp4rks3">
+  <meta name="keywords" content="博客">
+  
+    <meta name="description" content="前言漏洞方面没有什么好聊的，都是nday，信息收集方面可以参考参考。 网站框架是shopxo 1.7.0 开源的，2019版本，很老了属于是。 网上公开的主要是两个利用方式：  任意文件下载 进后台getshell   信息收集根据公开的后台地址，找不到后台，怀疑是他们的项目后台地址改了。那就只能先利用任意文件下载看看能不能找到一些数据库配置之类的东西。  利用任意文件下载获取配置对于thinkp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="简单信息收集即可(全是运气)">
+<meta property="og:url" content="https://sp4rks3.github.io/2025/05/11/%E6%B8%97%E9%80%8F%E5%AE%9E%E6%88%98/%E7%AE%80%E5%8D%95%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86%E5%8D%B3%E5%8F%AF(%E5%85%A8%E6%98%AF%E8%BF%90%E6%B0%94)/index.html">
+<meta property="og:site_name" content="Sp4rks3&#39;s Blog">
+<meta property="og:description" content="前言漏洞方面没有什么好聊的，都是nday，信息收集方面可以参考参考。 网站框架是shopxo 1.7.0 开源的，2019版本，很老了属于是。 网上公开的主要是两个利用方式：  任意文件下载 进后台getshell   信息收集根据公开的后台地址，找不到后台，怀疑是他们的项目后台地址改了。那就只能先利用任意文件下载看看能不能找到一些数据库配置之类的东西。  利用任意文件下载获取配置对于thinkp">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/05/image-20250511002452119.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/05/image-20250510214535317.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/05/image-20250507164023145.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/05/image-20250510215243603.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/05/image-20250510215333052.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/05/image-20250508115256988.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/05/image-20250508191054373.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/05/image-20250511002832220.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/05/image-20250508192348510.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/05/image-20250508192422014.png">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/05/image-20250508191746446.png">
+<meta property="article:published_time" content="2025-05-10T16:39:03.503Z">
+<meta property="article:modified_time" content="2025-05-10T17:23:34.959Z">
+<meta property="article:author" content="Sp4rks3">
+<meta property="article:tag" content="HC测试">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://image.sp4rks.xyz/2025/05/image-20250511002452119.png">
+  
+  
+  
+  <title>简单信息收集即可(全是运气) - Sp4rks3&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"sp4rks3.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":false},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Sp4rks3&#39;blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="简单信息收集即可(全是运气)"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-05-11 00:39" pubdate>
+          2025年5月11日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          579 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          5 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">简单信息收集即可(全是运气)</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>漏洞方面没有什么好聊的，都是nday，信息收集方面可以参考参考。</p>
+<p>网站框架是shopxo 1.7.0 开源的，2019版本，很老了属于是。</p>
+<p>网上公开的主要是两个利用方式：</p>
+<ul>
+<li>任意文件下载</li>
+<li>进后台getshell</li>
+</ul>
+<p><img src="https://image.sp4rks.xyz/2025/05/image-20250511002452119.png" srcset="/img/loading.gif" lazyload alt="image-20250511002452119"></p>
+<h1 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h1><p>根据公开的后台地址，找不到后台，怀疑是他们的项目后台地址改了。那就只能先利用任意文件下载看看能不能找到一些数据库配置之类的东西。</p>
+<p><img src="https://image.sp4rks.xyz/2025/05/image-20250510214535317.png" srcset="/img/loading.gif" lazyload alt="image-20250510214535317"></p>
+<h1 id="利用任意文件下载获取配置"><a href="#利用任意文件下载获取配置" class="headerlink" title="利用任意文件下载获取配置"></a>利用任意文件下载获取配置</h1><p>对于thinkphp数据库的配置文件通常位于</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">application/database.php<br>application/config/database.php<br>config/database.php<br></code></pre></td></tr></table></figure>
+
+<p>找半天config文件没有数据库相关的配置，我就想是不是没有上传到 github，果然</p>
+<p><img src="https://image.sp4rks.xyz/2025/05/image-20250507164023145.png" srcset="/img/loading.gif" lazyload alt="image-20250507164023145"></p>
+<p>继续尝试下载路径</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs abnf"><span class="hljs-attribute">s</span><span class="hljs-operator">=/</span>index/qrcode/download/url/Li4vY29uZmlnL2RhdGFiYXNlLnBocA<span class="hljs-operator">=</span><span class="hljs-operator">=</span><br></code></pre></td></tr></table></figure>
+
+<p>数据库拿下</p>
+<p><img src="https://image.sp4rks.xyz/2025/05/image-20250510215243603.png" srcset="/img/loading.gif" lazyload alt="image-20250510215243603"></p>
+<p><img src="https://image.sp4rks.xyz/2025/05/image-20250510215333052.png" srcset="/img/loading.gif" lazyload alt="image-20250510215333052"></p>
+<p>其实第一天到这就结束了，找后台找半天没找到，但拿下数据库当然还是想拿下shell，只能从后台入手。</p>
+<h1 id="quake的妙用"><a href="#quake的妙用" class="headerlink" title="quake的妙用"></a>quake的妙用</h1><p>对于后台的地址 title:”xxx管理后台”，虽然不一定能访问到后台，但是http响应还是可能会留一些信息。</p>
+<p><img src="https://image.sp4rks.xyz/2025/05/image-20250508115256988.png" srcset="/img/loading.gif" lazyload alt="image-20250508115256988"></p>
+<p>后台都是默认账号密码，进后台就直接拿下旁站</p>
+<p><img src="https://image.sp4rks.xyz/2025/05/image-20250508191054373.png" srcset="/img/loading.gif" lazyload alt="image-20250508191054373"></p>
+<h1 id="对主站的渗透尝试"><a href="#对主站的渗透尝试" class="headerlink" title="对主站的渗透尝试"></a>对主站的渗透尝试</h1><p>同样存在任意文件下载漏洞，但主站没有开放 3306，拿到账号密码也登陆不了。</p>
+<p><img src="https://image.sp4rks.xyz/2025/05/image-20250511002832220.png" srcset="/img/loading.gif" lazyload alt="image-20250511002832220"></p>
+<p>只能从后台方面入手，后台路径还是和旁站的一样</p>
+<p>这里有个坑，假如使用https:&#x2F;&#x2F;访问(浏览器默认https)，就算你账号密码是对的，也登陆不进去，显示非法访问。 (根据这个站的特性，我最开始是以为密码错了就提示这个，最后发现不是)</p>
+<p><img src="https://image.sp4rks.xyz/2025/05/image-20250508192348510.png" srcset="/img/loading.gif" lazyload alt="image-20250508192348510"></p>
+<p>换成http就好了</p>
+<p><img src="https://image.sp4rks.xyz/2025/05/image-20250508192422014.png" srcset="/img/loading.gif" lazyload alt="image-20250508192422014"></p>
+<p>但是后台密码不是默认账号密码，暴力破解了一下，网站有waf，G。</p>
+<p>正愁呢，怎么进去，记得我们刚刚拿下的那个数据库么？虽然不是主站的数据库(主站和旁站不是一个数据库)，但是我们有合理的理由怀疑账户是相通的。但是密码用md5解也解不开啊。</p>
+<p><img src="https://image.sp4rks.xyz/2025/05/image-20250508191746446.png" srcset="/img/loading.gif" lazyload alt="image-20250508191746446"></p>
+<p>6，这运气也是，遗憾的是后台权限不够不能拿shell 。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/" class="category-chain-item">渗透测试</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/HC%E6%B5%8B%E8%AF%95/" class="print-no-link">#HC测试</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>简单信息收集即可(全是运气)</div>
+      <div>https://sp4rks3.github.io/2025/05/11/渗透实战/简单信息收集即可(全是运气)/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Sp4rks3</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年5月11日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/05/11/%E6%B8%97%E9%80%8F%E5%AE%9E%E6%88%98/%E4%B8%80%E6%AC%A1%E9%92%88%E5%AF%B9SqlServer%E7%9A%84%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/" title="一次针对SqlServer的渗透测试">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">一次针对SqlServer的渗透测试</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/05/01/%E5%A4%A7%E5%B8%88%E4%B9%8B%E8%B7%AF/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C-Initial/" title="春秋云镜-Initial">
+                        <span class="hidden-mobile">春秋云镜-Initial</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+    <div id="giscus" class="giscus"></div>
+    <script type="text/javascript">
+      Fluid.utils.loadComments('#giscus', function() {
+        var options = {"repo":"Sp4rks3/Sp4rks3.github.io","repo-id":"R_kgDOL2R4Xw","category":"Announcements","category-id":"DIC_kwDOL2R4X84ChqtT","theme-light":"light","theme-dark":"dark","mapping":"pathname","reactions-enabled":1,"emit-metadata":0,"input-position":"top","lang":"zh-CN"};
+        var attributes = {};
+        for (let option in options) {
+          if (!option.startsWith('theme-')) {
+            var key = option.startsWith('data-') ? option : 'data-' + option;
+            attributes[key] = options[option];
+          }
+        }
+        var light = 'light';
+        var dark = 'dark';
+        window.GiscusThemeLight = light;
+        window.GiscusThemeDark = dark;
+        attributes['data-theme'] = document.documentElement.getAttribute('data-user-color-scheme') === 'dark' ? dark : light;
+        for (let attribute in attributes) {
+          var value = attributes[attribute];
+          if (value === undefined || value === null || value === '') {
+            delete attributes[attribute];
+          }
+        }
+        var s = document.createElement('script');
+        s.setAttribute('src', 'https://giscus.app/client.js');
+        s.setAttribute('crossorigin', 'anonymous');
+        for (let attribute in attributes) {
+          s.setAttribute(attribute, attributes[attribute]);
+        }
+        var ss = document.getElementsByTagName('script');
+        var e = ss.length > 0 ? ss[ss.length - 1] : document.head || document.documentElement;
+        e.parentNode.insertBefore(s, e.nextSibling);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

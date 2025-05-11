@@ -21,12 +21,12 @@
   <meta name="author" content="Sp4rks3">
   <meta name="keywords" content="博客">
   
-    <meta name="description" content="前言去年8月就在星球看到ABU师傅发solon内存马了，直到现在才准备看一下。结果发现确实简单，真的属于是最适合年轻人的第一个内存马。并且我发现官网demo中有Freemarker依赖，正好可以写一个漏洞环境。 简介Solon是一个高性能的Java应用开发框架，它具有轻量级、易于使用、高性能和可扩展等特点。 Solon请求处理过程示意图如下所示，Web处理会经过四个路段：过滤器(Filter) -">
+    <meta name="description" content="前言去年8月就在星球看到ABU师傅发solon内存马了，貌似没有看到有师傅实现哥斯拉内存马，直到现在才准备看一下。结果发现确实简单，真的属于是最适合年轻人的第一个内存马。并且我发现官网demo中有Freemarker依赖，正好可以写一个漏洞环境。 简介Solon是一个高性能的Java应用开发框架，它具有轻量级、易于使用、高性能和可扩展等特点。 Solon请求处理过程示意图如下所示，Web处理会经过">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Solon 哥斯拉内存马(最适合年轻人的第一个内存马)">
 <meta property="og:url" content="https://sp4rks3.github.io/2025/04/21/JAVA%E5%AE%89%E5%85%A8/%E5%86%85%E5%AD%98%E9%A9%AC/Solon%E5%86%85%E5%AD%98%E9%A9%AC%E5%88%86%E6%9E%90/index.html">
 <meta property="og:site_name" content="Sp4rks3&#39;s Blog">
-<meta property="og:description" content="前言去年8月就在星球看到ABU师傅发solon内存马了，直到现在才准备看一下。结果发现确实简单，真的属于是最适合年轻人的第一个内存马。并且我发现官网demo中有Freemarker依赖，正好可以写一个漏洞环境。 简介Solon是一个高性能的Java应用开发框架，它具有轻量级、易于使用、高性能和可扩展等特点。 Solon请求处理过程示意图如下所示，Web处理会经过四个路段：过滤器(Filter) -">
+<meta property="og:description" content="前言去年8月就在星球看到ABU师傅发solon内存马了，貌似没有看到有师傅实现哥斯拉内存马，直到现在才准备看一下。结果发现确实简单，真的属于是最适合年轻人的第一个内存马。并且我发现官网demo中有Freemarker依赖，正好可以写一个漏洞环境。 简介Solon是一个高性能的Java应用开发框架，它具有轻量级、易于使用、高性能和可扩展等特点。 Solon请求处理过程示意图如下所示，Web处理会经过">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://image.sp4rks.xyz/2025/04/9e9e9246d996491f80a83a38e9e7f575.png">
 <meta property="og:image" content="https://image.sp4rks.xyz/2025/04/Snipaste_2025-04-21_16-21-066.png">
@@ -39,7 +39,7 @@
 <meta property="og:image" content="https://image.sp4rks.xyz/2025/04/image-20250421163726807.png">
 <meta property="og:image" content="https://image.sp4rks.xyz/2025/04/image-20250421163759698.png">
 <meta property="article:published_time" content="2025-04-21T10:01:49.049Z">
-<meta property="article:modified_time" content="2025-04-21T13:54:32.481Z">
+<meta property="article:modified_time" content="2025-04-22T03:16:25.417Z">
 <meta property="article:author" content="Sp4rks3">
 <meta property="article:tag" content="JAVA内存马">
 <meta name="twitter:card" content="summary_large_image">
@@ -247,7 +247,7 @@
         
         
         
-          19 分钟
+          20 分钟
         
       </span>
     
@@ -289,11 +289,11 @@
             
               <div class="markdown-body">
                 
-                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>去年8月就在星球看到ABU师傅发solon内存马了，直到现在才准备看一下。结果发现确实简单，真的属于是最适合年轻人的第一个内存马。并且我发现官网demo中有Freemarker依赖，正好可以写一个漏洞环境。</p>
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>去年8月就在星球看到ABU师傅发solon内存马了，貌似没有看到有师傅实现哥斯拉内存马，直到现在才准备看一下。结果发现确实简单，真的属于是最适合年轻人的第一个内存马。并且我发现官网demo中有Freemarker依赖，正好可以写一个漏洞环境。</p>
 <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>Solon是一个<strong>高性能的Java应用开发框架</strong>，它具有轻量级、易于使用、高性能和可扩展等特点。</p>
 <p>Solon请求处理过程示意图如下所示，Web处理会经过四个路段：过滤器(Filter) -&gt; 路由拦截器(RouterInterceptor) -&gt; 处理器(Handler) -&gt; 拦截器(Interceptor)。</p>
 <p><img src="https://image.sp4rks.xyz/2025/04/9e9e9246d996491f80a83a38e9e7f575.png" srcset="/img/loading.gif" lazyload alt="9e9e9246d996491f80a83a38e9e7f575"></p>
-<h1 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h1><p>利用官网给出的项目模板搭建即可，<a target="_blank" rel="noopener" href="https://solon.noear.org/article/learn-quickstart">https://solon.noear.org/article/learn-quickstart</a>  。然后我们写一个有freemarker解析漏洞的controller，用来后面实例化我们的内存马。</p>
+<h1 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h1><p>利用官网给出的项目模板搭建即可，<a target="_blank" rel="noopener" href="https://solon.noear.org/article/learn-quickstart">https://solon.noear.org/article/learn-quickstart</a>  。然后我们写一个有freemarker ssti漏洞的controller，用来后面实例化我们的内存马。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.example.demo;<br><br><span class="hljs-keyword">import</span> freemarker.cache.StringTemplateLoader;<br><span class="hljs-keyword">import</span> freemarker.template.Configuration;<br><span class="hljs-keyword">import</span> freemarker.template.Template;<br><span class="hljs-keyword">import</span> freemarker.template.TemplateException;<br><span class="hljs-keyword">import</span> org.noear.solon.annotation.Controller;<br><span class="hljs-keyword">import</span> org.noear.solon.annotation.Mapping;<br><span class="hljs-keyword">import</span> org.noear.solon.annotation.Param;<br><span class="hljs-keyword">import</span> org.noear.solon.core.handle.ModelAndView;<br><br><span class="hljs-keyword">import</span> java.io.IOException;<br><span class="hljs-keyword">import</span> java.io.StringWriter;<br><span class="hljs-keyword">import</span> java.util.HashMap;<br><span class="hljs-keyword">import</span> java.util.Map;<br><br><span class="hljs-meta">@Controller</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">DemoController</span> &#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Configuration cfg;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> StringTemplateLoader templateLoader;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-title function_">DemoController</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-built_in">this</span>.cfg = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Configuration</span>(Configuration.VERSION_2_3_30);<br>        <span class="hljs-built_in">this</span>.templateLoader = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringTemplateLoader</span>();<br>        cfg.setTemplateLoader(templateLoader);<br>    &#125;<br><br><br>    <span class="hljs-meta">@Mapping(&quot;/hello&quot;)</span><br>    <span class="hljs-keyword">public</span> String <span class="hljs-title function_">hello</span><span class="hljs-params">(<span class="hljs-meta">@Param(defaultValue = &quot;world&quot;)</span> String name)</span> &#123;<br>        <span class="hljs-keyword">return</span> String.format(<span class="hljs-string">&quot;Hello %s!&quot;</span>, name);<br>    &#125;<br>    <br>    <span class="hljs-meta">@Mapping(&quot;/hello2&quot;)</span><br>    <span class="hljs-keyword">public</span> ModelAndView <span class="hljs-title function_">hello2</span><span class="hljs-params">(<span class="hljs-meta">@Param(defaultValue = &quot;world&quot;)</span> String name)</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ModelAndView</span>(<span class="hljs-string">&quot;hello2.ftl&quot;</span>).put(<span class="hljs-string">&quot;name&quot;</span>, name);<br>    &#125;<br><br><br>    <span class="hljs-meta">@Mapping(&quot;/vuln&quot;)</span><br>    <span class="hljs-keyword">public</span> String <span class="hljs-title function_">renderTemplate</span><span class="hljs-params">(<span class="hljs-meta">@Param</span> String template)</span> <span class="hljs-keyword">throws</span> TemplateException, IOException &#123;<br>        <span class="hljs-comment">// 检查模板是否为 null</span><br>        <span class="hljs-keyword">if</span> (template == <span class="hljs-literal">null</span>) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalArgumentException</span>(<span class="hljs-string">&quot;Template content cannot be null&quot;</span>);<br>        &#125;<br><br>        <span class="hljs-comment">// 将用户输入的模板存入 TemplateLoader</span><br>        <span class="hljs-type">String</span> <span class="hljs-variable">templateName</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;userTemplate&quot;</span>;<br>        templateLoader.putTemplate(templateName, template);<br><br>        <span class="hljs-comment">// 通过 TemplateLoader 获取模板</span><br>        <span class="hljs-type">Template</span> <span class="hljs-variable">freemarkerTemplate</span> <span class="hljs-operator">=</span> cfg.getTemplate(templateName);<br><br>        Map&lt;String, Object&gt; dataModel = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();<br><br>        <span class="hljs-type">StringWriter</span> <span class="hljs-variable">out</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringWriter</span>();<br>        <span class="hljs-comment">// 解析</span><br>        freemarkerTemplate.process(dataModel, out);<br><br>        <span class="hljs-keyword">return</span> out.toString();<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>能正常访问就没问题了。</p>
@@ -426,6 +426,12 @@
                 <div class="post-prevnext my-3">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2025/05/01/%E5%A4%A7%E5%B8%88%E4%B9%8B%E8%B7%AF/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C-Initial/" title="春秋云镜-Initial">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">春秋云镜-Initial</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
